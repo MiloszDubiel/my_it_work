@@ -1,26 +1,62 @@
-.profile{
-    width: 40px;
-    height: 40px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    transition: 0.2s;
-}
-.profile:hover{
-    background-color: rgba(169, 169, 169, 0.247);
+.profile {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: 0.2s;
 }
 .profile > * {
-    font-size: 35px;
-    cursor: pointer;
+  font-size: 35px;
+  cursor: pointer;
 }
-.search{
-    all:unset;
-    display: flex;
+.search {
+  all: unset;
+  display: flex;
 }
-.card{
-    width: 300px;
-    display: flex;
-    justify-content: center;
+.card {
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 75px;
+  right: 5px;
+  border: white 2px solid;
 }
-
-
+.cardShow {
+  display: none;
+}
+.navBar {
+  background-color: rgb(18, 24, 40);
+  border-bottom: white 1px solid;
+}
+.searchField {
+  all: unset;
+  border: white 2px solid;
+  background-color: #dddddd0a;
+  padding-left: 20px;
+  border-radius: 20px;
+}
+.searchField:active {
+  all: unset;
+  border: white 2px solid;
+  background-color: #dddddd0a;
+  padding-left: 20px;
+  border-radius: 20px;
+}
+.add {
+  border: rgb(13, 110, 253) 2px solid;
+  margin-right: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  border-radius: 20px;
+  color: rgb(13, 110, 253);
+  font-weight: bolder;
+  transform: 0.2s;
+  cursor: pointer;
+}
+.add:hover {
+  background-color: #dddddd0a;
+}

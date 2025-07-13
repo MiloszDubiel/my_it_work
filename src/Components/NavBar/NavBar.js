@@ -5,22 +5,25 @@ import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import Card from "react-bootstrap/Card";
-import ListGroup from "react-bootstrap/ListGroup";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import Button from "react-bootstrap/Button";
+import { useRef } from "react";
 
 const NavBar = () => {
+  let card = useRef(null);
+
   return (
-    <Navbar
-      expand="lg"
-      className="bg-body-tertiary"
-      fixed="top"
-      bg="dark"
-      data-bs-theme="dark"
-    >
+    <Navbar expand="lg" style={{height: '70px'}} className={styles.navBar} fixed="top">
       <Container fluid>
         <Navbar.Brand>
-          <Link to="/" style={{ textDecoration: "none" }}>
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              fontSize: "20px",
+              color: "white",
+            }}
+          >
             MyITWork
           </Link>
         </Navbar.Brand>
@@ -30,18 +33,26 @@ const NavBar = () => {
             style={{ maxHeight: "100px" }}
             navbarScroll
           ></Nav>
+
           <Form className="d-flex">
-            <Form.Control
+            <Nav.Link href="#action2"></Nav.Link>
+            <div className={styles.add}>Dodaj ogłoszenie</div>
+            <input
               type="search"
               placeholder="Szukaj ofert IT"
-              className="me-2"
+              className={styles.searchField}
               aria-label="Search"
               style={{ width: "250px" }}
             />
             <div className={styles.profile}>
-              <MdOutlineAccountCircle style={{ color: "white" }} />
+              <MdOutlineAccountCircle
+                style={{ color: "white" }}
+                onClick={() => {
+                  card.current.classList.toggle(styles.cardShow);
+                }}
+              />
             </div>
-            <Card className={styles.card}>
+            <Card className={styles.card + " " + styles.cardShow} ref={card}>
               <Card.Body style={{ width: "100%" }}>
                 <Button
                   style={{ width: "100%", borderRadius: "20px" }}
