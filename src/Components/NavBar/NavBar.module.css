@@ -1,0 +1,26 @@
+.profile{
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+.profile:hover{
+    background-color: rgba(169, 169, 169, 0.247);
+}
+.profile > * {
+    font-size: 35px;
+    cursor: pointer;
+}
+.search{
+    all:unset;
+    display: flex;
+}
+.card{
+    width: 300px;
+    display: flex;
+    justify-content: center;
+}
+
+
