@@ -1,16 +1,28 @@
-@import url("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css");
-.menu,
 .menu-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  height: 100%;
+  left: 5px;
+  top: 5px;
+  height: 325px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  z-index: 11;
+  overflow: hidden;
+  width: 500px;
+  height: calc(100% - 10px);
+}
+.menu {
+  position: fixed;
+  left: 5px;
+  top: 5px;
+  height: 325px;
   list-style-type: none;
   margin: 0;
   padding: 0;
   background: #f7f7f7;
   z-index: 10;
   overflow: hidden;
+  height: calc(100% - 10px);
   box-shadow: 2px 0 18px rgba(0, 0, 0, 0.26);
 }
 .menu li a {
@@ -21,13 +33,22 @@
   width: 4em;
   line-height: 5em;
   text-align: center;
-  color: #72739f;
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background 0.1s ease-in-out;
+  transition: 0.2s;
 }
+.menu li a:hover {
+  background-color: orange;
+}
+.menu li a:hover > * {
+  fill: white;
+}
+.hidden {
+  opacity: 0;
+}
+
 .black {
-  fill: #000 !important;
+  fill: #000;
 }
 .icon {
   font-size: 25px;
@@ -35,62 +56,23 @@
 
 .menu-bar {
   overflow: hidden;
-  left: 5em;
+  left: 4em;
   z-index: 5;
-  width: 0;
-  height: 0;
 }
-.menu-bar li a {
+.menu-bar li {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 4em;
-  width: 4em;
+  width: 200px;
   line-height: 5em;
   text-align: center;
-  color: #72739f;
   position: relative;
+  background-color: orange;
+  color: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-
-
-@media all and (max-width: 500px) {
-  .container {
-    margin-top: 100px;
-  }
-  .menu {
-    height: 5em;
-    width: 100%;
-  }
-  .menu li {
-    display: inline-block;
-  }
-  .menu-bar li a {
-    width: 100%;
-  }
-  .menu-bar {
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    height: 0;
-  }
-  .open {
-    width: 100%;
-    height: auto;
-  }
-  .para {
-    padding-left: 5px;
-  }
-}
-@media screen and (max-height: 34em) {
-  .menu li,
-  .menu-bar {
-    font-size: 70%;
-  }
-}
-@media screen and (max-height: 34em) and (max-width: 500px) {
-  .menu {
-    height: 3.5em;
-  }
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.26);
+  transition: 0.2s;
 }

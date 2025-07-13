@@ -4,34 +4,80 @@ import { IoSearchSharp } from "react-icons/io5";
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import { MdFavoriteBorder } from "react-icons/md";
-const Navbar = () => {
 
+const toggleShow = (el) => {
+  [...document.querySelectorAll(".menu-bar li")]
+    .at(el)
+    .classList.toggle("hidden");
+};
+
+const Navbar = () => {
   return (
     <nav>
       <ul class="menu">
-        <li title="home">
+        <li
+          title="home"
+          onMouseOver={() => {
+            toggleShow(0);
+          }}
+          onMouseOut={() => {
+            toggleShow(0);
+          }}
+        >
           <a href="#" class="menu-button">
             <IoMenuSharp className="icon black" />
           </a>
         </li>
 
-        <li title="search">
+        <li
+          title="search"
+          onMouseOver={() => {
+            toggleShow(1);
+          }}
+          onMouseOut={() => {
+            toggleShow(1);
+          }}
+        >
           <a href="#">
             <IoSearchSharp className="icon black" />
           </a>
         </li>
-        <li title="add">
+        <li
+          title="add"
+          onMouseOver={() => {
+            toggleShow(2);
+          }}
+          onMouseOut={() => {
+            toggleShow(2);
+          }}
+        >
           <a href="#">
             {" "}
             <IoMdAdd className="icon black" />
           </a>
         </li>
-        <li title="favorite">
+        <li
+          title="favorite"
+          onMouseOver={() => {
+            toggleShow(3);
+          }}
+          onMouseOut={() => {
+            toggleShow(3);
+          }}
+        >
           <a href="#">
             <MdFavoriteBorder className="icon black" />
           </a>
         </li>
-        <li title="account">
+        <li
+          title="account"
+          onMouseOver={() => {
+            toggleShow(4);
+          }}
+          onMouseOut={() => {
+            toggleShow(4);
+          }}
+        >
           <a href="#">
             <MdOutlineAccountCircle className="icon black" />
           </a>
@@ -39,11 +85,11 @@ const Navbar = () => {
       </ul>
 
       <ul class="menu-bar">
-        <li>Menu</li>
-        <li>Szukaj</li>
-        <li>Dodaj</li>
-        <li>Ulubione</li>
-        <li>Konto</li>
+        <li className="hidden">Strona główna</li>
+        <li className="hidden">Szukaj</li>
+        <li className="hidden">Dodaj</li>
+        <li className="hidden">Ulubione</li>
+        <li className="hidden">Konto</li>
       </ul>
     </nav>
   );
