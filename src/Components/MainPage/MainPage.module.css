@@ -1,0 +1,101 @@
+.main {
+  padding-left: calc(4em + 10px);
+  background-color: rgb(18, 24, 40);
+  box-sizing: border-box;
+}
+.parent {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(11, 1fr);
+  gap: 3px;
+  width: 100%;
+  height: 2000px;
+  background-color: rgb(18, 24, 40);
+  z-index: 12;
+}
+.parent * {
+  color: rgb(224, 225, 227);
+}
+
+.div1 {
+  grid-column: span 11 / span 11;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.div2 {
+  grid-column: span 9 / span 9;
+  grid-row: span 6 / span 6;
+  grid-column-start: 2;
+  grid-row-start: 2;
+  grid-row-start: 2;
+}
+.searchBox {
+  border: 1px solid rgb(71, 76, 89);
+  border-radius: 5px;
+  background-color: rgb(30, 36, 51);
+  height: 150px;
+  width: 100%;
+}
+.searchBox form {
+  width: 100%;
+  height: 100%;
+}
+.form1,
+.form2 {
+  height: 50%;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+.search,
+.location,
+.type,
+.experience {
+  width: 300px;
+  height: 40px;
+  background-color: rgb(224, 225, 227);
+  border: 1px solid rgb(71, 76, 89);
+  padding: 6px;
+  color: black;
+  border-radius: 5px;
+}
+.location option,
+.type option,
+.experience option {
+  height: 40px;
+  color: black;
+  border-radius: 5px;
+}
+
+.clear,
+.searchButton {
+  height: 40px;
+  background-color: transparent;
+  border-radius: 20px;
+  border: none;
+  transition: 0.1s;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.clear {
+  width: 100px;
+}
+.searchButton {
+  width: 200px;
+}
+
+.clear:hover,
+.searchButton:hover {
+  background-color: rgba(71, 76, 89, 0.377);
+}
+
+.div3 {
+  grid-column: span 11 / span 11;
+  grid-row: span 4 / span 4;
+  grid-row-start: 8;
+}

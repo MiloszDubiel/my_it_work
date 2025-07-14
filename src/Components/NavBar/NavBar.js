@@ -1,5 +1,5 @@
 import "./navbar-style.css";
-import { IoMenuSharp } from "react-icons/io5";
+import { GoHome } from "react-icons/go";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineAccountCircle } from "react-icons/md";
@@ -25,7 +25,7 @@ const Navbar = () => {
           }}
         >
           <a href="#" class="menu-button">
-            <IoMenuSharp className="icon black" />
+            <GoHome className="icon black" />
           </a>
         </li>
 
