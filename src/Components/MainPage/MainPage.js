@@ -3,11 +3,17 @@ import Navbar from "../NavBar/NavBar";
 import styles from "./MainPage.module.css";
 import C from "../../Icons/C.png";
 const MainPage = () => {
-  document.querySelectorAll("button").forEach((el) => {
-    el.onclick = () => {
-      el.classList.toggle(`${styles.checked}`);
-    };
-  });
+  const switchClass = (e) => {
+    e.currentTarget.classList.toggle(`${styles.checked}`);
+  };
+
+  const showMenu = (e) => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget
+        .querySelector("div")
+        .classList.toggle(`${styles.showMenu}`);
+    }
+  };
 
   return (
     <>
@@ -21,66 +27,320 @@ const MainPage = () => {
             <div className={styles.searchBox}>
               <form>
                 <div className={styles.form1}>
-                  <input
-                    type="text"
+                  <div
                     className={styles.search}
-                    placeholder="Technologia/specjalizacja"
-                  />
-                  <select className={styles.location}>
-                    <option value="" selected disabled hidden>
-                      Lokalizacja
-                    </option>
-                  </select>
-                  <select className={styles.type}>
-                    <option value="" selected disabled hidden>
-                      Typ umowy
-                    </option>
-                  </select>
-                  <select className={styles.experience}>
-                    <option value="" selected disabled hidden>
-                      Poziom doświadczenia
-                    </option>
-                    <option value="B2B">kontrakt B2B</option>
-                    <option value="contract">umowa o pracę</option>
-                  </select>
+                    onClick={(e) => {
+                      showMenu(e);
+                    }}
+                  >
+                    <p className={styles.formHeaders}>Tryb pracy</p>
+                    <div className={styles.wrapper + " " + styles.showMenu}>
+                      <div className={styles.searchOptions}>
+                        <p className={styles.headers}>Tryb pracy</p>
+                        <div className={styles.tryby}>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Zdalnie
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Hybrydowo
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Stacjonarnie
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.location}
+                    onClick={(e) => {
+                      showMenu(e);
+                    }}
+                  >
+                    <p className={styles.formHeaders}>Lokalizacja</p>
+                    <div className={styles.wrapper + " " + styles.showMenu}>
+                      <div className={styles.searchOptions}>
+                        <p className={styles.headers}>Lokalizacja</p>
+                        <div className={styles.tryby}>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Rzeszów
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Kraków
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Katowice
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Opole
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Wrocław
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Zielona Góra
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Szczecin
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Sopot
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Gdynia
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Bielsko-Biała
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Toruń
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Kielce
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Olsztyn
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.type}
+                    onClick={(e) => {
+                      showMenu(e);
+                    }}
+                  >
+                    <p className={styles.formHeaders}> Typ umowy</p>
+                    <div className={styles.wrapper + " " + styles.showMenu}>
+                      <div className={styles.searchOptions}>
+                        <p className={styles.headers}>Typ umowy</p>
+                        <div className={styles.tryby}>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Umowa o pracę
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            B2B
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Umowa zlecenie
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.experience}
+                    onClick={(e) => {
+                      showMenu(e);
+                    }}
+                  >
+                    <p className={styles.formHeaders}>Poziom doświadczenia</p>
+                    <div className={styles.wrapper + " " + styles.showMenu}>
+                      <div className={styles.searchOptions}>
+                        <p className={styles.headers}>Poziom doświadczenia</p>
+                        <div className={styles.tryby}>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Junior
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Mid
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Senior
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Head
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => switchClass(e)}
+                            className={styles.specialization}
+                          >
+                            Manager
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className={styles.form3}>
                   <p>Specjalizacje</p>
                   <div className={styles.specializations}>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Backend
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Frontend
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Full-stack
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Mobile
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Architecture
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Embedded
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       UX/UI
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Helpdesk
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Data Science
                     </button>
-                    <button type="button" className={styles.specialization}>
-                      IT dmin
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
+                      IT admin
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       Testing
                     </button>
-                    <button type="button" className={styles.specialization}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.specialization}
+                    >
                       GameDev
                     </button>
                   </div>
@@ -88,7 +348,11 @@ const MainPage = () => {
                 <div className={styles.form3}>
                   <p>Technologie</p>
                   <div className={styles.technologies}>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -117,7 +381,11 @@ const MainPage = () => {
                       </svg>
                       JavaScript
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -150,7 +418,11 @@ const MainPage = () => {
                       </svg>
                       HTML
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -175,7 +447,11 @@ const MainPage = () => {
                       </svg>
                       SQL
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -226,7 +502,11 @@ const MainPage = () => {
                       </svg>
                       Python
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -282,7 +562,11 @@ const MainPage = () => {
                       </svg>
                       Java
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -313,7 +597,11 @@ const MainPage = () => {
                       </svg>
                       PHP
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -347,11 +635,19 @@ const MainPage = () => {
                       </svg>
                       C#
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <img src={C} />
                       C++
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -386,7 +682,11 @@ const MainPage = () => {
                       </svg>
                       TypeScript
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -409,7 +709,11 @@ const MainPage = () => {
                       </svg>
                       Node.js
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -432,7 +736,11 @@ const MainPage = () => {
                       </svg>
                       React.js
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
@@ -454,7 +762,11 @@ const MainPage = () => {
                       </svg>
                       Angular
                     </button>
-                    <button type="button" className={styles.technologie}>
+                    <button
+                      type="button"
+                      onClick={(e) => switchClass(e)}
+                      className={styles.technologie}
+                    >
                       <svg
                         width="24"
                         height="24"
