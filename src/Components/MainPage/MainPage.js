@@ -804,7 +804,6 @@ const MainPage = () => {
               </form>
             </div>
           </div>
-          <div className={styles.div3}>3</div>
         </div>
       </main>
     </>

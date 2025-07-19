@@ -1,42 +1,28 @@
 .main {
-  padding-left: calc(4em + 10px);
-  background-color: rgb(18, 24, 40);
+  background-color: #f4e7e1;
   box-sizing: border-box;
+  padding-top: 60px;
 }
 .parent {
   display: grid;
-  grid-template-columns: repeat(11, 1fr);
-  grid-template-rows: repeat(11, 1fr);
-  gap: 3px;
-  width: 100%;
-  height: 2000px;
-  background-color: rgb(18, 24, 40);
-  z-index: 12;
-}
-.parent * {
-  color: rgb(224, 225, 227);
 }
 
 .div1 {
-  grid-column: span 11 / span 11;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 300px;
 }
 
 .div2 {
-  grid-column: span 9 / span 9;
-  grid-row: span 6 / span 6;
-  grid-column-start: 2;
-  grid-row-start: 2;
-  grid-row-start: 2;
   display: flex;
   justify-content: center;
+  height: 650px;
 }
 .searchBox {
   border: 1px solid rgb(71, 76, 89);
   border-radius: 5px;
-  background-color: rgb(30, 36, 51);
+  background-color: #eee0da;
   height: 450px;
   width: 80%;
   max-width: 1475px;
@@ -63,19 +49,28 @@
 .experience {
   width: 280px;
   height: 60px;
-  background-color: rgb(18, 24, 40);
+  background-color: #ece6e4;
   padding: 6px;
-  color: black;
   border: 1px solid rgb(71, 76, 89);
+  transition: 0.2s;
+  cursor: pointer;
 }
+.search:hover,
+.location:hover,
+.type:hover,
+.experience:hover{
+  background-color: #ff9c4525 !important;
+  border: 1px solid #fc8822;
+}
+
+
 .formHeaders {
   all: unset;
-  color: rgb(224, 225, 227);
   font-weight: bolder;
 }
 .searchOptions {
   border: 1px solid rgb(71, 76, 89);
-  background-color: rgb(18, 24, 40);
+  background-color: #ece6e4;
   height: 150px;
   width: 200px;
   border-radius: 5px;
@@ -118,7 +113,6 @@
   border-radius: 20px;
   border: 1px solid rgb(71, 76, 89);
   font-size: 14px;
-  color: rgb(224, 225, 227);
   transition: 0.2s;
   cursor: pointer;
   display: flex;
@@ -127,11 +121,14 @@
 }
 .technologie:hover,
 .specialization:hover {
-  background-color: rgba(35, 142, 204, 0.205) !important;
+  background-color: #ff9b45 !important;
+  color: #ece6e4;
+  border: 1px solid #fc8822;
 }
 .checked {
-  background-color: rgba(33, 43, 75, 0.699) !important;
-  border-color: rgb(35, 142, 204);
+  background-color: #ff9b45 !important;
+  border-color: #fc8822;
+  color: #ece6e4;
 }
 .showMenu {
   display: none;
@@ -149,19 +146,17 @@
   border-bottom-right-radius: 5px;
 }
 .specialization:hover {
-  background-color: rgba(18, 24, 40, 0.178);
+  background-color: #ff9b45;
 }
-
 .clear,
 .searchButton {
   height: 40px;
-  background-color: rgb(224, 225, 227);
+  background-color: #f4e7e1;
   border-radius: 20px;
-  border: none;
+  border: 1px solid rgb(71, 76, 89);
   transition: 0.1s;
   cursor: pointer;
   font-size: 14px;
-  color: black;
   transition: 0.2s;
 }
 .clear {
@@ -172,10 +167,6 @@
 }
 .clear:hover,
 .searchButton:hover {
-  background-color: rgb(255, 255, 255);
-}
-.div3 {
-  grid-column: span 11 / span 11;
-  grid-row: span 4 / span 4;
-  grid-row-start: 8;
+  background-color: #ff9c4525 !important;
+  border: 1px solid #fc8822;
 }
