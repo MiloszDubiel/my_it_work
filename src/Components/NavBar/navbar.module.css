@@ -1,17 +1,73 @@
 .navBar {
   width: 100%;
   height: 80px;
-  background-color: #f4e7e1;
+  background-color: #222831;
   border-bottom: 1px solid rgb(71, 76, 89);
   position: fixed;
   display: flex;
   justify-content: space-between;
 }
-.header{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
-    gap: 100px;
-    font-size: 30px;
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  gap: 20px;
+  margin-left: 20px;
+  font-size: 30px;
+}
+.barDiv{
+  position: fixed;
+  top: 80px;
+  border: 1px solid rgb(71, 76, 89);
+  height: 200px;
+  width: 300px;
+  display: flex;
+  animation: show 0.2s;
+}
+.searchBar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+}
+.searchBarInput{
+  height: 40px;
+  width: 300px;
+  border: none;
+  border-bottom: 1px solid rgb(71, 76, 89);
+  background-color: #222831;
+  padding-left: 20px;
+}
+.searchBarInput::placeholder{
+  color: white;
+}
+.searchIcon{
+  transform: translate(50px, 5px);
+  cursor: pointer;
+}
+.hiddenBar{
+  display: none;
+}
+.account{
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.account button {
+  all: unset;
+}
+.icon{
+  height: 25px;
+  width: 25px;
+}
+
+@keyframes show{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
 }
