@@ -21,7 +21,7 @@
 }
 .searchBox {
   border: 1px solid rgb(71, 76, 89);
-  background-color: #393E46;
+  background-color: #393e46;
   height: 450px;
   width: 80%;
   max-width: 1475px;
@@ -46,7 +46,7 @@
 .location,
 .type,
 .experience {
-  width: 280px;
+  width: calc(25% - 10px);
   height: 60px;
   background-color: #222831;
   padding: 6px;
@@ -57,11 +57,10 @@
 .search:hover,
 .location:hover,
 .type:hover,
-.experience:hover{
+.experience:hover {
   background-color: #948979 !important;
   border: 1px solid #948979;
 }
-
 
 .formHeaders {
   all: unset;
@@ -172,4 +171,135 @@
 .searchButton:active {
   background-color: #948979 !important;
   border: 1px solid #948979;
+}
+
+@media only screen and (max-width: 480px) {
+  .div1 {
+    height: 200px;
+  }
+  .div1 h1 {
+    font-size: 20px;
+  }
+  .div2 {
+    height: 900px;
+  }
+  .searchBox {
+    width: 100%;
+    height: 901px;
+  }
+  .searchBox form {
+    width: 100%;
+    height: 900px;
+  }
+  .form1 {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .form2 {
+    height: 100px;
+  }
+  .form3 {
+    height: 200px;
+  }
+  .search,
+  .location,
+  .type,
+  .experience {
+    width: calc(100% - 10px);
+    border-radius: 5px;
+  }
+  .searchOptions {
+    width: 100%;
+    height: 150px;
+    transform: translateX(5px);
+  }
+   .location .searchOptions {
+    height: 240px;
+  }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 768px) {
+  .div1 {
+    height: 200px;
+  }
+  .div1 h1 {
+    font-size: 20px;
+  }
+  .div2 {
+    height: 900px;
+  }
+  .searchBox {
+    width: 80%;
+    height: 900px;
+  }
+  .searchBox form {
+    width: 100%;
+    height: 900px;
+  }
+  .form1 {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .form2 {
+    height: 80px;
+  }
+  .form3 {
+    height: 200px;
+  }
+  .search,
+  .location,
+  .type,
+  .experience {
+    width: calc(100% - 10px);
+    border-radius: 5px;
+  }
+  .searchOptions {
+    width: 100%;
+    height: 100px;
+    transform: translateX(5px);
+  }
+   .location .searchOptions {
+    height: 200px;
+  }
+}
+@media only screen and (min-width: 769px) and (max-width: 1279px) {
+  .div2 {
+    height: 600px;
+  }
+  .searchBox {
+    width: 80%;
+    height: 600px;
+  }
+  .searchBox form {
+    width: 100%;
+    height: 600px;
+  }
+  .form1 {
+    height: 200px;
+    display: flex;
+  }
+  .form2 {
+    height: 80px;
+  }
+  .form3 {
+    height: 160px;
+  }
+  .search,
+  .location,
+  .type,
+  .experience {
+    width: calc(100% - 10px);
+  }
+  .searchOptions {
+    width: 100%;
+    height: 180px;
+  }
+  .location .searchOptions {
+    height: 420px;
+  }
+  
 }
