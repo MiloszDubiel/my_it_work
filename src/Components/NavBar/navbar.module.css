@@ -74,23 +74,26 @@
   height: 200px;
   background-color: rgb(255, 181, 45);
 }
-.searchDiv h1{
+.searchDiv h1 {
   padding: 0;
   margin: 0;
-  height: 60%;
+  height: 55%;
   font-size: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
 }
-.formDiv{
+.formDiv {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 50px;
+  height: 45%;
 }
-.localization, .position, .technologies{
+.localization,
+.position,
+.technologies {
   background-color: white;
   width: 350px;
   height: 50px;
@@ -99,9 +102,27 @@
   display: flex;
   justify-content: space-between;
 }
-.localization p, .position p, .technologies p{
+.localization p,
+.position p,
+.technologies p {
   margin-left: 20px;
 }
-.arrow{
+.arrow {
   margin-right: 10px;
+}
+.filter {
+  border: 1px solid white;
+  width: 100px;
+  height: 50px;
+  display: flex;
+  justify-content: space-evenly;
+  border-radius: 50px;
+  cursor: pointer;
+}
+.filter > * {
+  color: white;
+  font-weight: bolder;
+}
+.filter:hover {
+  background-color: rgba(243, 243, 243, 0.151);
 }

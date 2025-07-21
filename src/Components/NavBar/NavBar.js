@@ -1,6 +1,7 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
-import { TbArrowNarrowDownDashed, TbArrowNarrowUpDashed } from "react-icons/tb";
+import { IoFilterOutline } from "react-icons/io5";
+import { TbArrowNarrowDownDashed } from "react-icons/tb";
 
 const Navbar = () => {
   return (
@@ -39,7 +40,6 @@ const Navbar = () => {
             <p className={styles.arrow}>
               <TbArrowNarrowDownDashed />
             </p>
-
           </div>
           <div className={styles.technologies}>
             <p>Technologia</p>
@@ -48,7 +48,10 @@ const Navbar = () => {
             </p>
           </div>
           <div className={styles.filter}>
-            <p></p>
+            <p>
+              <IoFilterOutline />
+            </p>
+            <p>Filtruj</p>
           </div>
         </div>
       </div>
