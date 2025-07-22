@@ -93,7 +93,7 @@
 }
 .localization,
 .position,
-.technologies {
+.technologie {
   background-color: white;
   width: 350px;
   height: 50px;
@@ -102,9 +102,12 @@
   display: flex;
   justify-content: space-between;
 }
+.bordered {
+  border: 2px solid black;
+}
 .localization p,
 .position p,
-.technologies p {
+.technologie p {
   margin-left: 20px;
 }
 .arrow {
@@ -125,4 +128,55 @@
 }
 .filter:hover {
   background-color: rgba(243, 243, 243, 0.151);
+}
+
+/*Okna wyskaujce*/
+.localizations,
+.positions,
+.technologies {
+  position: fixed;
+  width: 350px;
+  height: 250px;
+  transform: translate(-2px, 40px);
+  background-color: white;
+  border: 2px solid black;
+  border-top: none;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.searchBox {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.searchBox input {
+  all: unset;
+  width: 100%;
+  margin: 0px 20px;
+  height: 35px;
+  padding: 0px 20px;
+}
+.searchBox input:focus {
+  border: 2px solid gray;
+  border-radius: 5px;
+}
+.options {
+  width: 100%;
+  overflow-y: scroll;
+  height: 189px;
+}
+.options p {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.253);
+  padding: 10px 0px;
+  margin: 0px 20px;
+}
+.options p:last-child {
+  border: none;
+}
+.showMenu{
+  display: none;
+}
+.rotate{
+  transform: rotate(180deg);
 }
