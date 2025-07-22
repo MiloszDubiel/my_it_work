@@ -1,6 +1,9 @@
 .headerElement {
-  position: fixed;
   width: 100%;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  height: 280px;
 }
 .navBar {
   width: 100%;
@@ -92,6 +95,9 @@
 .smallSearchDiv {
   height: 100px;
 }
+.smallHeader {
+  height: 180px !important;
+}
 .formDiv {
   display: flex;
   justify-content: center;
@@ -176,13 +182,27 @@
 .toggleFilter {
   display: none;
 }
+.optionsFilter {
+  width: 575px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.optionsFilter > div {
+  width: 575px;
+}
+.experienceDiv{
+  height: 100px;
+  margin-top: 40px;
+}
 
 /*Okna wyskaujce*/
 .localizations,
 .positions,
 .technologies {
   position: fixed;
-  width: 350px;
+  width: inherit;
   height: 250px;
   transform: translate(-2px, 40px);
   background-color: white;
@@ -227,6 +247,7 @@
 .rotate {
   transform: rotate(180deg);
 }
+
 /*MEDIA QUERY*/
 @media screen and (min-width: 1024px) and (max-width: 1336px) {
   .localization,
@@ -315,6 +336,9 @@
   }
   .searchOfferts {
     width: 100%;
+  }
+  .headerElement {
+    height: 180px;
   }
 }
 @media screen and (max-width: 479px) {

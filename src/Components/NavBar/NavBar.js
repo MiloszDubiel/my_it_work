@@ -4,7 +4,7 @@ import { IoFilterOutline } from "react-icons/io5";
 import { TbArrowNarrowDownDashed } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 const Navbar = () => {
   let hiddenMenu = useRef(null);
@@ -18,7 +18,7 @@ const Navbar = () => {
     }
     if (e.target.tagName === "P" || e.target.tagName === "svg") {
       e.currentTarget.lastChild.classList.toggle(styles.showMenu);
-      e.currentTarget.classList.toggle(`${styles.bordered}`);
+      e.currentTarget.classList.toggle(styles.bordered);
       e.currentTarget.querySelector("svg").classList.toggle(styles.rotate);
     }
   };
@@ -26,24 +26,27 @@ const Navbar = () => {
   const toggleFilter = () => {
     hiddenMenu.current.classList.toggle(styles.toggleFilter);
   };
+  useEffect(() => {
+    const handleScroll = () => {
+      const parent = searchDiv.current;
+      if (!parent) return;
 
-  window.addEventListener("scroll", () => {
-    let parent = searchDiv.current;
+      window.requestAnimationFrame(() => {
+        if (window.scrollY > 10 && window.innerWidth > 768) {
+          parent.firstChild?.classList.add(styles.hideH1);
+          parent.children[1]?.classList.add(styles.moveUp);
+          parent.classList.add(styles.smallSearchDiv);
+        } else {
+          parent.firstChild?.classList.remove(styles.hideH1);
+          parent.children[1]?.classList.remove(styles.moveUp);
+          parent.classList.remove(styles.smallSearchDiv);
+        }
+      });
+    };
 
-    if (window.scrollY >= 100 && window.innerWidth > 768) {
-      if (parent.firstChild) {
-        parent.firstChild.classList.add(styles.hideH1);
-        parent.children[1].classList.add(styles.moveUp);
-        parent.classList.add(styles.smallSearchDiv);
-      }
-    } else {
-      if (parent.firstChild) {
-        parent.firstChild.classList.remove(styles.hideH1);
-        parent.children[1].classList.remove(styles.moveUp);
-        parent.classList.remove(styles.smallSearchDiv);
-      }
-    }
-  });
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <header className={styles.headerElement}>
@@ -210,8 +213,127 @@ const Navbar = () => {
       >
         <div className={styles.searchOfferts}>
           <div className={styles.closeWindow}>
-            <p>Filtruj oferty</p>
+            <p style={{fontSize: '26px'}}>Filtruj oferty</p>
             <IoCloseOutline onClick={toggleFilter} />
+          </div>
+          <div className={styles.optionsFilter}>
+            <div
+              className={styles.localization}
+              onClick={(e) => {
+                showMenu(e);
+              }}
+            >
+              <p>Lokalizacja</p>
+              <p className={styles.arrow}>
+                <TbArrowNarrowDownDashed />
+              </p>
+              <div className={styles.localizations + " " + styles.showMenu}>
+                <div className={styles.searchBox}>
+                  <CiSearch
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      transform: "translateX(23px)",
+                      color: "grey",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    id="searchLocalization"
+                    placeholder="Szukaj..."
+                  />
+                </div>
+                <div className={styles.options}>
+                  <p>Remote</p>
+                  <p>Rzeszów</p>
+                  <p>Kraków</p>
+                  <p>Warszawa</p>
+                  <p>Poznań</p>
+                  <p>Opole</p>
+                  <p>Katowice</p>
+                  <p>Wrocław</p>
+                </div>
+              </div>
+            </div>
+            <div
+              className={styles.position}
+              onClick={(e) => {
+                showMenu(e);
+              }}
+            >
+              <p>Stanowisko</p>
+              <p className={styles.arrow}>
+                <TbArrowNarrowDownDashed />
+              </p>
+              <div className={styles.positions + " " + styles.showMenu}>
+                <div className={styles.searchBox}>
+                  <CiSearch
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      transform: "translateX(23px)",
+                      color: "grey",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    id="searchLocalization"
+                    placeholder="Szukaj..."
+                  />
+                </div>
+                <div className={styles.options}>
+                  <p>Remote</p>
+                  <p>Rzeszów</p>
+                  <p>Kraków</p>
+                  <p>Warszawa</p>
+                  <p>Poznań</p>
+                  <p>Opole</p>
+                  <p>Katowice</p>
+                  <p>Wrocław</p>
+                </div>
+              </div>
+            </div>
+            <div
+              className={styles.technologie}
+              onClick={(e) => {
+                showMenu(e);
+              }}
+            >
+              <p>Technologia</p>
+              <p className={styles.arrow}>
+                <TbArrowNarrowDownDashed />
+              </p>
+              <div className={styles.technologies + " " + styles.showMenu}>
+                <div className={styles.searchBox}>
+                  <CiSearch
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      transform: "translateX(23px)",
+                      color: "grey",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    id="searchLocalization"
+                    placeholder="Szukaj..."
+                  />
+                </div>
+                <div className={styles.options}>
+                  <p>Remote</p>
+                  <p>Rzeszów</p>
+                  <p>Kraków</p>
+                  <p>Warszawa</p>
+                  <p>Poznań</p>
+                  <p>Opole</p>
+                  <p>Katowice</p>
+                  <p>Wrocław</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.experienceDiv}>
+            <p style={{ fontWeight: "bolder" }}>Poziom doświadczenia</p>
           </div>
         </div>
       </div>
