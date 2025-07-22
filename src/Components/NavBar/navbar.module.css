@@ -1,13 +1,13 @@
+.headerElement {
+  position: fixed;
+  width: 100%;
+}
 .navBar {
   width: 100%;
   height: 80px;
   background-color: white;
   display: flex;
   justify-content: space-evenly;
-}
-.headerElement {
-  position: fixed;
-  width: 100%;
 }
 .header {
   display: flex;
@@ -73,23 +73,34 @@
 .searchDiv {
   height: 200px;
   background-color: rgb(255, 181, 45);
+  transition: 0.2s;
 }
 .searchDiv h1 {
   padding: 0;
   margin: 0;
-  height: 55%;
+  height: 100px;
   font-size: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
 }
+.hideH1 {
+  opacity: 0;
+}
+.smallSearchDiv {
+  height: 100px;
+}
 .formDiv {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 50px;
-  height: 45%;
+  height: 100px;
+  transition: 0.2s;
+}
+.moveUp {
+  transform: translateY(-100px);
 }
 .localization,
 .position,
@@ -128,6 +139,41 @@
 }
 .filter:hover {
   background-color: rgba(243, 243, 243, 0.151);
+}
+.hiddenMenu {
+  display: none;
+}
+/*Filtrowanie*/
+.searchOfferts {
+  width: 615px;
+  height: 100%;
+  padding: 20px;
+  background-color: white;
+  position: absolute;
+  right: 0;
+  animation: slideOnRight 0.1s ease-out forwards;
+}
+.closeWindow {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.closeWindow svg {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+.searchOffertsDiv {
+  position: fixed;
+  display: flex;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.158);
+}
+.toggleFilter {
+  display: none;
 }
 
 /*Okna wyskaujce*/
@@ -174,9 +220,115 @@
 .options p:last-child {
   border: none;
 }
-.showMenu{
+.showMenu {
   display: none;
 }
-.rotate{
+.rotate {
   transform: rotate(180deg);
+}
+/*MEDIA QUERY*/
+@media screen and (min-width: 1024px) and (max-width: 1336px) {
+  .localization,
+  .position,
+  .technologie {
+    width: 250px;
+  }
+  .localizations,
+  .positions,
+  .technologies {
+    width: 250px;
+  }
+}
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+  .localization,
+  .position {
+    width: 280px;
+  }
+  .technologie {
+    display: none;
+  }
+
+  .localizations,
+  .positions,
+  .technologies {
+    width: 280px;
+  }
+  .searchDiv h1 {
+    font-size: 40px;
+  }
+  .list {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .searchDiv {
+    height: 100px;
+  }
+  .searchDiv .formDiv {
+    display: none;
+  }
+  .searchDiv h1 {
+    font-size: 30px;
+    height: 100%;
+    text-align: center;
+  }
+  .list {
+    display: none;
+  }
+  .hiddenMenu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    height: 80px;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    font-size: 16px;
+  }
+  .hiddenMenu button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 85%;
+    height: 55px;
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 50px;
+    color: inherit;
+    font-size: inherit;
+    font-weight: bold;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .hiddenMenu button:hover {
+    background-color: rgba(253, 253, 253, 0.096);
+  }
+  .hiddenMenu svg {
+    width: 20px;
+    height: 20px;
+    transform: translateY(1px);
+  }
+  .searchOfferts {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 479px) {
+  .addOffert {
+    display: none;
+  }
+}
+/*animacje*/
+@keyframes slideOnRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
 }

@@ -3,8 +3,13 @@ import styles from "./navbar.module.css";
 import { IoFilterOutline } from "react-icons/io5";
 import { TbArrowNarrowDownDashed } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
+import { IoCloseOutline } from "react-icons/io5";
+import { useRef } from "react";
 
 const Navbar = () => {
+  let hiddenMenu = useRef(null);
+  let searchDiv = useRef(null);
+
   const showMenu = (e) => {
     if (e.currentTarget === e.target) {
       e.target.lastChild.classList.toggle(`${styles.showMenu}`);
@@ -17,6 +22,28 @@ const Navbar = () => {
       e.currentTarget.querySelector("svg").classList.toggle(`${styles.rotate}`);
     }
   };
+
+  const toggleFilter = () => {
+    hiddenMenu.current.classList.toggle(`${styles.toggleFilter}`);
+  };
+
+  window.addEventListener("scroll", () => {
+    let parent = searchDiv.current;
+
+    if (window.scrollY >= 100) {
+      if (parent.firstChild) {
+        parent.firstChild.classList.add(styles.hideH1);
+        parent.children[1].classList.add(styles.moveUp);
+        parent.classList.add(styles.smallSearchDiv);
+      }
+    } else {
+      if (parent.firstChild) {
+        parent.firstChild.classList.remove(styles.hideH1);
+        parent.children[1].classList.remove(styles.moveUp);
+        parent.classList.remove(styles.smallSearchDiv);
+      }
+    }
+  });
 
   return (
     <header className={styles.headerElement}>
@@ -40,7 +67,7 @@ const Navbar = () => {
           </button>
         </div>
       </nav>
-      <div className={styles.searchDiv}>
+      <div className={styles.searchDiv} ref={searchDiv}>
         <h1>Rekrutacja IT, bez zbędnego kodu.</h1>
         <div className={styles.formDiv}>
           <div
@@ -157,11 +184,34 @@ const Navbar = () => {
               </div>
             </div>
           </div>
-          <div className={styles.filter}>
+          <div
+            className={styles.filter}
+            onClick={(e) => {
+              toggleFilter(e);
+            }}
+          >
             <p>
               <IoFilterOutline />
             </p>
             <p>Filtruj</p>
+          </div>
+        </div>
+      </div>
+      <div className={styles.hiddenMenu}>
+        <button onClick={toggleFilter}>
+          {" "}
+          <CiSearch />
+          Wyszukuj oferty
+        </button>
+      </div>
+      <div
+        className={styles.searchOffertsDiv + " " + styles.toggleFilter}
+        ref={hiddenMenu}
+      >
+        <div className={styles.searchOfferts}>
+          <div className={styles.closeWindow}>
+            <p>Filtruj oferty</p>
+            <IoCloseOutline onClick={toggleFilter} />
           </div>
         </div>
       </div>
