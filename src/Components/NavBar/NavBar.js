@@ -12,25 +12,25 @@ const Navbar = () => {
 
   const showMenu = (e) => {
     if (e.currentTarget === e.target) {
-      e.target.lastChild.classList.toggle(`${styles.showMenu}`);
-      e.target.classList.toggle(`${styles.bordered}`);
-      e.target.querySelector("svg").classList.toggle(`${styles.rotate}`);
+      e.target.lastChild.classList.toggle(styles.showMenu);
+      e.target.classList.toggle(styles.bordered);
+      e.target.querySelector("svg").classList.toggle(styles.rotate);
     }
     if (e.target.tagName === "P" || e.target.tagName === "svg") {
-      e.currentTarget.lastChild.classList.toggle(`${styles.showMenu}`);
+      e.currentTarget.lastChild.classList.toggle(styles.showMenu);
       e.currentTarget.classList.toggle(`${styles.bordered}`);
-      e.currentTarget.querySelector("svg").classList.toggle(`${styles.rotate}`);
+      e.currentTarget.querySelector("svg").classList.toggle(styles.rotate);
     }
   };
 
   const toggleFilter = () => {
-    hiddenMenu.current.classList.toggle(`${styles.toggleFilter}`);
+    hiddenMenu.current.classList.toggle(styles.toggleFilter);
   };
 
   window.addEventListener("scroll", () => {
     let parent = searchDiv.current;
 
-    if (window.scrollY >= 100) {
+    if (window.scrollY >= 100 && window.innerWidth > 768) {
       if (parent.firstChild) {
         parent.firstChild.classList.add(styles.hideH1);
         parent.children[1].classList.add(styles.moveUp);
