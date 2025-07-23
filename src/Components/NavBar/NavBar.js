@@ -5,10 +5,12 @@ import { TbArrowNarrowDownDashed } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
 import { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   let hiddenMenu = useRef(null);
   let searchDiv = useRef(null);
+  let account = useRef(null);
 
   const showMenu = (e) => {
     if (e.currentTarget === e.target) {
@@ -69,9 +71,20 @@ const Navbar = () => {
           <div className={styles.addOffert}>
             <p>Dodaj ogłoszenie</p>
           </div>
-          <button>
+          <button
+            onClick={() => {
+              account.current.classList.toggle(styles.accountDivHide);
+            }}
+          >
             <IoPersonOutline className={styles.icon} />
           </button>
+        </div>
+        <div
+          className={styles.accountDiv + " " + styles.accountDivHide}
+          ref={account}
+        >
+          <Link to="/login">Zaloguj się</Link>
+          <Link to="/register">Zarejestruj się</Link>
         </div>
       </nav>
       <div className={styles.searchDiv} ref={searchDiv}>
