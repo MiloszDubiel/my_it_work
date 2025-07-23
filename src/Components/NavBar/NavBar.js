@@ -23,6 +23,10 @@ const Navbar = () => {
     }
   };
 
+  const toggleStyle = (e) => {
+    e.currentTarget.classList.toggle(styles.toggleColor);
+  };
+
   const toggleFilter = () => {
     hiddenMenu.current.classList.toggle(styles.toggleFilter);
   };
@@ -150,7 +154,7 @@ const Navbar = () => {
             </div>
           </div>
           <div
-            className={styles.technologie}
+            className={styles.technologie + " " + styles.toHide}
             onClick={(e) => {
               showMenu(e);
             }}
@@ -213,127 +217,170 @@ const Navbar = () => {
       >
         <div className={styles.searchOfferts}>
           <div className={styles.closeWindow}>
-            <p style={{fontSize: '26px'}}>Filtruj oferty</p>
+            <p style={{ fontSize: "26px" }}>Filtruj oferty</p>
             <IoCloseOutline onClick={toggleFilter} />
           </div>
-          <div className={styles.optionsFilter}>
-            <div
-              className={styles.localization}
-              onClick={(e) => {
-                showMenu(e);
-              }}
-            >
-              <p>Lokalizacja</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
-              </p>
-              <div className={styles.localizations + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
+          <div className={styles.mainFilters}>
+            <div className={styles.optionsFilter}>
+              <div
+                className={styles.localization}
+                onClick={(e) => {
+                  showMenu(e);
+                }}
+              >
+                <p>Lokalizacja</p>
+                <p className={styles.arrow}>
+                  <TbArrowNarrowDownDashed />
+                </p>
+                <div className={styles.localizations + " " + styles.showMenu}>
+                  <div className={styles.searchBox}>
+                    <CiSearch
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        transform: "translateX(23px)",
+                        color: "grey",
+                      }}
+                    />
+                    <input
+                      type="text"
+                      id="searchLocalization"
+                      placeholder="Szukaj..."
+                    />
+                  </div>
+                  <div className={styles.options}>
+                    <p>Remote</p>
+                    <p>Rzeszów</p>
+                    <p>Kraków</p>
+                    <p>Warszawa</p>
+                    <p>Poznań</p>
+                    <p>Opole</p>
+                    <p>Katowice</p>
+                    <p>Wrocław</p>
+                  </div>
                 </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
+              </div>
+              <div
+                className={styles.position}
+                onClick={(e) => {
+                  showMenu(e);
+                }}
+              >
+                <p>Stanowisko</p>
+                <p className={styles.arrow}>
+                  <TbArrowNarrowDownDashed />
+                </p>
+                <div className={styles.positions + " " + styles.showMenu}>
+                  <div className={styles.searchBox}>
+                    <CiSearch
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        transform: "translateX(23px)",
+                        color: "grey",
+                      }}
+                    />
+                    <input
+                      type="text"
+                      id="searchLocalization"
+                      placeholder="Szukaj..."
+                    />
+                  </div>
+                  <div className={styles.options}>
+                    <p>Remote</p>
+                    <p>Rzeszów</p>
+                    <p>Kraków</p>
+                    <p>Warszawa</p>
+                    <p>Poznań</p>
+                    <p>Opole</p>
+                    <p>Katowice</p>
+                    <p>Wrocław</p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={styles.technologie}
+                onClick={(e) => {
+                  showMenu(e);
+                }}
+              >
+                <p>Technologia</p>
+                <p className={styles.arrow}>
+                  <TbArrowNarrowDownDashed />
+                </p>
+                <div className={styles.technologies + " " + styles.showMenu}>
+                  <div className={styles.searchBox}>
+                    <CiSearch
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        transform: "translateX(23px)",
+                        color: "grey",
+                      }}
+                    />
+                    <input
+                      type="text"
+                      id="searchLocalization"
+                      placeholder="Szukaj..."
+                    />
+                  </div>
+                  <div className={styles.options}>
+                    <p>Remote</p>
+                    <p>Rzeszów</p>
+                    <p>Kraków</p>
+                    <p>Warszawa</p>
+                    <p>Poznań</p>
+                    <p>Opole</p>
+                    <p>Katowice</p>
+                    <p>Wrocław</p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div
-              className={styles.position}
-              onClick={(e) => {
-                showMenu(e);
-              }}
-            >
-              <p>Stanowisko</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
+            <div className={styles.experienceDiv}>
+              <p style={{ fontWeight: "bolder", margin: 0 }}>
+                Poziom doświadczenia
               </p>
-              <div className={styles.positions + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
-                </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
-                </div>
+              <div className={styles.experiencesTypes}>
+                <p onClick={(e) => toggleStyle(e)}>Intern</p>
+                <p onClick={(e) => toggleStyle(e)}>Junior</p>
+                <p onClick={(e) => toggleStyle(e)}>Senior</p>
+                <p onClick={(e) => toggleStyle(e)}>Lead/Principal</p>
               </div>
             </div>
-            <div
-              className={styles.technologie}
-              onClick={(e) => {
-                showMenu(e);
-              }}
-            >
-              <p>Technologia</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
-              </p>
-              <div className={styles.technologies + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
-                </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
-                </div>
+            <div className={styles.contract}>
+              <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
+              <div className={styles.contractTypes}>
+                <p onClick={(e) => toggleStyle(e)}>Umowa B2B</p>
+                <p onClick={(e) => toggleStyle(e)}>Umowa o prace</p>
+                <p onClick={(e) => toggleStyle(e)}>Umowa zlecenie</p>
+              </div>
+            </div>
+            <hr />
+            <div className={styles.saleryDiv}>
+              <p style={{ fontWeight: "bolder", margin: 0 }}>Wypłata</p>
+              <div className={styles.moneyDiv}>
+                <input
+                  type="number"
+                  min={0}
+                  max={50_000}
+                  className={styles.money}
+                  placeholder="Minimalna"
+                />
+                <p>-</p>
+                <input
+                  placeholder="Maksymalna"
+                  type="number"
+                  min={0}
+                  max={50_000}
+                  className={styles.money}
+                />
               </div>
             </div>
           </div>
-          <div className={styles.experienceDiv}>
-            <p style={{ fontWeight: "bolder" }}>Poziom doświadczenia</p>
+          <div className={styles.setFilter}>
+            <button>Resetuj</button>
+            <button>Zastosuj</button>
           </div>
         </div>
       </div>
