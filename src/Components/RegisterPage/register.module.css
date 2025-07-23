@@ -15,7 +15,6 @@
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.24);
 }
 .form input {
-
   height: 60px;
   width: 100%;
   padding: 0px;
@@ -23,8 +22,6 @@
   margin-bottom: 1.3rem;
   border: 1px solid #ddd;
   border-radius: 6px;
-
-
 }
 .form input:focus {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
@@ -85,52 +82,13 @@
   cursor: pointer;
   background-color: #f7f7f7;
 }
-.container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.login_form {
-  width: 100%;
-  min-width: 400px;
-  max-width: 435px;
-  background: #fff;
-  border-radius: 6px;
-  padding: 41px 30px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.24);
-}
+
 .login_form h3 {
   font-size: 20px;
   text-align: center;
   margin-bottom: 10px;
 }
-.login_form .login_option .option {
-  width: calc(100% / 2 - 12px);
-}
-.login_form .login_option .option a {
-  height: 56px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  background: #f8f8fb;
-  border: 1px solid #dadaf2;
-  border-radius: 5px;
-  margin: 34px 0 24px 0;
-  text-decoration: none;
-  color: #171645;
-  font-weight: 500;
-  transition: 0.2s ease;
-}
-.login_form .login_option .option a:hover {
-  background: #ededf5;
-  border-color: #eca217;
-}
-.login_form .login_option .option a img {
-  max-width: 25px;
-}
+
 .login_form p {
   text-align: center;
   font-weight: 500;
@@ -220,4 +178,14 @@ form .input_box label {
 }
 .checkbox_box input:checked {
   accent-color: #eea010;
+}
+
+@media screen and (max-width: 520px) {
+  .login_form {
+    box-shadow: none;
+  }
+  .form {
+    height: 100%;
+    width: 100%;
+  }
 }

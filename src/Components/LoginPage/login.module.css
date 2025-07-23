@@ -98,12 +98,12 @@ form .input_box label {
   position: relative;
   margin-bottom: 15px;
 }
-.sign_up a {
+.form a {
   text-decoration: none;
   color: #eca217;
   font-weight: 500;
 }
-.sign_up a :hover {
+.form a :hover {
   text-decoration: underline;
 }
 /* Login button styling */
@@ -132,4 +132,13 @@ form .input_box label {
 }
 .checkbox_box input:checked {
   accent-color: #eea010;
+}
+@media screen and (max-width: 520px) {
+  .login_form {
+    box-shadow: none;
+  }
+  .form {
+    height: 100%;
+    width: 100%;
+  }
 }

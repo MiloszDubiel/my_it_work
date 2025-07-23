@@ -62,6 +62,9 @@ const LoginPage = () => {
               <b> Zarejestruj się</b>
             </Link>
           </p>
+          <p>
+            <Link to="/">Wróć do strony głownej</Link>
+          </p>
         </form>
       </div>
     </div>

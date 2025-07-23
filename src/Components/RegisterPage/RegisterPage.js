@@ -67,6 +67,9 @@ const RegisterPage = () => {
               <b> Zaloguj się</b>
             </Link>
           </p>
+          <p>
+            <Link to="/">Wróć do strony głownej</Link>
+          </p>
         </form>
       </div>
     </div>
