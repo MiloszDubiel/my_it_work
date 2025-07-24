@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import puppeteer from "puppeteer";
-import { BiMoney } from "react-icons/bi";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -9,41 +8,68 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-async function scrapeProtocolOffers() {
+async function scrapeBulldogjobPages(pagesToScrape = 5) {
   const browser = await puppeteer.launch({ headless: true });
-
   const page = await browser.newPage();
-  await page.goto("https://theprotocol.it/praca?pageNumber=1", {
-    waitUntil: "networkidle2",
-  });
-  await page.waitForSelector(".a4pzt2q "); // dostosuj selektor
 
-  // Pobieranie danych ofert
-  const jobs = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll(".a4pzt2q ")).map((el) => ({
-      title: el.querySelector(".t1sf8hf8")?.innerText.trim(),
-      company: el.querySelector(".r4179ok")?.innerText.trim(),
-      trybe: el.querySelectorAll(".l86y70m .l1wv8638")[1]?.innerText.trim(),
-      cities: {
-        city: el.querySelectorAll(".l86y70m .l1wv8638")[2]?.innerText.trim(),
-        choises: el.querySelector(".c1apubow")?.innerText.trim(),
-      },
-      url: el.href,
-      salery: {
-        option1: el.querySelectorAll(".i1wqx14h")[0]?.innerText.trim(),
-        option2: el.querySelectorAll(".i1wqx14h")[1]?.innerText.trim(),
-      },
-      image: el.querySelector("img")?.src,
-    }));
-  });
+  const allJobs = [];
+
+  for (let i = 1; i <= pagesToScrape; i++) {
+    console.log(`Scraping page ${i}...`);
+    await page.goto(
+      `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
+      {
+        waitUntil: "networkidle2",
+      }
+    );
+
+    await page.waitForSelector(".JobListItem_item__fYh8y");
+
+    const jobs = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll(".JobListItem_item__fYh8y")
+      ).map((el) => ({
+        title: el
+          .querySelector(".JobListItem_item__title__278xz h3")
+          ?.textContent?.trim(),
+        companyName: el
+          .querySelector(".JobListItem_item__title__278xz div")
+          ?.textContent?.trim(),
+        workingMode: el
+          .querySelector(".JobListItem_item__details__sg4tk .relative ")
+          ?.textContent?.trim(),
+        contractType: el
+          .querySelectorAll(
+            ".JobListItem_item__details__sg4tk .items-start "
+          )[0]
+          ?.textContent?.trim(),
+        experience: el
+          .querySelectorAll(
+            ".JobListItem_item__details__sg4tk .items-start "
+          )[1]
+          ?.textContent?.trim(),
+        technologies: Array.from(
+          el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
+        ).map((tag) => tag.textContent.trim()),
+        salary:
+          el
+            .querySelector(".JobListItem_item__salary__OIin6 ")
+            ?.textContent?.trim() || "not available",
+        img: el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
+        link: el?.href,
+      }));
+    });
+
+    allJobs.push(...jobs);
+  }
 
   await browser.close();
-  return jobs;
+  return allJobs;
 }
 
-app.get("/api/protocol-jobs", async (req, res) => {
+app.get("/api/job-offerts", async (req, res) => {
   try {
-    const offers = await scrapeProtocolOffers();
+    const offers = await scrapeBulldogjobPages();
     res.json(offers);
   } catch (error) {
     console.error("Błąd scrapowania:", error);
@@ -52,7 +78,5 @@ app.get("/api/protocol-jobs", async (req, res) => {
 });
 
 app.listen(PORT, () =>
-  console.log(
-    `Scraper API działa na http://localhost:${PORT}/api/protocol-jobs`
-  )
+  console.log(`Scraper API działa na http://localhost:${PORT}/api/job-offerts`)
 );
