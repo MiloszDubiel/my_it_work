@@ -1,14 +1,16 @@
 import express from "express";
 import cors from "cors";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
+puppeteer.use(StealthPlugin());
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-async function scrapeBulldogjobPages(pagesToScrape = 5) {
+async function getJobOfferts(pagesToScrape = 5) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -67,9 +69,67 @@ async function scrapeBulldogjobPages(pagesToScrape = 5) {
   return allJobs;
 }
 
-app.get("/api/job-offerts", async (req, res) => {
+export async function getEmployers(pagesToScrape = 5) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  const allEmployers = [];
+
+  for (let i = 1; i <= pagesToScrape; i++) {
+    const url =
+      i === 1
+        ? "https://bulldogjob.pl/companies/profiles"
+        : `https://bulldogjob.pl/companies/profiles/s/page,${i}`;
+
+    console.log(`Scraping page ${i}: ${url}`);
+
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+
+    try {
+      await page.waitForSelector(".container", {
+        timeout: 10000,
+      });
+      await page.screenshot({ path: "snapshot.png" });
+      const employers = await page.evaluate(() => {
+        return Array.from(
+          document.querySelectorAll(".container div:not(.mb-10) a")
+        )
+          .filter((el) => el.querySelector("h3") != null)
+          .map((el) => ({
+            companyName: el.querySelector("h3")?.textContent,
+            technologies: Array.from(el.querySelectorAll(".gap-3 span")).map(
+              (tag) => tag.textContent.trim()
+            ),
+            localization: Array.from(
+              el.querySelectorAll(".rounded-t-lg span")
+            ).map((tag) => tag.textContent.trim()),
+            img: el.querySelector("img")?.src,
+            link: el?.href,
+          }));
+      });
+
+      allEmployers.push(...employers);
+    } catch (err) {
+      console.error(`Błąd ładowania zawartości strony ${i}:`, err.message);
+    }
+  }
+
+  await browser.close();
+  return allEmployers;
+}
+
+app.get("/api/get-job-offerts", async (req, res) => {
   try {
-    const offers = await scrapeBulldogjobPages();
+    const offers = await getJobOfferts();
+    res.json(offers);
+  } catch (error) {
+    console.error("Błąd scrapowania:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.get("/api/get-employers", async (req, res) => {
+  try {
+    const offers = await getEmployers();
     res.json(offers);
   } catch (error) {
     console.error("Błąd scrapowania:", error);
@@ -77,6 +137,4 @@ app.get("/api/job-offerts", async (req, res) => {
   }
 });
 
-app.listen(PORT, () =>
-  console.log(`Scraper API działa na http://localhost:${PORT}/api/job-offerts`)
-);
+app.listen(PORT, () => console.log(`Scraper API działa`));
