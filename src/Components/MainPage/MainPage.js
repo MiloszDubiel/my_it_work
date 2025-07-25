@@ -1,8 +1,6 @@
-import React, { useEffect } from "react";
 import NavBar from "../NavBar/NavBar";
 import styles from "./MainPage.module.css";
-import axios from "axios";
-
+import JobOfferttsComponent from "../JobOffertsComponent/JobOffertsComponent";
 const MainPage = () => {
   return (
     <div className={styles.page}>
@@ -13,12 +11,7 @@ const MainPage = () => {
       </h2>
       <div className={styles.recommended}>
         <div className={styles.parent}>
-          <div className={styles.div1}>Dupa</div>
-          <div className={styles.div2}>2</div>
-          <div className={styles.div3}>3</div>
-          <div className={styles.div4}>4</div>
-          <div className={styles.div5}>5</div>
-          <div className={styles.div6}>6</div>
+          <JobOfferttsComponent amount={9} styles={styles} />
         </div>
       </div>
     </div>

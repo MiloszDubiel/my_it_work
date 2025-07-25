@@ -120,7 +120,8 @@ export async function getEmployers(pagesToScrape = 5) {
 
 app.get("/api/get-job-offerts", async (req, res) => {
   try {
-    const offers = await getJobOfferts();
+    const pages = parseInt(req.query.pages) || 1;
+    const offers = await getJobOfferts(pages);
     res.json(offers);
   } catch (error) {
     console.error("Błąd scrapowania:", error);
@@ -129,7 +130,8 @@ app.get("/api/get-job-offerts", async (req, res) => {
 });
 app.get("/api/get-employers", async (req, res) => {
   try {
-    const offers = await getEmployers();
+    const pages = parseInt(req.query.pages) || 1;
+    const offers = await getEmployers(pages);
     res.json(offers);
   } catch (error) {
     console.error("Błąd scrapowania:", error);

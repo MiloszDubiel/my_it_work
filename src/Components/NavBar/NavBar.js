@@ -36,13 +36,15 @@ const Navbar = () => {
     const handleScroll = () => {
       const parent = searchDiv.current;
       if (!parent) return;
-
+      console.log(parent.parentElement);
       window.requestAnimationFrame(() => {
         if (window.scrollY > 10 && window.innerWidth > 768) {
+          parent.parentElement.classList.add(styles.smallHeader)
           parent.firstChild?.classList.add(styles.hideH1);
           parent.children[1]?.classList.add(styles.moveUp);
           parent.classList.add(styles.smallSearchDiv);
         } else {
+          parent.parentElement.classList.remove(styles.smallHeader);
           parent.firstChild?.classList.remove(styles.hideH1);
           parent.children[1]?.classList.remove(styles.moveUp);
           parent.classList.remove(styles.smallSearchDiv);
