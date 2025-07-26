@@ -16,7 +16,7 @@ async function getJobOfferts(pagesToScrape = 5, maxPerPage = 50) {
 
   const allJobs = [];
 
-  const safeMax = Math.min(maxPerPage, 50); // ograniczenie do max 50
+  const safeMax = Math.min(maxPerPage, 50);
 
   for (let i = 1; i <= pagesToScrape; i++) {
     console.log(`Scraping page ${i}...`);

@@ -1,26 +1,30 @@
 import NavBar from "../NavBar/NavBar";
 import styles from "./MainPage.module.css";
-import JobOfferttsComponent from "../JobOffertsComponent/JobOffertsComponent";
+import JobOfferttsComponent from "../JobOfferts/JobOffertsComponent";
+import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 const MainPage = () => {
   return (
-    <div className={styles.page}>
-      <NavBar />
-      <h1 className={styles.header}>Praca w IT</h1>
-      <h2 className={styles.header} style={{ marginTop: 0 }}>
-        Najnowsze oferty pracy
-      </h2>
-      <div className={styles.recommended}>
-        <div className={styles.parent}>
-          <JobOfferttsComponent amount={9} styles={styles} />
+    <>
+      <JobOfferttDetailsComponent />
+      <div className={styles.page}>
+        <NavBar />
+        <h1 className={styles.header}>Praca w IT</h1>
+        <h2 className={styles.header} style={{ marginTop: 0 }}>
+          Najnowsze oferty pracy
+        </h2>
+        <div className={styles.recommended}>
+          <div className={styles.parent}>
+            <JobOfferttsComponent amount={9} styles={styles} />
+          </div>
         </div>
+        <div className={styles.showMoreOfferts}>
+          <button>Pokaż więcej</button>
+        </div>
+        <footer className={styles.footer}>
+          <p>Tu coś kiedy bedzie</p>
+        </footer>
       </div>
-      <div className={styles.showMoreOfferts}>
-        <button>Pokaż więcej</button>
-      </div>
-      <footer className={styles.footer}>
-        <p>Tu coś kiedy bedzie</p>
-      </footer>
-    </div>
+    </>
   );
 };
 

@@ -11,7 +11,7 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 
 const fetchData = async (amount) => {
   const request = await axios.get(
-    `http://localhost:3001/api/get-job-offerts?pages=1&perPage=${amount}`
+    `http://192.168.100.2:3001/api/get-job-offerts?pages=1&perPage=${amount}`
   );
   return request.data;
 };
@@ -80,9 +80,15 @@ const JobOfferttsComponent = ({ amount, styles }) => {
                   {offert.experience}
                 </span>
               </div>
-              <div>
+              <div className={styles.box}>
                 {offert.technologies.map((el) => {
-                  return <span>{el}</span>;
+                  return (
+                    <>
+                      <span className={styles.ellipsis} data-text={el}>
+                        {el}
+                      </span>
+                    </>
+                  );
                 })}
               </div>
             </div>
