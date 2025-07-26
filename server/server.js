@@ -10,11 +10,13 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-async function getJobOfferts(pagesToScrape = 5) {
+async function getJobOfferts(pagesToScrape = 5, maxPerPage = 50) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   const allJobs = [];
+
+  const safeMax = Math.min(maxPerPage, 50); // ograniczenie do max 50
 
   for (let i = 1; i <= pagesToScrape; i++) {
     console.log(`Scraping page ${i}...`);
@@ -27,40 +29,41 @@ async function getJobOfferts(pagesToScrape = 5) {
 
     await page.waitForSelector(".JobListItem_item__fYh8y");
 
-    const jobs = await page.evaluate(() => {
-      return Array.from(
-        document.querySelectorAll(".JobListItem_item__fYh8y")
-      ).map((el) => ({
-        title: el
-          .querySelector(".JobListItem_item__title__278xz h3")
-          ?.textContent?.trim(),
-        companyName: el
-          .querySelector(".JobListItem_item__title__278xz div")
-          ?.textContent?.trim(),
-        workingMode: el
-          .querySelector(".JobListItem_item__details__sg4tk .relative ")
-          ?.textContent?.trim(),
-        contractType: el
-          .querySelectorAll(
-            ".JobListItem_item__details__sg4tk .items-start "
-          )[0]
-          ?.textContent?.trim(),
-        experience: el
-          .querySelectorAll(
-            ".JobListItem_item__details__sg4tk .items-start "
-          )[1]
-          ?.textContent?.trim(),
-        technologies: Array.from(
-          el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
-        ).map((tag) => tag.textContent.trim()),
-        salary:
-          el
-            .querySelector(".JobListItem_item__salary__OIin6 ")
-            ?.textContent?.trim() || "not available",
-        img: el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
-        link: el?.href,
-      }));
-    });
+    const jobs = await page.evaluate((safeMax) => {
+      return Array.from(document.querySelectorAll(".JobListItem_item__fYh8y"))
+        .slice(0, safeMax)
+        .map((el) => ({
+          title: el
+            .querySelector(".JobListItem_item__title__278xz h3")
+            ?.textContent?.trim(),
+          companyName: el
+            .querySelector(".JobListItem_item__title__278xz div")
+            ?.textContent?.trim(),
+          workingMode: el
+            .querySelector(".JobListItem_item__details__sg4tk .relative ")
+            ?.textContent?.trim(),
+          contractType: el
+            .querySelectorAll(
+              ".JobListItem_item__details__sg4tk .items-start "
+            )[0]
+            ?.textContent?.trim(),
+          experience: el
+            .querySelectorAll(
+              ".JobListItem_item__details__sg4tk .items-start "
+            )[1]
+            ?.textContent?.trim(),
+          technologies: Array.from(
+            el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
+          ).map((tag) => tag.textContent.trim()),
+          salary:
+            el
+              .querySelector(".JobListItem_item__salary__OIin6 ")
+              ?.textContent?.trim() || "not available",
+          img:
+            el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
+          link: el?.href,
+        }));
+    }, safeMax);
 
     allJobs.push(...jobs);
   }
@@ -121,7 +124,9 @@ export async function getEmployers(pagesToScrape = 5) {
 app.get("/api/get-job-offerts", async (req, res) => {
   try {
     const pages = parseInt(req.query.pages) || 1;
-    const offers = await getJobOfferts(pages);
+    const perPage = parseInt(req.query.perPage) || 50;
+
+    const offers = await getJobOfferts(pages, perPage);
     res.json(offers);
   } catch (error) {
     console.error("Błąd scrapowania:", error);

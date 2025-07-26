@@ -17,6 +17,7 @@
   width: 1300px;
   place-items: center;
   gap: 25px;
+  position: relative;
 }
 
 /*Divy z ofertami*/
@@ -143,7 +144,7 @@
 /*Ładowanie */
 .loader {
   position: absolute;
-  transform: translateY(-100px);
+  top: 100px;
   display: flex;
   align-items: center;
   gap: 20px;

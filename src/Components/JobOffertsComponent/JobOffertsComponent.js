@@ -1,30 +1,48 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { CiLocationOn } from "react-icons/ci";
 import { BsFileText } from "react-icons/bs";
 import { MdGrading } from "react-icons/md";
 import { MdFavorite } from "react-icons/md";
+import { useCookies } from "react-cookie";
 
-const fetchData = async () => {
-  let request = await axios.get(
-    "http://192.168.100.2:3001/api/get-job-offerts?pages=1"
+const CACHE_KEY = "jobOffertsCache";
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
+
+const fetchData = async (amount) => {
+  const request = await axios.get(
+    `http://localhost:3001/api/get-job-offerts?pages=1&perPage=${amount}`
   );
-  let response = await request.data;
-
-  return response;
+  return request.data;
 };
 
 const JobOfferttsComponent = ({ amount, styles }) => {
   const [isLoading, setIsLoading] = useState(false);
-  let [jobOfferts, setJobOfferts] = useState(null);
+  const [jobOfferts, setJobOfferts] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchData().then((data) => {
-      setJobOfferts(data);
+    const cached = localStorage.getItem(CACHE_KEY);
+    const parsed = cached ? JSON.parse(cached) : null;
+
+    if (parsed && Date.now() < parsed.expiry) {
+      setJobOfferts(parsed.data);
       setIsLoading(false);
-    });
-  }, []);
+    } else {
+      fetchData(amount).then((data) => {
+        setJobOfferts(data);
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({
+            data,
+            expiry: Date.now() + CACHE_DURATION_MS,
+          })
+        );
+        setIsLoading(false);
+      });
+    }
+  }, [amount]);
+
   let jobOffertsDivs = [];
 
   for (let i = 0; i < amount; i++) {
