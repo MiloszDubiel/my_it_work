@@ -419,7 +419,7 @@
     width: inherit;
   }
   .optionsFilter > div > div {
-    width: calc(100% - 40px);
+    width: calc(100% + 4px);
   }
   .searchDiv .formDiv {
     display: none;

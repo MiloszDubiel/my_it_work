@@ -1,9 +1,13 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { CiLocationOn } from "react-icons/ci";
+import { BsFileText } from "react-icons/bs";
+import { MdGrading } from "react-icons/md";
+import { MdFavorite } from "react-icons/md";
 
 const fetchData = async () => {
   let request = await axios.get(
-    "http://localhost:3001/api/get-job-offerts?pages=1"
+    "http://192.168.100.2:3001/api/get-job-offerts?pages=1"
   );
   let response = await request.data;
 
@@ -34,11 +38,39 @@ const JobOfferttsComponent = ({ amount, styles }) => {
             <img src={offert.img} width={80} />
           </div>
           <div className={styles.info}>
-            <div>
-              <span>{offert.title}</span>
-              <span>{offert.companyName}</span>
+            <div className={styles.info1}>
+              <span style={{ fontWeight: "bold", paddingTop: "10px" }}>
+                {offert.title}
+              </span>
+              <span style={{ fontSize: "12px", paddingTop: "2px" }}>
+                {offert.companyName}
+              </span>
             </div>
-            <div></div>
+            <div className={styles.info2}>
+              <div>
+                <span>
+                  {" "}
+                  <CiLocationOn />
+                  {offert.workingMode}
+                </span>
+                <span>
+                  <BsFileText />
+                  {offert.contractType}
+                </span>
+                <span>
+                  <MdGrading />
+                  {offert.experience}
+                </span>
+              </div>
+              <div>
+                {offert.technologies.map((el) => {
+                  return <span>{el}</span>;
+                })}
+              </div>
+            </div>
+          </div>
+          <div className={styles.addToFavorite}>
+            <MdFavorite />
           </div>
         </div>
       );

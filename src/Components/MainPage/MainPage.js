@@ -14,6 +14,12 @@ const MainPage = () => {
           <JobOfferttsComponent amount={9} styles={styles} />
         </div>
       </div>
+      <div className={styles.showMoreOfferts}>
+        <button>Pokaż więcej</button>
+      </div>
+      <footer className={styles.footer}>
+        <p>Tu coś kiedy bedzie</p>
+      </footer>
     </div>
   );
 };
