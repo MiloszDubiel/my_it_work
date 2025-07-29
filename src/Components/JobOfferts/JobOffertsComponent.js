@@ -4,7 +4,6 @@ import { CiLocationOn } from "react-icons/ci";
 import { BsFileText } from "react-icons/bs";
 import { MdGrading } from "react-icons/md";
 import { MdFavorite } from "react-icons/md";
-import { useCookies } from "react-cookie";
 
 const CACHE_KEY = "jobOffertsCache";
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
@@ -51,7 +50,16 @@ const JobOfferttsComponent = ({ amount, styles }) => {
       let offert = jobOfferts[i];
 
       jobOffertsDivs.push(
-        <div className={styles.offerts} key={i}>
+        <div
+          className={styles.offerts}
+          key={i}
+          onClick={() => {
+            document
+              .querySelector("#showWindow")
+              .classList.add(styles.showWindow);
+            localStorage.setItem("currentOfert", JSON.stringify(offert));
+          }}
+        >
           <div className={styles.companyImg}>
             <img src={offert.img} width={80} />
           </div>

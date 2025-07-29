@@ -5,7 +5,7 @@ import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComp
 const MainPage = () => {
   return (
     <>
-      <JobOfferttDetailsComponent />
+      <JobOfferttDetailsComponent styles1={styles} />
       <div className={styles.page}>
         <NavBar />
         <h1 className={styles.header}>Praca w IT</h1>

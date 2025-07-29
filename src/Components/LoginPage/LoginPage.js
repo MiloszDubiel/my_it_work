@@ -11,8 +11,6 @@ const LoginPage = () => {
   let passwordError = useRef(null);
   let infoDiv = useRef(null);
   let checkbox = useRef(null);
-  const naviagate = useNavigate();
-  const [userData, setUserData] = useState(null);
 
   return (
     <div className={styles.container}>
