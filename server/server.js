@@ -72,53 +72,69 @@ async function getJobOfferts(pagesToScrape = 5, maxPerPage = 50) {
   return allJobs;
 }
 
-export async function getEmployers(pagesToScrape = 5) {
+export async function getEmployers(link) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   const allEmployers = [];
 
-  for (let i = 1; i <= pagesToScrape; i++) {
-    const url =
-      i === 1
-        ? "https://bulldogjob.pl/companies/profiles"
-        : `https://bulldogjob.pl/companies/profiles/s/page,${i}`;
+  console.log(`Scraping page ${i}: ${link}`);
 
-    console.log(`Scraping page ${i}: ${url}`);
+  await page.goto(url, { waitUntil: "domcontentloaded" });
 
-    await page.goto(url, { waitUntil: "domcontentloaded" });
+  try {
+    await page.waitForSelector(".jsx-4039385543", {
+      timeout: 10000,
+    });
+    const employers = await page.evaluate(() => {
+      return Array.from(document.querySelector(".jsx-4039385543")).map(
+        (el) => ({
+          willDo: Array.from(
+            el.querySelectorAll("#1-panel .list--check ul li")
+          ).map((tag) => tag?.textContent),
+          offerts: el.querySelectorAll(".#2-panel .list--check ul li")
+            ?.textContent,
+        })
+      );
+    });
 
-    try {
-      await page.waitForSelector(".container", {
-        timeout: 10000,
-      });
-      await page.screenshot({ path: "snapshot.png" });
-      const employers = await page.evaluate(() => {
-        return Array.from(
-          document.querySelectorAll(".container div:not(.mb-10) a")
-        )
-          .filter((el) => el.querySelector("h3") != null)
-          .map((el) => ({
-            companyName: el.querySelector("h3")?.textContent,
-            technologies: Array.from(el.querySelectorAll(".gap-3 span")).map(
-              (tag) => tag.textContent.trim()
-            ),
-            localization: Array.from(
-              el.querySelectorAll(".rounded-t-lg span")
-            ).map((tag) => tag.textContent.trim()),
-            img: el.querySelector("img")?.src,
-            link: el?.href,
-          }));
-      });
-
-      allEmployers.push(...employers);
-    } catch (err) {
-      console.error(`Błąd ładowania zawartości strony ${i}:`, err.message);
-    }
+    allEmployers.push(...employers);
+  } catch (err) {
+    console.error(`Błąd ładowania zawartości strony ${i}:`, err.message);
   }
 
   await browser.close();
   return allEmployers;
+}
+
+export async function getOfertDetails(link) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  console.log(`Scraping page: ${link}`);
+
+  await page.goto(link, { waitUntil: "domcontentloaded" });
+
+  try {
+    await page.waitForSelector("main.jsx-1023221994 aside.jsx-1023221994", {
+      timeout: 10000,
+    });
+    const details = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll("main.jsx-1023221994 aside.jsx-1023221994")
+      ).map((el) => ({
+        money: el.querySelector(".mb-4 p.text-c22")?.textContent,
+        type: el.querySelector(".mb-4 p.mt-1")?.textContent,
+      }));
+    });
+
+    await browser.close();
+    return details;
+  } catch (err) {
+    console.error(`Błąd ładowania zawartości strony:`, err.message);
+  }
+
+  await browser.close();
 }
 
 app.get("/api/get-job-offerts", async (req, res) => {
@@ -138,6 +154,16 @@ app.get("/api/get-employers", async (req, res) => {
     const pages = parseInt(req.query.pages) || 1;
     const offers = await getEmployers(pages);
     res.json(offers);
+  } catch (error) {
+    console.error("Błąd scrapowania:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.post("/api/get-ofert-details", async (req, res) => {
+  try {
+    const { link } = req.body;
+    const offersDetails = await getOfertDetails(link);
+    res.json(offersDetails);
   } catch (error) {
     console.error("Błąd scrapowania:", error);
     res.status(500).json({ error: error.message });

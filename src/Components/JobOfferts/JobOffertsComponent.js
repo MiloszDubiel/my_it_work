@@ -58,6 +58,7 @@ const JobOfferttsComponent = ({ amount, styles }) => {
               .querySelector("#showWindow")
               .classList.add(styles.showWindow);
             localStorage.setItem("currentOfert", JSON.stringify(offert));
+            window.dispatchEvent(new Event("ofert-selected"));
           }}
         >
           <div className={styles.companyImg}>
