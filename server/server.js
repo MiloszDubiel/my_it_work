@@ -116,19 +116,25 @@ export async function getOfertDetails(link) {
   await page.goto(link, { waitUntil: "domcontentloaded" });
 
   try {
-    await page.waitForSelector("main.jsx-1023221994 aside.jsx-1023221994", {
+    await page.waitForSelector("aside", {
       timeout: 10000,
     });
+
     const details = await page.evaluate(() => {
-      return Array.from(
-        document.querySelectorAll("main.jsx-1023221994 aside.jsx-1023221994")
-      ).map((el) => ({
-        money: el.querySelector(".mb-4 p.text-c22")?.textContent,
-        type: el.querySelector(".mb-4 p.mt-1")?.textContent,
+      return Array.from(document.querySelectorAll("aside")).map((el) => ({
+        moneyOfHours:
+          el.querySelector(".mb-4 p.text-c22")?.textContent || "Not available",
+        typeOfContract:
+          el.querySelector(".mb-4 p.mt-1")?.textContent || "Not available",
+        restInfo: Array.from(el.querySelectorAll(".flex.mt-6")).map((el) => [
+          [
+            el.querySelectorAll("p")[0].textContent,
+            el.querySelectorAll("p")[1].textContent,
+          ],
+        ]),
       }));
     });
 
-    await browser.close();
     return details;
   } catch (err) {
     console.error(`Błąd ładowania zawartości strony:`, err.message);

@@ -16,7 +16,7 @@ const fetchData = async (link) => {
 
 const JobOfferttDetailsComponent = ({ styles1 }) => {
   let [offert, setOffert] = useState(null);
-  let [offertDatails, setOffertDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const updateOffert = () => {
@@ -27,28 +27,46 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
     window.addEventListener("ofert-selected", updateOffert);
   }, []);
 
-  useEffect(() => {
-    if (!!offert) {
-      console.log(offert);
-      fetchData(offert.link).then((res) => console.log(res));
-    }
-  });
+  if (
+    document.querySelector("#showOfert")?.classList.contains(styles.showOfert)
+  ) {
+    fetchData(offert.link).then((res) => console.log(res));
+  }
 
-  return (
-    <div className={styles.conteiner} id="showWindow">
-      <div className={styles.details}>
+  const content = (
+    <div className={styles.searchOffertsDiv} id="showOfert">
+      <div className={styles.searchOfferts}>
         <div className={styles.closeWindow}>
-          <p style={{ fontSize: "26px" }}>Szczegóły oferty</p>
+          <p style={{ fontSize: "26px" }}>Filtruj oferty</p>
           <IoCloseOutline
             onClick={() => {
               document
-                .querySelector("#showWindow")
-                .classList.remove(styles1.showWindow);
+                .querySelector("#showOfert")
+                .classList.remove(styles.showOfert);
             }}
           />
         </div>
+        <div className={styles.mainFilters}>
+          <div className={styles.setFilter}>
+            <button>Resetuj</button>
+            <button>Zastosuj</button>
+          </div>
+        </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {isLoading ? (
+        <div className={styles.loader}>
+          <div className={styles.loaderAnimation}></div>
+
+          <p style={{ textAlign: "center" }}>Wczytywanie ofert...</p>
+        </div>
+      ) : null}
+      {content}
+    </>
   );
 };
 

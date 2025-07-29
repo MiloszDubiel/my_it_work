@@ -15,7 +15,7 @@ const fetchData = async (amount) => {
   return request.data;
 };
 
-const JobOfferttsComponent = ({ amount, styles }) => {
+const JobOfferttsComponent = ({ amount, styles, ofertDetailsStyle }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [jobOfferts, setJobOfferts] = useState(null);
 
@@ -55,8 +55,8 @@ const JobOfferttsComponent = ({ amount, styles }) => {
           key={i}
           onClick={() => {
             document
-              .querySelector("#showWindow")
-              .classList.add(styles.showWindow);
+              .querySelector("#showOfert")
+              .classList.add(ofertDetailsStyle.showOfert);
             localStorage.setItem("currentOfert", JSON.stringify(offert));
             window.dispatchEvent(new Event("ofert-selected"));
           }}
