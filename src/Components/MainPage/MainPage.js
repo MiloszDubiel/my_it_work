@@ -3,11 +3,14 @@ import styles from "./MainPage.module.css";
 import JobOfferttsComponent from "../JobOfferts/JobOffertsComponent";
 import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
+import Navbar from "../NavBar/NavBar";
+
 const MainPage = () => {
   return (
     <>
       <JobOfferttDetailsComponent />
       <div className={styles.page}>
+        <Navbar />
         <h1 className={styles.header}>Praca w IT</h1>
         <h2 className={styles.header} style={{ marginTop: 0 }}>
           Najnowsze oferty pracy

@@ -31,6 +31,7 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
     setIsLoading(true);
     if (!offert) return;
     fetchData(offert.link).then((res) => {
+      console.log(res);
       setOffertDetails(
         <div className={styles.searchOffertsDiv} id="showOfert">
           <div className={styles.searchOfferts}>
@@ -45,8 +46,34 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
               />
             </div>
             <div className={styles.mainFilters}>
+              <div className={styles.offertInfo}>
+                <div>
+                  <img scr={offert.img} alt="logo" />
+                </div>
+                <div>
+                  <div className={styles.detail}>
+                    <p>{offert.title}</p>
+                    <span>{offert.companyName}</span>
+                  </div>
+                </div>
+              </div>
               <div className={styles.details}>
-                <p>{res[0].moneyOfHours}</p>
+                <div className={styles.detail}>
+                  <p>Stawka godzinowa:</p>
+                  <span>{res[0].moneyOfHours}</span>
+                </div>
+                <div className={styles.detail}>
+                  <p>Typ umowy:</p>
+                  <span>{res[0].typeOfContract}</span>
+                </div>
+                {res[0].restInfo.map((el) => {
+                  return (
+                    <div className={styles.detail}>
+                      <p>{el[0][0]}:</p>
+                      <span>{el[0][1]}</span>
+                    </div>
+                  );
+                })}
               </div>
               <div className={styles.setFilter}>
                 <button>Aplikuj</button>
