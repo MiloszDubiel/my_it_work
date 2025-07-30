@@ -17,7 +17,7 @@ const fetchData = async (link) => {
 const JobOfferttDetailsComponent = ({ styles1 }) => {
   let [offert, setOffert] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [offertDetails, setOffertDetails] = useState(null);
   useEffect(() => {
     const updateOffert = () => {
       const stored = localStorage.getItem("currentOfert");
@@ -27,45 +27,62 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
     window.addEventListener("ofert-selected", updateOffert);
   }, []);
 
-  if (
-    document.querySelector("#showOfert")?.classList.contains(styles.showOfert)
-  ) {
-    fetchData(offert.link).then((res) => console.log(res));
-  }
-
-  const content = (
-    <div className={styles.searchOffertsDiv} id="showOfert">
-      <div className={styles.searchOfferts}>
-        <div className={styles.closeWindow}>
-          <p style={{ fontSize: "26px" }}>Filtruj oferty</p>
-          <IoCloseOutline
-            onClick={() => {
-              document
-                .querySelector("#showOfert")
-                .classList.remove(styles.showOfert);
-            }}
-          />
-        </div>
-        <div className={styles.mainFilters}>
-          <div className={styles.setFilter}>
-            <button>Resetuj</button>
-            <button>Zastosuj</button>
+  useEffect(() => {
+    setIsLoading(true);
+    if (!offert) return;
+    fetchData(offert.link).then((res) => {
+      setOffertDetails(
+        <div className={styles.searchOffertsDiv} id="showOfert">
+          <div className={styles.searchOfferts}>
+            <div className={styles.closeWindow}>
+              <p style={{ fontSize: "26px" }}>Szczegóły oferty</p>
+              <IoCloseOutline
+                onClick={() => {
+                  document
+                    .querySelector("#showOfert")
+                    .classList.remove(styles.showOfert);
+                }}
+              />
+            </div>
+            <div className={styles.mainFilters}>
+              <div className={styles.details}>
+                <p>{res[0].moneyOfHours}</p>
+              </div>
+              <div className={styles.setFilter}>
+                <button>Aplikuj</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+      setIsLoading(false);
+    });
+  }, [offert]);
 
   return (
     <>
       {isLoading ? (
-        <div className={styles.loader}>
-          <div className={styles.loaderAnimation}></div>
-
-          <p style={{ textAlign: "center" }}>Wczytywanie ofert...</p>
+        <div className={styles.searchOffertsDiv} id="showOfert">
+          <div className={styles.searchOfferts}>
+            <div className={styles.closeWindow}>
+              <p style={{ fontSize: "26px" }}>Szczegóły oferty</p>
+              <IoCloseOutline
+                onClick={() => {
+                  document
+                    .querySelector("#showOfert")
+                    .classList.remove(styles.showOfert);
+                }}
+              />
+            </div>
+            <div className={styles.loader}>
+              <div className={styles.loaderAnimation}></div>
+              <p style={{ textAlign: "center" }}>Wczytywanie ofert...</p>
+            </div>
+          </div>
         </div>
-      ) : null}
-      {content}
+      ) : (
+        offertDetails
+      )}
     </>
   );
 };

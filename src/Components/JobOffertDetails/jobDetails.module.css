@@ -31,6 +31,18 @@
 .showOfert {
   display: block;
 }
+.details {
+  height: calc(100% - 140px);
+}
+.setFilter {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.mainFilters {
+  height: 100%;
+}
 
 /*
 
@@ -61,5 +73,10 @@
   to {
     transform: translateX(0%);
     opacity: 1;
+  }
+}
+@keyframes l2 {
+  to {
+    transform: rotate(1turn);
   }
 }

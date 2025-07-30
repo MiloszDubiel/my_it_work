@@ -1,13 +1,15 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./Components/MainPage/MainPage";
 import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
+import Navbar from "./Components/NavBar/NavBar";
 
 const App = () => {
   return (
     <>
-      <Router>
+      <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<MainPage />} />
         </Routes>
@@ -17,7 +19,7 @@ const App = () => {
         <Routes>
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </>
   );
 };
