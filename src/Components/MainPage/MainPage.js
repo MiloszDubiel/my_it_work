@@ -1,9 +1,9 @@
-import NavBar from "../NavBar/NavBar";
 import styles from "./MainPage.module.css";
 import JobOfferttsComponent from "../JobOfferts/JobOffertsComponent";
 import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
 import Navbar from "../NavBar/NavBar";
+import { Link } from "react-router-dom";
 
 const MainPage = () => {
   return (
@@ -25,7 +25,15 @@ const MainPage = () => {
           </div>
         </div>
         <div className={styles.showMoreOfferts}>
-          <button>Pokaż więcej</button>
+          <button>
+            {" "}
+            <Link
+              to={"/job-offerts"}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              Pokaż więcej
+            </Link>
+          </button>
         </div>
         <footer className={styles.footer}>
           <p>Tu coś kiedy bedzie</p>

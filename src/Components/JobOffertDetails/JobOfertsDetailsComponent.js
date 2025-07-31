@@ -37,7 +37,6 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
 
     fetchData(offert.link).then((res) => {
       setOffertDetails(res);
-
       setContent(
         <div className={styles.searchOffertsDiv} id="showOfert">
           <div className={styles.searchOfferts}>
@@ -53,8 +52,15 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
             </div>
             <div className={styles.mainFilters}>
               <div className={styles.offertInfo}>
-                <div>
-                  <img scr={offert.img} alt="logo" />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  <img src={offert.img} width={60} alt="logo" />
                 </div>
                 <div>
                   <div className={styles.detail}>

@@ -7,7 +7,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ hideHeadder }) => {
   let hiddenMenu = useRef(null);
   let searchDiv = useRef(null);
   let account = useRef(null);
@@ -26,18 +26,32 @@ const Navbar = () => {
   };
 
   const toggleStyle = (e) => {
-    e.currentTarget.classList.toggle(styles.toggleColor);
+    if (e.target.tagName === "P") {
+      e.target.classList.toggle(styles.toggleColor);
+    }
   };
 
   const toggleFilter = () => {
     hiddenMenu.current.classList.toggle(styles.toggleFilter);
   };
+
+  useEffect(() => {
+    const parent = searchDiv.current;
+    if (!parent) return;
+    if (hideHeadder) {
+      parent.parentElement.classList.add(styles.smallHeader);
+      parent.firstChild?.classList.add(styles.hideH1);
+      parent.children[1]?.classList.add(styles.moveUp);
+      parent.classList.add(styles.smallSearchDiv);
+    }
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       const parent = searchDiv.current;
       if (!parent) return;
       window.requestAnimationFrame(() => {
-        if (window.scrollY > 10 && window.innerWidth > 768) {
+        if (hideHeadder || (window.scrollY > 10 && window.innerWidth > 768)) {
           parent.parentElement.classList.add(styles.smallHeader);
           parent.firstChild?.classList.add(styles.hideH1);
           parent.children[1]?.classList.add(styles.moveUp);
@@ -355,19 +369,25 @@ const Navbar = () => {
               <p style={{ fontWeight: "bolder", margin: 0 }}>
                 Poziom doświadczenia
               </p>
-              <div className={styles.experiencesTypes}>
-                <p onClick={(e) => toggleStyle(e)}>Intern</p>
-                <p onClick={(e) => toggleStyle(e)}>Junior</p>
-                <p onClick={(e) => toggleStyle(e)}>Senior</p>
-                <p onClick={(e) => toggleStyle(e)}>Lead/Principal</p>
+              <div
+                className={styles.experiencesTypes}
+                onClick={(e) => toggleStyle(e)}
+              >
+                <p>Intern</p>
+                <p>Junior</p>
+                <p>Senior</p>
+                <p>Lead/Principal</p>
               </div>
             </div>
             <div className={styles.contract}>
               <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
-              <div className={styles.contractTypes}>
-                <p onClick={(e) => toggleStyle(e)}>Umowa B2B</p>
-                <p onClick={(e) => toggleStyle(e)}>Umowa o prace</p>
-                <p onClick={(e) => toggleStyle(e)}>Umowa zlecenie</p>
+              <div
+                className={styles.contractTypes}
+                onClick={(e) => toggleStyle(e)}
+              >
+                <p>Umowa B2B</p>
+                <p>Umowa o prace</p>
+                <p>Umowa zlecenie</p>
               </div>
             </div>
           </div>
