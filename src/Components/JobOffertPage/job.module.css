@@ -154,7 +154,6 @@
   gap: 20px;
 }
 
-
 .loaderAnimation {
   width: 20px;
   height: 20px;
@@ -174,6 +173,9 @@
   padding: 20px;
 }
 
+.showOfert {
+  display: block;
+}
 /*Pokaz okno*/
 .showWindow {
   display: flex !important;

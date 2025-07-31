@@ -31,7 +31,7 @@ function Items({ currentItems, ofertDetailsStyle }) {
             onClick={() => {
               document
                 .querySelector("#showOfert")
-                .classList.add(ofertDetailsStyle.showOfert);
+                .classList.add(styles.showOfert);
               localStorage.setItem("currentOfert", JSON.stringify(el));
               window.dispatchEvent(new Event("ofert-selected"));
             }}
