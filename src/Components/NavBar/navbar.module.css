@@ -475,10 +475,14 @@
     height: 180px;
   }
   .setFilter button:nth-child(1) {
-    width: 150px;
+    width: 100px;
+    height: 40px;
+    font-size: 14px;
   }
   .setFilter button:nth-child(2) {
-    width: 200px;
+    width: 150px;
+    height: 40px;
+    font-size: 14px;
   }
   .experienceDiv,
   .contract {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./jobDetails.module.css";
 import { IoCloseOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
@@ -18,6 +18,10 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
   let [offert, setOffert] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [offertDetails, setOffertDetails] = useState(null);
+  const [content, setContent] = useState(null);
+
+  let prevOffert = useRef(null);
+
   useEffect(() => {
     const updateOffert = () => {
       const stored = localStorage.getItem("currentOfert");
@@ -30,9 +34,11 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
   useEffect(() => {
     setIsLoading(true);
     if (!offert) return;
+
     fetchData(offert.link).then((res) => {
-      console.log(res);
-      setOffertDetails(
+      setOffertDetails(res);
+
+      setContent(
         <div className={styles.searchOffertsDiv} id="showOfert">
           <div className={styles.searchOfferts}>
             <div className={styles.closeWindow}>
@@ -108,7 +114,7 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
           </div>
         </div>
       ) : (
-        offertDetails
+        content
       )}
     </>
   );

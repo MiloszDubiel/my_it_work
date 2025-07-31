@@ -370,27 +370,6 @@ const Navbar = () => {
                 <p onClick={(e) => toggleStyle(e)}>Umowa zlecenie</p>
               </div>
             </div>
-            <hr />
-            <div className={styles.saleryDiv}>
-              <p style={{ fontWeight: "bolder", margin: 0 }}>Wypłata</p>
-              <div className={styles.moneyDiv}>
-                <input
-                  type="number"
-                  min={0}
-                  max={50_000}
-                  className={styles.money}
-                  placeholder="Minimalna"
-                />
-                <p>-</p>
-                <input
-                  placeholder="Maksymalna"
-                  type="number"
-                  min={0}
-                  max={50_000}
-                  className={styles.money}
-                />
-              </div>
-            </div>
           </div>
           <div className={styles.setFilter}>
             <button>Resetuj</button>
