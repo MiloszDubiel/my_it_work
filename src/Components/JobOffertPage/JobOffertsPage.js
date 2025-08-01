@@ -4,11 +4,7 @@ import Navbar from "../NavBar/NavBar";
 import ReactPaginate from "react-paginate";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { CiLocationOn } from "react-icons/ci";
-import { BsFileText } from "react-icons/bs";
-import { MdGrading } from "react-icons/md";
-import { MdFavorite } from "react-icons/md";
-import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
+import Offert from "../OffertComponent/Offert";
 
 const fetchData = async () => {
   const request = await axios.get(
@@ -17,78 +13,17 @@ const fetchData = async () => {
   return request.data;
 };
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
-const items = [...Array(33).keys()];
 
-function Items({ currentItems, ofertDetailsStyle }) {
+const Items = ({ currentItems }) => {
   return (
     <>
       {currentItems &&
-        currentItems.map((el, index) => (
-          <div
-            className={styles.offerts}
-            key={index}
-            onClick={() => {
-              document
-                .querySelector("#showOfert")
-                .classList.add(styles.showOfert);
-              localStorage.setItem("currentOfert", JSON.stringify(el));
-              window.dispatchEvent(new Event("ofert-selected"));
-            }}
-            onLoad={() => {
-              document.querySelector(".pagination").style.display = "flex";
-            }}
-          >
-            <div className={styles.companyImg}>
-              <img src={el.img} width={80} />
-            </div>
-            <div className={styles.info}>
-              <div className={styles.info1}>
-                <span style={{ fontWeight: "bold", paddingTop: "10px" }}>
-                  {el.title}
-                </span>
-                <span style={{ fontSize: "12px", paddingTop: "2px" }}>
-                  {el.companyName}
-                </span>
-              </div>
-              <div className={styles.info2}>
-                <div>
-                  <span>
-                    {" "}
-                    <CiLocationOn />
-                    {el.workingMode}
-                  </span>
-                  <span>
-                    <BsFileText />
-                    {el.contractType}
-                  </span>
-                  <span>
-                    <MdGrading />
-                    {el.experience}
-                  </span>
-                </div>
-                <div className={styles.box}>
-                  {el.technologies.map((ele) => {
-                    return (
-                      <>
-                        <span className={styles.ellipsis} data-text={ele}>
-                          {ele}
-                        </span>
-                      </>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            <div className={styles.addToFavorite}>
-              <MdFavorite />
-            </div>
-          </div>
-        ))}
+        currentItems.map((el, index) => <Offert offert={el} index={index} />)}
     </>
   );
-}
+};
 
-function PaginatedItems({ itemsPerPage }) {
+const PaginatedItems = ({ itemsPerPage }) => {
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
@@ -127,7 +62,6 @@ function PaginatedItems({ itemsPerPage }) {
       setItemOffset(newOffset);
     }
   };
-
   return (
     <>
       <Items currentItems={currentItems} />
@@ -153,7 +87,7 @@ function PaginatedItems({ itemsPerPage }) {
       />
     </>
   );
-}
+};
 
 const JobOffertsPage = () => {
   return (
@@ -161,16 +95,10 @@ const JobOffertsPage = () => {
       <JobOfferttDetailsComponent />
       <div className={styles.page}>
         <Navbar hideHeadder={true} />
-        <h1 className={styles.header}>Praca w IT</h1>
-        <h2 className={styles.header} style={{ marginTop: 0 }}>
-          Najnowsze oferty pracy
-        </h2>
+        <h1 className={styles.header}>Przeglądaj oferty pracy</h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
-            <PaginatedItems
-              itemsPerPage={9}
-              ofertDetailsStyle={jobOfertsStyle}
-            />
+            <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
         <div className={styles.showMoreOfferts}></div>

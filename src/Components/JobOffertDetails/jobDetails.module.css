@@ -28,9 +28,6 @@
   width: 30px;
   cursor: pointer;
 }
-.showOfert {
-  display: block;
-}
 
 .details {
   height: calc(100% - 100px - 60px - 80px);

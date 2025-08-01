@@ -1,5 +1,5 @@
 import styles from "./MainPage.module.css";
-import JobOfferttsComponent from "../JobOfferts/JobOffertsComponent";
+import NewJobOfferts from "../NewJobOfferts/NewJobOfferts";
 import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
 import Navbar from "../NavBar/NavBar";
@@ -17,7 +17,7 @@ const MainPage = () => {
         </h2>
         <div className={styles.recommended}>
           <div className={styles.parent}>
-            <JobOfferttsComponent
+            <NewJobOfferts
               amount={9}
               styles={styles}
               ofertDetailsStyle={jobOfertsStyle}
@@ -25,15 +25,13 @@ const MainPage = () => {
           </div>
         </div>
         <div className={styles.showMoreOfferts}>
-          <button>
-            {" "}
-            <Link
-              to={"/job-offerts"}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              Pokaż więcej
-            </Link>
-          </button>
+          {" "}
+          <Link
+            to={"/job-offerts"}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <button> Pokaż więcej</button>
+          </Link>
         </div>
         <footer className={styles.footer}>
           <p>Tu coś kiedy bedzie</p>

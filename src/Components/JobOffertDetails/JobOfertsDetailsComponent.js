@@ -3,6 +3,7 @@ import styles from "./jobDetails.module.css";
 import { IoCloseOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const fetchData = async (link) => {
   const request = await axios.post(
@@ -14,7 +15,7 @@ const fetchData = async (link) => {
   return request.data;
 };
 
-const JobOfferttDetailsComponent = ({ styles1 }) => {
+const JobOfferttDetailsComponent = () => {
   let [offert, setOffert] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [offertDetails, setOffertDetails] = useState(null);
@@ -46,7 +47,7 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
                 onClick={() => {
                   document
                     .querySelector("#showOfert")
-                    .classList.remove(styles.showOfert);
+                    .classList.remove("showOfert");
                 }}
               />
             </div>
@@ -113,10 +114,7 @@ const JobOfferttDetailsComponent = ({ styles1 }) => {
                 }}
               />
             </div>
-            <div className={styles.loader}>
-              <div className={styles.loaderAnimation}></div>
-              <p style={{ textAlign: "center" }}>Wczytywanie ofert...</p>
-            </div>
+            <LoadingComponent />
           </div>
         </div>
       ) : (
