@@ -16,11 +16,10 @@ const fetchData = async () => {
   );
   return request.data;
 };
-
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 const items = [...Array(33).keys()];
 
 function Items({ currentItems, ofertDetailsStyle }) {
-  console.log(document.querySelector("#showOfert"));
   return (
     <>
       {currentItems &&
@@ -34,6 +33,9 @@ function Items({ currentItems, ofertDetailsStyle }) {
                 .classList.add(styles.showOfert);
               localStorage.setItem("currentOfert", JSON.stringify(el));
               window.dispatchEvent(new Event("ofert-selected"));
+            }}
+            onLoad={() => {
+              document.querySelector(".pagination").style.display = "flex";
             }}
           >
             <div className={styles.companyImg}>
@@ -93,24 +95,20 @@ function PaginatedItems({ itemsPerPage }) {
   const [offerts, setOfferts] = useState(null);
 
   useEffect(() => {
-    console.log(JSON.parse(localStorage.getItem("offerts")));
+    const cached = localStorage.getItem("offerts");
+    const parsed = cached ? JSON.parse(cached) : null;
 
-    if (
-      JSON.parse(localStorage.getItem("offerts")) &&
-      offerts &&
-      JSON.parse(localStorage.getItem("offerts"))[0].companyName ===
-        offerts[0].companyName
-    ) {
-      let items = JSON.parse(localStorage.getItem("offerts"));
+    if (parsed && Date.now() < parsed.expiry) {
       const endOffset = itemOffset + itemsPerPage;
-
-      setCurrentItems(items.slice(itemOffset, endOffset));
-      setPageCount(Math.ceil(items.length / itemsPerPage));
+      setCurrentItems(parsed.res.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(parsed.res.length / itemsPerPage));
     } else {
       fetchData().then((res) => {
-        console.log(res);
         setOfferts(res);
-        localStorage.setItem("offerts", JSON.stringify(res));
+        localStorage.setItem(
+          "offerts",
+          JSON.stringify({ res, expiry: Date.now() + CACHE_DURATION_MS })
+        );
         const endOffset = itemOffset + itemsPerPage;
         setCurrentItems(res.slice(itemOffset, endOffset));
         setPageCount(Math.ceil(res.length / itemsPerPage));
@@ -119,20 +117,26 @@ function PaginatedItems({ itemsPerPage }) {
   }, [itemOffset, itemsPerPage]);
 
   const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % items.length;
-    setItemOffset(newOffset);
+    if (offerts) {
+      const newOffset = (event.selected * itemsPerPage) % offerts.length;
+      setItemOffset(newOffset);
+    } else {
+      const newOffset =
+        (event.selected * itemsPerPage) %
+        JSON.parse(localStorage.getItem("offerts")).res.length;
+    }
   };
 
   return (
     <>
       <Items currentItems={currentItems} />
       <ReactPaginate
-        nextLabel="next >"
+        nextLabel=">"
         onPageChange={handlePageClick}
         pageRangeDisplayed={3}
         marginPagesDisplayed={2}
         pageCount={9}
-        previousLabel="< previous"
+        previousLabel="<"
         pageClassName="page-item"
         pageLinkClassName="page-link"
         previousClassName="page-item"
@@ -166,7 +170,6 @@ const JobOffertsPage = () => {
               itemsPerPage={9}
               ofertDetailsStyle={jobOfertsStyle}
             />
-            ;
           </div>
         </div>
         <div className={styles.showMoreOfferts}></div>
