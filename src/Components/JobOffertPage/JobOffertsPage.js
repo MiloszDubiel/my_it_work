@@ -124,6 +124,7 @@ function PaginatedItems({ itemsPerPage }) {
       const newOffset =
         (event.selected * itemsPerPage) %
         JSON.parse(localStorage.getItem("offerts")).res.length;
+      setItemOffset(newOffset);
     }
   };
 
