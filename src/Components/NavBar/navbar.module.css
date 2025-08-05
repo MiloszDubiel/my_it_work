@@ -80,9 +80,19 @@
 }
 .searchDiv {
   height: 200px;
-  background-color: rgb(255, 181, 45);
   transition: 0.2s;
 }
+.orangeSearchDiv {
+  background-color: rgb(255, 181, 45);
+}
+.darkSearchDiv {
+  background-color: rgb(36, 133, 36);
+}
+
+.blueSearchDiv{
+  background-color: rgb(98, 134, 255);
+}
+
 .searchDiv h1 {
   padding: 0;
   margin: 0;
@@ -126,6 +136,15 @@
   justify-content: space-between;
   position: relative;
 }
+.searchInput {
+  border: none;
+  padding-left: 20px;
+}
+.localization::placeholder {
+  font-size: 16px;
+  color: black;
+}
+
 .bordered {
   border: 2px solid black;
 }

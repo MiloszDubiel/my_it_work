@@ -10,7 +10,7 @@ const MainPage = () => {
     <>
       <JobOfferttDetailsComponent />
       <div className={styles.page}>
-        <Navbar />
+        <Navbar offertPage={true} />
         <h1 className={styles.header}>Praca w IT</h1>
         <h2 className={styles.header} style={{ marginTop: 0 }}>
           Najnowsze oferty pracy

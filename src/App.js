@@ -4,6 +4,8 @@ import MainPage from "./Components/MainPage/MainPage";
 import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
 import JobOffertsPage from "./Components/JobOffertPage/JobOffertsPage";
+import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
+import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
 const App = () => {
   return (
     <>
@@ -19,6 +21,12 @@ const App = () => {
         </Routes>
         <Routes>
           <Route path="/job-offerts" element={<JobOffertsPage />} />
+        </Routes>
+        <Routes>
+          <Route path="/employers" element={<EmployersComponent />} />
+        </Routes>
+        <Routes>
+          <Route path="/candidates" element={<CandidateComponent />} />
         </Routes>
       </BrowserRouter>
     </>

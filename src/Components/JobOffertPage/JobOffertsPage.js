@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Offert from "../OffertComponent/Offert";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const fetchData = async () => {
   const request = await axios.get(
@@ -28,15 +29,18 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const [offerts, setOfferts] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const cached = localStorage.getItem("offerts");
     const parsed = cached ? JSON.parse(cached) : null;
+    setIsLoading(true);
 
     if (parsed && Date.now() < parsed.expiry) {
       const endOffset = itemOffset + itemsPerPage;
       setCurrentItems(parsed.res.slice(itemOffset, endOffset));
       setPageCount(Math.ceil(parsed.res.length / itemsPerPage));
+      setIsLoading(false);
     } else {
       fetchData().then((res) => {
         setOfferts(res);
@@ -47,6 +51,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
         const endOffset = itemOffset + itemsPerPage;
         setCurrentItems(res.slice(itemOffset, endOffset));
         setPageCount(Math.ceil(res.length / itemsPerPage));
+        setIsLoading(false);
       });
     }
   }, [itemOffset, itemsPerPage]);
@@ -65,26 +70,30 @@ const PaginatedItems = ({ itemsPerPage }) => {
   return (
     <>
       <Items currentItems={currentItems} />
-      <ReactPaginate
-        nextLabel=">"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={3}
-        marginPagesDisplayed={2}
-        pageCount={9}
-        previousLabel="<"
-        pageClassName="page-item"
-        pageLinkClassName="page-link"
-        previousClassName="page-item"
-        previousLinkClassName="page-link"
-        nextClassName="page-item"
-        nextLinkClassName="page-link"
-        breakLabel="..."
-        breakClassName="page-item"
-        breakLinkClassName="page-link"
-        containerClassName="pagination"
-        activeClassName="active"
-        renderOnZeroPageCount={null}
-      />
+      {isLoading ? (
+        <LoadingComponent />
+      ) : (
+        <ReactPaginate
+          nextLabel=">"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          pageCount={9}
+          previousLabel="<"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          breakLabel="..."
+          breakClassName="page-item"
+          breakLinkClassName="page-link"
+          containerClassName="pagination"
+          activeClassName="active"
+          renderOnZeroPageCount={null}
+        />
+      )}
     </>
   );
 };
@@ -94,7 +103,7 @@ const JobOffertsPage = () => {
     <>
       <JobOfferttDetailsComponent />
       <div className={styles.page}>
-        <Navbar hideHeadder={true} />
+        <Navbar offertPage={true} />
         <h1 className={styles.header}>Przeglądaj oferty pracy</h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
