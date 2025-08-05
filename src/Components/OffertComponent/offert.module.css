@@ -1,6 +1,7 @@
 /*CSS dla poszczegolnej oferty */
 
-.parent, .offerts {
+.parent,
+.offerts {
   animation: fadeInUp 0.2s ease forwards;
   border-radius: 5px;
   width: 100%;
@@ -96,6 +97,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.buttonCity {
+  all: unset;
+}
+.cities {
+  display: none !important;
+}
+.showCities {
+  display: block;
 }
 
 @media screen and (max-width: 880px) {

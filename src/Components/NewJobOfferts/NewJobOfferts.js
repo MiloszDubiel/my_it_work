@@ -8,7 +8,7 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 
 const fetchData = async (amount) => {
   const request = await axios.get(
-    `http://192.168.100.2:3001/api/get-job-offerts?pages=1&perPage=${amount}`
+    `http://192.168.100.2:3001/api/get-job-offerts`
   );
   return request.data;
 };

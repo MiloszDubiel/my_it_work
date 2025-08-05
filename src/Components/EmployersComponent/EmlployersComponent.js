@@ -5,7 +5,7 @@ const EmployersComponent = () => {
   return (
     <>
       <Navbar employersPage={true} />
-      <div>DUPA</div>
+      
     </>
   );
 };

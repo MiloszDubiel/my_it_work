@@ -1,5 +1,4 @@
 import styles from "./job.module.css";
-import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 import Navbar from "../NavBar/NavBar";
 import ReactPaginate from "react-paginate";
 import { useEffect, useState } from "react";
@@ -101,7 +100,6 @@ const PaginatedItems = ({ itemsPerPage }) => {
 const JobOffertsPage = () => {
   return (
     <>
-      <JobOfferttDetailsComponent />
       <div className={styles.page}>
         <Navbar offertPage={true} />
         <h1 className={styles.header}>Przeglądaj oferty pracy</h1>

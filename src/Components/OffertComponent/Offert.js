@@ -5,15 +5,36 @@ import { MdFavorite } from "react-icons/md";
 import styles from "./offert.module.css";
 
 const Offert = ({ offert, index }) => {
+  let cities = null;
+
+  if (JSON.parse(offert.workingMode)[1].length > 0) {
+    cities = (
+      <>
+        <button
+          className={styles.buttonCity}
+          onClick={() => {
+            document
+              .querySelector(`.${styles.cities}`)
+              .classList.toggle(styles.showCities);
+          }}
+        >
+          {JSON.parse(offert.workingMode)[0] + " i więcej"}
+        </button>
+        <div className={styles.cities}>
+          {JSON.parse(offert.workingMode)[1].map((el) => {
+            return <span>{el}</span>;
+          })}
+        </div>
+      </>
+    );
+  } else {
+    cities = <span>{JSON.parse(offert.workingMode)}</span>;
+  }
+
   return (
     <div
       className={styles.offerts}
       key={index}
-      onClick={() => {
-        document.querySelector("#showOfert").classList.add("showOfert");
-        localStorage.setItem("currentOfert", JSON.stringify(offert));
-        window.dispatchEvent(new Event("ofert-selected"));
-      }}
       onLoad={() => {
         let el = document.querySelector(".pagination");
 
@@ -37,9 +58,8 @@ const Offert = ({ offert, index }) => {
         <div className={styles.info2}>
           <div>
             <span>
-              {" "}
               <CiLocationOn />
-              {offert.workingMode}
+              {cities}
             </span>
             <span>
               <BsFileText />
@@ -51,7 +71,7 @@ const Offert = ({ offert, index }) => {
             </span>
           </div>
           <div className={styles.box}>
-            {offert.technologies.map((el) => {
+            {JSON.parse(offert.technologies).map((el) => {
               return (
                 <>
                   <span className={styles.ellipsis} data-text={el}>

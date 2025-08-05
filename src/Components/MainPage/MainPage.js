@@ -1,6 +1,5 @@
 import styles from "./MainPage.module.css";
 import NewJobOfferts from "../NewJobOfferts/NewJobOfferts";
-import JobOfferttDetailsComponent from "../JobOffertDetails/JobOfertsDetailsComponent";
 import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
 import Navbar from "../NavBar/NavBar";
 import { Link } from "react-router-dom";
@@ -8,7 +7,6 @@ import { Link } from "react-router-dom";
 const MainPage = () => {
   return (
     <>
-      <JobOfferttDetailsComponent />
       <div className={styles.page}>
         <Navbar offertPage={true} />
         <h1 className={styles.header}>Praca w IT</h1>
