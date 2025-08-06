@@ -48,8 +48,17 @@ const Offert = ({ offert, index }) => {
       </div>
       <div className={styles.info}>
         <div className={styles.info1}>
-          <span style={{ fontWeight: "bold", paddingTop: "10px" }}>
+          <span
+            style={{
+              fontWeight: "bold",
+              paddingTop: "10px",
+              gap: "20px",
+              display: "flex",
+              position: "relative"
+            }}
+          >
             {offert.title}
+            <button className={styles.apply}>Aplikuj</button>
           </span>
           <span style={{ fontSize: "12px", paddingTop: "2px" }}>
             {offert.companyName}

@@ -10,7 +10,6 @@
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.24);
   transform: 0.2s;
   cursor: pointer;
-  z-index: 0;
   display: block;
   overflow: hidden;
 }
@@ -103,14 +102,42 @@
 }
 .cities {
   display: none !important;
+  height: 50px;
+  position: absolute;
+  width: 150px !important;
+  padding: 5px;
+  height: 100px;
+  background-color: white;
+  overflow-y: auto !important;
+  transform: translateY(60px);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.24);
+  border-radius: 5px;
 }
 .showCities {
-  display: block;
+  display: block !important;
 }
+.apply{
+  background-color: orange;
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  border: none;
+  right: 0;
+  border-radius: 20px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.24);
+  height: 30px;
+  width: 100px;
+  cursor: pointer;
+}
+
 
 @media screen and (max-width: 880px) {
   .offerts {
     height: 200px;
+  }
+  .apply{
+    top: 80px;
+    left: 0;
   }
   .recommended {
     height: 2000px;
@@ -134,6 +161,7 @@
     height: 40%;
     justify-content: unset;
     align-items: end;
+    overflow: hidden;
   }
   .info2 div:first-child {
     height: 60%;
@@ -144,7 +172,7 @@
 
   .info2 div:first-child span:nth-child(2),
   .info2 div:first-child span:nth-child(3) {
-    display: none;
+   
   }
   .info2 div {
     padding: 0px;

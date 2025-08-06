@@ -17,7 +17,7 @@ async function getJobOfferts() {
 
   const allJobs = [];
 
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 1; i <= 120; i++) {
     console.log(`Scraping page ${i}...`);
     await page.goto(
       `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
@@ -81,9 +81,63 @@ async function getJobOfferts() {
   return allJobs;
 }
 
+async function getEmployers() {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  const employers = [];
+
+  for (let i = 1; i <= 120; i++) {
+    console.log(`Scraping page ${i}...`);
+    await page.goto(`https://bulldogjob.pl/companies/profiles/s/page,${i}`, {
+      waitUntil: "networkidle2",
+    });
+
+    await page.waitForSelector(".container a");
+
+    const employer = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll(".container a"))
+        .map((el) => ({
+          companyName: el.querySelector(
+            ".styles_cli__wrapper__OcwPn .justify-between .items-center"
+          )?.textContent,
+          technologies: [
+            [
+              ...el.querySelectorAll(
+                ".styles_cli__wrapper__OcwPn .flex-wrap span"
+              ),
+            ].map((tag) => {
+              return tag.textContent;
+            }),
+          ],
+          locations: [
+            el.querySelector(".text-sm")?.textContent,
+            [
+              [
+                ...el.querySelectorAll(
+                  ".styles_cli__wrapper__OcwPn  div.rounded-t-lg div.px-1 span"
+                ),
+              ].map((tag) => {
+                return tag.textContent;
+              }),
+            ],
+          ],
+          link: el.href,
+          img: el.querySelector(".w-full img")?.src,
+        }))
+        .filter((el) => el.companyName != undefined);
+    });
+
+    employers.push(...employer);
+  }
+
+  await browser.close();
+  return employers;
+}
+
 function saveOffersToDb(offers) {
   const insertQuery = `
-    INSERT INTO job_offers 
+    INSERT IGNORE INTO job_offers 
       (title, companyName, workingMode, contractType, experience, technologies, salary, img, link) 
     VALUES ?`;
 
@@ -107,6 +161,28 @@ function saveOffersToDb(offers) {
   });
 }
 
+function saveEmployersToDb(employers) {
+  const insertQuery = `
+    INSERT IGNORE INTO companies
+      (companyName, technologies, locations, link, img) 
+    VALUES ?`;
+
+  const values = employers.map((employer) => [
+    employer.companyName || null,
+    JSON.stringify(employer.technologies || []),
+    JSON.stringify(employer.locations || []),
+    employer.link || null,
+    employer.img || null,
+  ]);
+
+  return new Promise((resolve, reject) => {
+    connection.query(insertQuery, [values], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+}
+
 app.get("/api/get-job-offerts", async (req, res) => {
   try {
     const [rows] = await connection.query("SELECT * FROM job_offerts");
@@ -117,11 +193,8 @@ app.get("/api/get-job-offerts", async (req, res) => {
   }
 });
 
-app.get("/api/scrape-and-save", async (req, res) => {
+app.get("/api/scrape-and-save-job-offerts", async (req, res) => {
   try {
-    const pages = parseInt(req.query.pages) || 1;
-    const perPage = parseInt(req.query.perPage) || 10;
-
     const offers = await getJobOfferts(pages, perPage);
     const result = await saveOffersToDb(offers);
 
@@ -129,6 +202,22 @@ app.get("/api/scrape-and-save", async (req, res) => {
       message: `Zapisano ${result.affectedRows} ofert do bazy danych`,
       inserted: result.affectedRows,
     });
+  } catch (error) {
+    console.error("Błąd:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.get("/api/scrape-and-save-employers", async (req, res) => {
+  try {
+    const offers = await getEmployers();
+    const result = await saveEmployersToDb(offers);
+
+    res.json({
+      message: `Zapisano ${result.affectedRows} ofert do bazy danych`,
+      inserted: result.affectedRows,
+    });
+
+    res.json(offers);
   } catch (error) {
     console.error("Błąd:", error);
     res.status(500).json({ error: error.message });
