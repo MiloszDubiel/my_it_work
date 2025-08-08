@@ -8,7 +8,7 @@ import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const fetchData = async () => {
   const request = await axios.get(
-    `http://192.168.100.2:3001/api/get-job-offerts?pages=3&perPage=50`
+    `http://192.168.100.2:3001/api/get-job-offerts`
   );
   return request.data;
 };
@@ -77,7 +77,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           marginPagesDisplayed={2}
-          pageCount={9}
+          pageCount={pageCount}
           previousLabel="<"
           pageClassName="page-item"
           pageLinkClassName="page-link"

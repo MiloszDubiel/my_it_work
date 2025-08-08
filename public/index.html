@@ -74,12 +74,35 @@
         cursor: pointer;
       }
 
+      .pagination-for-employers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        list-style-type: none;
+        gap: 5px;
+      }
+      .page-link-for-employers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 35px;
+        height: 35px;
+        box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.24);
+        cursor: pointer;
+      }
+
+      .active-for-employers {
+        background-color: rgb(100, 0, 158);
+        color: white;
+        font-weight: bold;
+      }
       .active {
         background-color: orange;
         color: white;
         font-weight: bold;
       }
-      .disabled a{
+      .disabled a {
         cursor: not-allowed;
         box-shadow: none;
       }

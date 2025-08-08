@@ -28,7 +28,7 @@ async function getJobOfferts() {
 
     await page.waitForSelector(".JobListItem_item__fYh8y");
 
-    const jobs = await page.evaluate((safeMax) => {
+    const jobs = await page.evaluate(() => {
       return Array.from(
         document.querySelectorAll(".JobListItem_item__fYh8y")
       ).map((el) => ({
@@ -192,10 +192,19 @@ app.get("/api/get-job-offerts", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+app.get("/api/get-job-employers", async (req, res) => {
+  try {
+    const [rows] = await connection.query("SELECT * FROM companies");
+    res.json(rows);
+  } catch (error) {
+    console.error("Błąd scrapowania:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/api/scrape-and-save-job-offerts", async (req, res) => {
   try {
-    const offers = await getJobOfferts(pages, perPage);
+    const offers = await getJobOfferts();
     const result = await saveOffersToDb(offers);
 
     res.json({
