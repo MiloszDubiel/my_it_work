@@ -35,6 +35,8 @@ const PaginatedItems = ({ itemsPerPage }) => {
     const parsed = cached ? JSON.parse(cached) : null;
     setIsLoading(true);
 
+    window.scrollTo(0, 0);
+
     if (parsed && Date.now() < parsed.expiry) {
       const endOffset = itemOffset + itemsPerPage;
       setCurrentItems(parsed.res.slice(itemOffset, endOffset));
@@ -108,7 +110,6 @@ const JobOffertsPage = () => {
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
-        <div className={styles.showMoreOfferts}></div>
         <footer className={styles.footer}>
           <p>Tu coś kiedy bedzie</p>
         </footer>

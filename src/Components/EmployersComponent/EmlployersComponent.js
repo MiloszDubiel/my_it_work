@@ -108,6 +108,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
     const cached = localStorage.getItem("employers");
     const parsed = cached ? JSON.parse(cached) : null;
     setIsLoading(true);
+    window.scrollTo(0, 0);
 
     if (parsed && Date.now() < parsed.expiry) {
       const endOffset = itemOffset + itemsPerPage;
@@ -182,7 +183,6 @@ const EmployersComponent = () => {
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
-        <div className={styles.showMoreOfferts}></div>
         <Footer />
       </div>
     </>
