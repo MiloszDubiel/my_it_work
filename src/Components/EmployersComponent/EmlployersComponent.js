@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../NavBar/NavBar";
 import styles from "./employers.module.css";
 import axios from "axios";
 import { CiLocationOn } from "react-icons/ci";
-import { BsFileText } from "react-icons/bs";
-import { MdGrading } from "react-icons/md";
-import { MdFavorite } from "react-icons/md";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import ReactPaginate from "react-paginate";
+import Footer from "../Footer/Fotter";
 
 const fetchData = async () => {
   const request = await axios.get(
@@ -35,7 +33,7 @@ const Items = ({ currentItems }) => {
               }}
             >
               <div className={styles.companyImg}>
-                <img width={80} />
+                <img width={80} src={el.img} />
               </div>
               <div className={styles.info}>
                 <div className={styles.info1}>
@@ -45,10 +43,9 @@ const Items = ({ currentItems }) => {
                       paddingTop: "10px",
                       gap: "20px",
                       display: "flex",
-                      position: "relative",
                     }}
                   >
-                    <button className={styles.apply}>Aplikuj</button>
+                    {el.companyName}
                   </span>
                   <span style={{ fontSize: "12px", paddingTop: "2px" }}></span>
                 </div>
@@ -56,19 +53,42 @@ const Items = ({ currentItems }) => {
                   <div>
                     <span>
                       <CiLocationOn />
-                    </span>
-                    <span>
-                      <BsFileText />
-                    </span>
-                    <span>
-                      <MdGrading />
+                      <button
+                        onClick={(e) => {
+                          if (JSON.parse(el.locations)[1][0].length !== 0) {
+                            e.target.parentElement.parentElement
+                              .querySelector(`.${styles.cities}`)
+                              .classList.toggle(styles.showCities);
+                          }
+                        }}
+                        style={{ all: "unset" }}
+                      >
+                        {JSON.parse(el.locations)[0]}
+                      </button>
+                      <div className={styles.cities}>
+                        {JSON.parse(el.locations)[1][0].length !== 0
+                          ? JSON.parse(el.locations)[1][0].map((tag) => {
+                              return <span>{tag}</span>;
+                            })
+                          : ""}
+                      </div>
                     </span>
                   </div>
-                  <div className={styles.box}></div>
+                  <div className={styles.box}>
+                    {JSON.parse(el.technologies)[0].map((el) => {
+                      return (
+                        <>
+                          <span className={styles.ellipsis} data-text={el}>
+                            {el}
+                          </span>
+                        </>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
               <div className={styles.addToFavorite}>
-                <MdFavorite />
+                <button className={styles.apply}>Pokaż oferty pracy</button>
               </div>
             </div>
           );
@@ -156,19 +176,14 @@ const EmployersComponent = () => {
     <>
       <Navbar employersPage={true} />
       <div className={styles.page}>
-        <h1 className={styles.header}>Praca w IT</h1>
-        <h2 className={styles.header} style={{ marginTop: 0 }}>
-          Najnowsze oferty pracy
-        </h2>
+        <h1 className={styles.header}>Pracodawcy w IT</h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
         <div className={styles.showMoreOfferts}></div>
-        <footer className={styles.footer}>
-          <p>Tu coś kiedy bedzie</p>
-        </footer>
+        <Footer />
       </div>
     </>
   );

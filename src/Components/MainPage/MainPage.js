@@ -2,6 +2,7 @@ import styles from "./MainPage.module.css";
 import NewJobOfferts from "../NewJobOfferts/NewJobOfferts";
 import jobOfertsStyle from "../JobOffertDetails/jobDetails.module.css";
 import Navbar from "../NavBar/NavBar";
+import Footer from "../Footer/Fotter";
 import { Link } from "react-router-dom";
 
 const MainPage = () => {
@@ -31,9 +32,7 @@ const MainPage = () => {
             <button> Pokaż więcej</button>
           </Link>
         </div>
-        <footer className={styles.footer}>
-          <p>Tu coś kiedy bedzie</p>
-        </footer>
+        <Footer />
       </div>
     </>
   );

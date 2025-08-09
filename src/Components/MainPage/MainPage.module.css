@@ -6,20 +6,17 @@
   text-align: center;
 }
 .recommended {
-  height: 1100px;
   display: flex;
   justify-content: center;
 }
 .parent {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  height: inherit;
   width: 1300px;
   place-items: center;
   gap: 25px;
   position: relative;
 }
-
 
 /*Prtzycisk pokaz wiecej*/
 .showMoreOfferts {
@@ -48,15 +45,6 @@
   color: black;
 }
 
-
-/*Stópka*/
-.footer {
-  height: 500px;
-  width: 100%;
-  background-color: rgb(31, 31, 31);
-  color: white;
-  padding: 20px;
-}
 /*Pokaz okno*/
 .showWindow {
   display: flex !important;
