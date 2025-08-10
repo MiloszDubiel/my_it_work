@@ -1,10 +1,10 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
 import { IoFilterOutline } from "react-icons/io5";
-import { TbArrowNarrowDownDashed } from "react-icons/tb";
+import { TbArrowNarrowDownDashed, TbBrandFacebookFilled } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
@@ -12,15 +12,70 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let searchDiv = useRef(null);
   let account = useRef(null);
 
-  const showMenu = (e) => {
+  const showMenu = (e, variant) => {
+    let elements = [
+      styles.localizations,
+      styles.positions,
+      styles.technologies,
+    ];
+
     if (e.currentTarget === e.target) {
-      e.target.lastChild.classList.toggle(styles.showMenu);
-      e.target.classList.toggle(styles.bordered);
+      let parent = e.target.parentElement;
+      let grandParent = e.target.parentElement.parentElement;
+
+      for (let el of elements) {
+        if (
+          parent.classList.contains(styles.optionsFilter) ||
+          grandParent.classList.contains(styles.optionsFilter)
+        ) {
+          if (variant === el) {
+            grandParent
+              .querySelector(`.${el}`)
+              .classList.toggle(styles.showMenu);
+          } else {
+            grandParent.querySelector(`.${el}`).classList.add(styles.showMenu);
+          }
+        } else {
+          if (variant === el) {
+            document.querySelector(`.${el}`).classList.toggle(styles.showMenu);
+          } else {
+            document.querySelector(`.${el}`).classList.add(styles.showMenu);
+          }
+        }
+      }
       e.target.querySelector("svg").classList.toggle(styles.rotate);
     }
+
     if (e.target.tagName === "P" || e.target.tagName === "svg") {
-      e.currentTarget.lastChild.classList.toggle(styles.showMenu);
-      e.currentTarget.classList.toggle(styles.bordered);
+      for (let el of elements) {
+        if (
+          e.currentTarget.parentElement.parentElement.classList.contains(
+            styles.optionsFilter
+          ) ||
+          e.target.parentElement.parentElement.classList.contains(
+            styles.optionsFilter
+          ) ||
+          e.target.parentElement.parentElement.parentElement.classList.contains(
+            styles.optionsFilter
+          )
+        ) {
+          if (variant === el) {
+            e.currentTarget.parentElement.parentElement
+              .querySelector(`.${el}`)
+              .classList.toggle(styles.showMenu);
+          } else {
+            e.currentTarget.parentElement.parentElement
+              .querySelector(`.${el}`)
+              .classList.add(styles.showMenu);
+          }
+        } else {
+          if (variant === el) {
+            document.querySelector(`.${el}`).classList.toggle(styles.showMenu);
+          } else {
+            document.querySelector(`.${el}`).classList.add(styles.showMenu);
+          }
+        }
+      }
       e.currentTarget.querySelector("svg").classList.toggle(styles.rotate);
     }
   };
@@ -138,7 +193,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             <div
               className={styles.localization}
               onClick={(e) => {
-                showMenu(e);
+                showMenu(e, styles.localizations);
               }}
             >
               <p>Lokalizacja</p>
@@ -187,7 +242,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             <div
               className={styles.position}
               onClick={(e) => {
-                showMenu(e);
+                showMenu(e, styles.positions);
               }}
             >
               <p>Stanowisko</p>
@@ -226,7 +281,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             <div
               className={styles.localization}
               onClick={(e) => {
-                showMenu(e);
+                showMenu(e, styles.localizations);
               }}
             >
               <p>Lokalizacja</p>
@@ -268,7 +323,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           <div
             className={styles.technologie + " " + styles.toHide}
             onClick={(e) => {
-              showMenu(e);
+              showMenu(e, styles.technologies);
             }}
           >
             <p>Technologia</p>
@@ -341,7 +396,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               <div
                 className={styles.localization}
                 onClick={(e) => {
-                  showMenu(e);
+                  showMenu(e, styles.localizations);
                 }}
               >
                 <p>Lokalizacja</p>
@@ -379,7 +434,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               <div
                 className={styles.position}
                 onClick={(e) => {
-                  showMenu(e);
+                  showMenu(e, styles.positions);
                 }}
               >
                 <p>Stanowisko</p>
@@ -417,7 +472,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               <div
                 className={styles.technologie}
                 onClick={(e) => {
-                  showMenu(e);
+                  showMenu(e, styles.technologies);
                 }}
               >
                 <p>Technologia</p>

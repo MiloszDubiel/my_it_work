@@ -1,5 +1,9 @@
 .page {
-  height: 100%;
+  background: linear-gradient(180deg, #f5f5f5 0%, #fbfbfb 100%);
+}
+.page h1{
+  margin: 0;
+  padding: 40px 0px ;
 }
 .header {
   margin-top: 40px;
@@ -26,6 +30,7 @@
   transform: 0.2s;
   cursor: pointer;
   display: block;
+  background-color: white;
 }
 .companyImg {
   width: 100px;
@@ -121,7 +126,7 @@
 }
 
 .apply {
-  background-color: rgb(100, 0, 158);
+  background: linear-gradient(180deg, #a84aff, #8100fa);
   color: white;
   border: none;
   border-radius: 20px;

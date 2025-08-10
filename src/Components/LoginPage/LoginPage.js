@@ -1,71 +1,146 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import styles from "./login.module.css";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const LoginPage = () => {
-  let email = useRef(null);
-  let passoword = useRef(null);
-  let emailError = useRef(null);
-  let passwordError = useRef(null);
-  let infoDiv = useRef(null);
-  let checkbox = useRef(null);
+const LoginForm = ({ onSubmit }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const validate = () => {
+    if (!email) return "Podaj adres e-mail.";
+    // prosty regex na e-mail
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!re.test(email)) return "Nieprawidłowy adres e-mail.";
+    if (!password || password.length < 6)
+      return "Hasło musi mieć co najmniej 6 znaków.";
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    const v = validate();
+    if (v) {
+      setError(v);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (onSubmit) {
+        await onSubmit({ email, password, remember });
+      } else {
+        // PRZYKŁADOWE WYWOŁANIE: odkomentuj i zaktualizuj endpoint jeśli chcesz
+        /*
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, remember }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || "Błąd logowania");
+        */
+        await new Promise((r) => setTimeout(r, 800)); // demo
+      }
+    } catch (err) {
+      setError(err?.message || "Błąd połączenia");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div
-        className={styles.info}
-        ref={infoDiv}
-        onClick={() => {
-          infoDiv.current.style.display = "none";
-        }}
-      ></div>
-      <div className={styles.login_form}>
-        <form className={styles.form}>
-          <h3 style={{ marginBottom: 10 + "px" }}>Zaloguj się</h3>
-          <p className={styles.separator}></p>
-          <div className={styles.input_box}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Wpisz email..."
-              required
-              ref={email}
-            />
-            <p className="error" id="email-error" ref={emailError}></p>
-          </div>
-          <div className={styles.input_box}>
-            <div className={styles.password_title}>
-              <label htmlFor="password">Wpisz hasło</label>
+        className={styles.container1}
+        role="region"
+        aria-label="Formularz logowania"
+      >
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <h2 className={styles.title}>Zaloguj się</h2>
+
+          {error && (
+            <div className={styles.error} role="alert">
+              {error}
             </div>
+          )}
+
+          <label className={styles.field}>
+            <span className={styles.label}>E-mail</span>
             <input
-              type="password"
-              id="password"
-              placeholder="Wpisz hasło..."
+              className={styles.input}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="twoj@email.pl"
+              autoComplete="email"
               required
-              ref={passoword}
+              aria-required="true"
             />
-            <p className={styles.error} ref={passwordError}></p>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Hasło</span>
+            <div className={styles.pwdWrapper}>
+              <input
+                className={styles.input}
+                type={showPwd ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Twoje hasło"
+                autoComplete="current-password"
+                required
+                aria-required="true"
+              />
+              <button
+                type="button"
+                className={styles.togglePwd}
+                onClick={() => setShowPwd((s) => !s)}
+                aria-pressed={showPwd}
+                aria-label={showPwd ? "Ukryj hasło" : "Pokaż hasło"}
+              >
+                {showPwd ? "Ukryj" : "Pokaż"}
+              </button>
+            </div>
+          </label>
+
+          <div className={styles.row}>
+            <label className={styles.remember}>
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              <span>Pamiętaj mnie</span>
+            </label>
+
+            <a className={styles.forgot} href="/forgot">
+              Zapomniałeś hasła?
+            </a>
           </div>
-          <div className={styles.checkbox_box}>
-            <input type="checkbox" id="remember-me" ref={checkbox} />
-            <label htmlFor="remember-me">Zapamietaj mnie</label>
-          </div>
-          <button type="button">Zaloguj się</button>
-          <p className={styles.sign_up}>
-            Nie masz konta?
-            <Link to="/register">
-              <b> Zarejestruj się</b>
+
+          <button
+            className={styles.btnPrimary}
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? <span className={styles.spinner} /> : "Zaloguj"}
+          </button>
+
+          <div className={styles.footer}>
+            <span>Nie masz konta?</span>{" "}
+            <Link to="/register" className={styles.link}>
+              Zarejestruj się
             </Link>
-          </p>
-          <p>
-            <Link to="/">Wróć do strony głownej</Link>
-          </p>
+          </div>
         </form>
       </div>
     </div>
   );
 };
-export default LoginPage;
+
+export default LoginForm;

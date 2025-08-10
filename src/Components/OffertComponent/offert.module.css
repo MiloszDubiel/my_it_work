@@ -12,6 +12,7 @@
   cursor: pointer;
   display: block;
   overflow: hidden;
+  background-color: #fff;
 }
 .companyImg {
   width: 100px;
@@ -117,7 +118,7 @@
   display: block !important;
 }
 .apply{
-  background-color: orange;
+  background: linear-gradient(90deg, #ff8a00, #ff5a00);
   color: white;
   font-weight: bold;
   position: absolute;
