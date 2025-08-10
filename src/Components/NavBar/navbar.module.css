@@ -188,6 +188,7 @@
   position: absolute;
   right: 0;
   animation: slideOnRight 0.1s ease-out forwards;
+  z-index: 1111;
 }
 .closeWindow {
   width: 100%;
@@ -320,9 +321,16 @@
   background-color: white;
   border-top: none;
   border-radius: 0px 0px 10px 10px;
-  z-index: 1;
+  z-index: 0 ;
   border: 1px solid rgb(209, 208, 208);
   border-top: none;
+}
+
+
+.optionsFilter .localizations,
+.optionsFilter .positions,
+.optionsFilter .technologies{
+  z-index: 1;
 }
 .showMenu {
   display: none;
