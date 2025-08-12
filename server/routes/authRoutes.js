@@ -38,7 +38,7 @@ router.post("/login", async (req, res) => {
         role: user.role,
         name: user.name,
         surname: user.surname,
-        phone_number: user.phone_number || "Nie podano",
+        phone_number: user.phone_number,
       },
     });
   } catch (error) {

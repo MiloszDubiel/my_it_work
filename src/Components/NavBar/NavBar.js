@@ -7,6 +7,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import SettingPage from "../SettingsPage/SettingsPage";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let hiddenMenu = useRef(null);
@@ -118,53 +119,64 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   }, []);
 
   return (
-    <header className={styles.headerElement}>
-      <nav className={styles.navBar}>
-        <div className={styles.header}>
-          <h3>MyITWork</h3>
-        </div>
-        <div className={styles.list}>
-          <ul>
-            <li>
-              {" "}
-              <Link
-                to="/job-offerts"
-                style={{ textDecoration: "none", color: "black" }}
-              >
-                Oferty pracy
-              </Link>
-            </li>
-            <li>
-              {" "}
-              <Link
-                to="/employers"
-                style={{ textDecoration: "none", color: "black" }}
-              >
-                Pracodawcy IT
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/candidates"
-                style={{ textDecoration: "none", color: "black" }}
-              >
-                Kandydaci IT
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div className={styles.account}>
-          {userData ? (
-            ""
-          ) : (
-            <div className={styles.addOffert}>
-              <p>Dodaj ogłoszenie</p>
-            </div>
-          )}
+    <>
+      <SettingPage />
+      <header className={styles.headerElement}>
+        <nav className={styles.navBar}>
+          <div className={styles.header}>
+            <h3>MyITWork</h3>
+          </div>
+          <div className={styles.list}>
+            <ul>
+              <li>
+                {" "}
+                <Link
+                  to="/job-offerts"
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  Oferty pracy
+                </Link>
+              </li>
+              <li>
+                {" "}
+                <Link
+                  to="/employers"
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  Pracodawcy IT
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/candidates"
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  Kandydaci IT
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className={styles.account}>
+            {userData ? (
+              ""
+            ) : (
+              <div className={styles.addOffert}>
+                <p>Dodaj ogłoszenie</p>
+              </div>
+            )}
 
-          {userData ? (
-            <>
-              Witaj {userData.name || ""} {userData.surname || ""}
+            {userData ? (
+              <>
+                Witaj {userData.name || ""} {userData.surname || ""}
+                <button
+                  onClick={() => {
+                    account.current.classList.toggle(styles.accountDivHide);
+                  }}
+                >
+                  <IoPersonOutline className={styles.icon} />
+                </button>
+              </>
+            ) : (
               <button
                 onClick={() => {
                   account.current.classList.toggle(styles.accountDivHide);
@@ -172,272 +184,67 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               >
                 <IoPersonOutline className={styles.icon} />
               </button>
-            </>
-          ) : (
-            <button
-              onClick={() => {
-                account.current.classList.toggle(styles.accountDivHide);
-              }}
-            >
-              <IoPersonOutline className={styles.icon} />
-            </button>
-          )}
-        </div>
-        <div
-          className={styles.accountDiv + " " + styles.accountDivHide}
-          ref={account}
-        >
-          {userData ? (
-            <>
-              {" "}
-              <Link to="/user/setting">Ustawienia</Link>
-              <Link to="/user/add-ad">Dodaj ogłoszenie</Link>
-              <Link to="/user/my-ad">Moje ogłoszenia</Link>
-              <Link
-                onClick={() => {
-                  navigate("/");
-                  localStorage.setItem(
-                    "userData",
-                    JSON.parse({ info: "Wylogowano" })
-                  );
-                }}
-              >
-                Wyloguj
-              </Link>
-            </>
-          ) : (
-            <>
-              {""}
-              <Link to="/login">Zaloguj się</Link>
-              <Link to="/register">Zarejestruj się</Link>
-            </>
-          )}
-        </div>
-      </nav>
-      <div
-        className={
-          styles.searchDiv +
-          " " +
-          (employersPage
-            ? styles.darkSearchDiv
-            : candidatePage
-            ? styles.blueSearchDiv
-            : styles.orangeSearchDiv)
-        }
-        ref={searchDiv}
-      >
-        <h1>
-          {offertPage
-            ? "Rekrutacja IT, bez zbędnego kodu."
-            : employersPage
-            ? "Firmy IT"
-            : "Kandydaci IT"}
-        </h1>
-        <div className={styles.formDiv}>
-          {offertPage ? (
-            <div
-              className={styles.localization}
-              onClick={(e) => {
-                showMenu(e, styles.localizations);
-              }}
-            >
-              <p>Lokalizacja</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
-              </p>
-              <div className={styles.localizations + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
-                </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
-                </div>
-              </div>
-            </div>
-          ) : employersPage ? (
-            <input
-              type="text"
-              className={styles.localization + " " + styles.searchInput}
-              placeholder="Nazwa firmy"
-            />
-          ) : (
-            ""
-          )}
-
-          {offertPage ? (
-            <div
-              className={styles.position}
-              onClick={(e) => {
-                showMenu(e, styles.positions);
-              }}
-            >
-              <p>Stanowisko</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
-              </p>
-              <div className={styles.positions + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
-                </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
-                </div>
-              </div>
-            </div>
-          ) : employersPage ? (
-            <div
-              className={styles.localization}
-              onClick={(e) => {
-                showMenu(e, styles.localizations);
-              }}
-            >
-              <p>Lokalizacja</p>
-              <p className={styles.arrow}>
-                <TbArrowNarrowDownDashed />
-              </p>
-              <div className={styles.localizations + " " + styles.showMenu}>
-                <div className={styles.searchBox}>
-                  <CiSearch
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      transform: "translateX(23px)",
-                      color: "grey",
-                    }}
-                  />
-                  <input
-                    type="text"
-                    id="searchLocalization"
-                    placeholder="Szukaj..."
-                  />
-                </div>
-                <div className={styles.options}>
-                  <p>Remote</p>
-                  <p>Rzeszów</p>
-                  <p>Kraków</p>
-                  <p>Warszawa</p>
-                  <p>Poznań</p>
-                  <p>Opole</p>
-                  <p>Katowice</p>
-                  <p>Wrocław</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            ""
-          )}
-
+            )}
+          </div>
           <div
-            className={styles.technologie + " " + styles.toHide}
-            onClick={(e) => {
-              showMenu(e, styles.technologies);
-            }}
+            className={styles.accountDiv + " " + styles.accountDivHide}
+            ref={account}
           >
-            <p>Technologia</p>
-            <p className={styles.arrow}>
-              <TbArrowNarrowDownDashed />
-            </p>
-            <div className={styles.technologies + " " + styles.showMenu}>
-              <div className={styles.searchBox}>
-                <CiSearch
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    transform: "translateX(23px)",
-                    color: "grey",
+            {userData ? (
+              <>
+                {" "}
+                <Link
+                  onClick={() => {
+                    document.querySelector("#userSettings").style.display =
+                      "flex";
                   }}
-                />
-                <input
-                  type="text"
-                  id="searchLocalization"
-                  placeholder="Szukaj..."
-                />
-              </div>
-              <div className={styles.options}>
-                <p>JavaScript</p>
-                <p>Java</p>
-                <p>C</p>
-                <p>C#</p>
-                <p>C++</p>
-                <p>PHP</p>
-                <p>Kotlin</p>
-                <p>Python</p>
-              </div>
-            </div>
+                >
+                  Ustawienia
+                </Link>
+                <Link to="/user/add-ad">Dodaj ogłoszenie</Link>
+                <Link to="/user/my-ad">Moje ogłoszenia</Link>
+                <Link
+                  onClick={() => {
+                    navigate("/");
+                    localStorage.setItem(
+                      "userData",
+                      JSON.parse({ info: "Wylogowano" })
+                    );
+                  }}
+                >
+                  Wyloguj
+                </Link>
+              </>
+            ) : (
+              <>
+                {""}
+                <Link to="/login">Zaloguj się</Link>
+                <Link to="/register">Zarejestruj się</Link>
+              </>
+            )}
           </div>
-          {offertPage ? (
-            <div
-              className={styles.filter}
-              onClick={(e) => {
-                toggleFilter(e);
-              }}
-            >
-              <p>
-                <IoFilterOutline />
-              </p>
-              <p>Filtruj</p>
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
-      <div className={styles.hiddenMenu}>
-        <button onClick={toggleFilter}>
-          {" "}
-          <CiSearch />
-          Wyszukuj oferty
-        </button>
-      </div>
-      <div
-        className={styles.searchOffertsDiv + " " + styles.toggleFilter}
-        ref={hiddenMenu}
-      >
-        <div className={styles.searchOfferts}>
-          <div className={styles.closeWindow}>
-            <p style={{ fontSize: "26px" }}>Filtruj oferty</p>
-            <IoCloseOutline onClick={toggleFilter} />
-          </div>
-          <div className={styles.mainFilters}>
-            <div className={styles.optionsFilter}>
+        </nav>
+        <div
+          className={
+            styles.searchDiv +
+            " " +
+            (employersPage
+              ? styles.darkSearchDiv
+              : candidatePage
+              ? styles.blueSearchDiv
+              : styles.orangeSearchDiv)
+          }
+          ref={searchDiv}
+        >
+          <h1>
+            {offertPage
+              ? "Rekrutacja IT, bez zbędnego kodu."
+              : employersPage
+              ? "Firmy IT"
+              : "Kandydaci IT"}
+          </h1>
+          <div className={styles.formDiv}>
+            {offertPage ? (
               <div
                 className={styles.localization}
                 onClick={(e) => {
@@ -476,6 +283,17 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   </div>
                 </div>
               </div>
+            ) : employersPage ? (
+              <input
+                type="text"
+                className={styles.localization + " " + styles.searchInput}
+                placeholder="Nazwa firmy"
+              />
+            ) : (
+              ""
+            )}
+
+            {offertPage ? (
               <div
                 className={styles.position}
                 onClick={(e) => {
@@ -514,17 +332,18 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   </div>
                 </div>
               </div>
+            ) : employersPage ? (
               <div
-                className={styles.technologie}
+                className={styles.localization}
                 onClick={(e) => {
-                  showMenu(e, styles.technologies);
+                  showMenu(e, styles.localizations);
                 }}
               >
-                <p>Technologia</p>
+                <p>Lokalizacja</p>
                 <p className={styles.arrow}>
                   <TbArrowNarrowDownDashed />
                 </p>
-                <div className={styles.technologies + " " + styles.showMenu}>
+                <div className={styles.localizations + " " + styles.showMenu}>
                   <div className={styles.searchBox}>
                     <CiSearch
                       style={{
@@ -541,51 +360,243 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                     />
                   </div>
                   <div className={styles.options}>
-                    <p>JavaScript</p>
-                    <p>Java</p>
-                    <p>C</p>
-                    <p>C#</p>
-                    <p>C++</p>
-                    <p>PHP</p>
-                    <p>Kotlin</p>
-                    <p>Python</p>
+                    <p>Remote</p>
+                    <p>Rzeszów</p>
+                    <p>Kraków</p>
+                    <p>Warszawa</p>
+                    <p>Poznań</p>
+                    <p>Opole</p>
+                    <p>Katowice</p>
+                    <p>Wrocław</p>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className={styles.experienceDiv}>
-              <p style={{ fontWeight: "bolder", margin: 0 }}>
-                Poziom doświadczenia
+            ) : (
+              ""
+            )}
+
+            <div
+              className={styles.technologie + " " + styles.toHide}
+              onClick={(e) => {
+                showMenu(e, styles.technologies);
+              }}
+            >
+              <p>Technologia</p>
+              <p className={styles.arrow}>
+                <TbArrowNarrowDownDashed />
               </p>
-              <div
-                className={styles.experiencesTypes}
-                onClick={(e) => toggleStyle(e)}
-              >
-                <p>Intern</p>
-                <p>Junior</p>
-                <p>Senior</p>
-                <p>Lead/Principal</p>
+              <div className={styles.technologies + " " + styles.showMenu}>
+                <div className={styles.searchBox}>
+                  <CiSearch
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      transform: "translateX(23px)",
+                      color: "grey",
+                    }}
+                  />
+                  <input
+                    type="text"
+                    id="searchLocalization"
+                    placeholder="Szukaj..."
+                  />
+                </div>
+                <div className={styles.options}>
+                  <p>JavaScript</p>
+                  <p>Java</p>
+                  <p>C</p>
+                  <p>C#</p>
+                  <p>C++</p>
+                  <p>PHP</p>
+                  <p>Kotlin</p>
+                  <p>Python</p>
+                </div>
               </div>
             </div>
-            <div className={styles.contract}>
-              <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
+            {offertPage ? (
               <div
-                className={styles.contractTypes}
-                onClick={(e) => toggleStyle(e)}
+                className={styles.filter}
+                onClick={(e) => {
+                  toggleFilter(e);
+                }}
               >
-                <p>Umowa B2B</p>
-                <p>Umowa o prace</p>
-                <p>Umowa zlecenie</p>
+                <p>
+                  <IoFilterOutline />
+                </p>
+                <p>Filtruj</p>
               </div>
-            </div>
-          </div>
-          <div className={styles.setFilter}>
-            <button>Resetuj</button>
-            <button>Zastosuj</button>
+            ) : (
+              ""
+            )}
           </div>
         </div>
-      </div>
-    </header>
+        <div className={styles.hiddenMenu}>
+          <button onClick={toggleFilter}>
+            {" "}
+            <CiSearch />
+            Wyszukuj oferty
+          </button>
+        </div>
+        <div
+          className={styles.searchOffertsDiv + " " + styles.toggleFilter}
+          ref={hiddenMenu}
+        >
+          <div className={styles.searchOfferts}>
+            <div className={styles.closeWindow}>
+              <p style={{ fontSize: "26px" }}>Filtruj oferty</p>
+              <IoCloseOutline onClick={toggleFilter} />
+            </div>
+            <div className={styles.mainFilters}>
+              <div className={styles.optionsFilter}>
+                <div
+                  className={styles.localization}
+                  onClick={(e) => {
+                    showMenu(e, styles.localizations);
+                  }}
+                >
+                  <p>Lokalizacja</p>
+                  <p className={styles.arrow}>
+                    <TbArrowNarrowDownDashed />
+                  </p>
+                  <div className={styles.localizations + " " + styles.showMenu}>
+                    <div className={styles.searchBox}>
+                      <CiSearch
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          transform: "translateX(23px)",
+                          color: "grey",
+                        }}
+                      />
+                      <input
+                        type="text"
+                        id="searchLocalization"
+                        placeholder="Szukaj..."
+                      />
+                    </div>
+                    <div className={styles.options}>
+                      <p>Remote</p>
+                      <p>Rzeszów</p>
+                      <p>Kraków</p>
+                      <p>Warszawa</p>
+                      <p>Poznań</p>
+                      <p>Opole</p>
+                      <p>Katowice</p>
+                      <p>Wrocław</p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className={styles.position}
+                  onClick={(e) => {
+                    showMenu(e, styles.positions);
+                  }}
+                >
+                  <p>Stanowisko</p>
+                  <p className={styles.arrow}>
+                    <TbArrowNarrowDownDashed />
+                  </p>
+                  <div className={styles.positions + " " + styles.showMenu}>
+                    <div className={styles.searchBox}>
+                      <CiSearch
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          transform: "translateX(23px)",
+                          color: "grey",
+                        }}
+                      />
+                      <input
+                        type="text"
+                        id="searchLocalization"
+                        placeholder="Szukaj..."
+                      />
+                    </div>
+                    <div className={styles.options}>
+                      <p>Remote</p>
+                      <p>Rzeszów</p>
+                      <p>Kraków</p>
+                      <p>Warszawa</p>
+                      <p>Poznań</p>
+                      <p>Opole</p>
+                      <p>Katowice</p>
+                      <p>Wrocław</p>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className={styles.technologie}
+                  onClick={(e) => {
+                    showMenu(e, styles.technologies);
+                  }}
+                >
+                  <p>Technologia</p>
+                  <p className={styles.arrow}>
+                    <TbArrowNarrowDownDashed />
+                  </p>
+                  <div className={styles.technologies + " " + styles.showMenu}>
+                    <div className={styles.searchBox}>
+                      <CiSearch
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          transform: "translateX(23px)",
+                          color: "grey",
+                        }}
+                      />
+                      <input
+                        type="text"
+                        id="searchLocalization"
+                        placeholder="Szukaj..."
+                      />
+                    </div>
+                    <div className={styles.options}>
+                      <p>JavaScript</p>
+                      <p>Java</p>
+                      <p>C</p>
+                      <p>C#</p>
+                      <p>C++</p>
+                      <p>PHP</p>
+                      <p>Kotlin</p>
+                      <p>Python</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.experienceDiv}>
+                <p style={{ fontWeight: "bolder", margin: 0 }}>
+                  Poziom doświadczenia
+                </p>
+                <div
+                  className={styles.experiencesTypes}
+                  onClick={(e) => toggleStyle(e)}
+                >
+                  <p>Intern</p>
+                  <p>Junior</p>
+                  <p>Senior</p>
+                  <p>Lead/Principal</p>
+                </div>
+              </div>
+              <div className={styles.contract}>
+                <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
+                <div
+                  className={styles.contractTypes}
+                  onClick={(e) => toggleStyle(e)}
+                >
+                  <p>Umowa B2B</p>
+                  <p>Umowa o prace</p>
+                  <p>Umowa zlecenie</p>
+                </div>
+              </div>
+            </div>
+            <div className={styles.setFilter}>
+              <button>Resetuj</button>
+              <button>Zastosuj</button>
+            </div>
+          </div>
+        </div>
+      </header>
+    </>
   );
 };
 export default Navbar;

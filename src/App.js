@@ -6,6 +6,7 @@ import RegisterPage from "./Components/RegisterPage/RegisterPage";
 import JobOffertsPage from "./Components/JobOffertPage/JobOffertsPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
+import SettingPage from "./Components/SettingsPage/SettingsPage";
 const App = () => {
   return (
     <>
