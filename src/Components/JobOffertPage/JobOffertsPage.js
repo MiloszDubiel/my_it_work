@@ -7,9 +7,7 @@ import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const fetchData = async () => {
-  const request = await axios.get(
-    `http://192.168.100.2:3001/api/get-job-offerts`
-  );
+  const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
   return request.data;
 };
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut

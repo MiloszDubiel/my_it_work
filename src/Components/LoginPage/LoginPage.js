@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./login.module.css";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const LoginForm = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
@@ -9,45 +10,25 @@ const LoginForm = ({ onSubmit }) => {
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const validate = () => {
-    if (!email) return "Podaj adres e-mail.";
-    // prosty regex na e-mail
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!re.test(email)) return "Nieprawidłowy adres e-mail.";
-    if (!password || password.length < 6)
-      return "Hasło musi mieć co najmniej 6 znaków.";
-    return null;
-  };
+  const [info, setInfo] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const v = validate();
-    if (v) {
-      setError(v);
-      return;
-    }
+    setInfo("");
 
     setLoading(true);
     try {
-      if (onSubmit) {
-        await onSubmit({ email, password, remember });
-      } else {
-        // PRZYKŁADOWE WYWOŁANIE: odkomentuj i zaktualizuj endpoint jeśli chcesz
-        /*
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, remember }),
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || "Błąd logowania");
-        */
-        await new Promise((r) => setTimeout(r, 800)); // demo
-      }
+      let res = await axios.post("http://192.168.100.2:3001/auth/login", {
+        email,
+        password,
+      });
+
+      setInfo(res.data.info);
+
+      localStorage.setItem("userData", JSON.stringify(res.data.user));
     } catch (err) {
-      setError(err?.message || "Błąd połączenia");
+      setError(JSON.parse(err.request.response).error);
     } finally {
       setLoading(false);
     }
@@ -68,6 +49,11 @@ const LoginForm = ({ onSubmit }) => {
               {error}
             </div>
           )}
+          {info && (
+            <div className={styles.info} role="alert">
+              {info}
+            </div>
+          )}
 
           <label className={styles.field}>
             <span className={styles.label}>E-mail</span>
@@ -76,7 +62,7 @@ const LoginForm = ({ onSubmit }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="twoj@email.pl"
+              placeholder="Email"
               autoComplete="email"
               required
               aria-required="true"
@@ -91,7 +77,7 @@ const LoginForm = ({ onSubmit }) => {
                 type={showPwd ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Twoje hasło"
+                placeholder="Hasło"
                 autoComplete="current-password"
                 required
                 aria-required="true"

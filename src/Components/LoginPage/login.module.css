@@ -154,6 +154,15 @@
   border-radius: 8px;
   font-size: 13px;
 }
+/* info */
+.info {
+  background: #fafff5;
+  color: #1d5e0d;
+  border: 1px solid rgba(197, 47, 47, 0.08);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
 
 .spinner {
   display: inline-block;

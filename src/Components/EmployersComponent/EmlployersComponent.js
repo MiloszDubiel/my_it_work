@@ -9,7 +9,7 @@ import Footer from "../Footer/Fotter";
 
 const fetchData = async () => {
   const request = await axios.get(
-    `http://192.168.100.2:3001/api/get-job-employers`
+    `http://192.168.100.2:3001/api/employers`
   );
   return request.data;
 };
