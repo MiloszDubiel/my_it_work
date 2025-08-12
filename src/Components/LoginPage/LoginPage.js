@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./login.module.css";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const LoginForm = ({ onSubmit }) => {
+const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -11,6 +12,7 @@ const LoginForm = ({ onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +29,7 @@ const LoginForm = ({ onSubmit }) => {
       setInfo(res.data.info);
 
       localStorage.setItem("userData", JSON.stringify(res.data.user));
+      setTimeout(() => navigate("/", { replace: true }), 1000);
     } catch (err) {
       setError(JSON.parse(err.request.response).error);
     } finally {

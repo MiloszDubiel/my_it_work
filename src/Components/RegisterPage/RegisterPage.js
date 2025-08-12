@@ -56,7 +56,7 @@ const RegisterPage = () => {
       <div
         className={styles.container1}
         role="region"
-        aria-label="Formularz logowania"
+        aria-label="Formularz rejestracji"
       >
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <h2 className={styles.title}>Zarejestruj się </h2>

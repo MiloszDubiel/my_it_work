@@ -1,16 +1,20 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
 import { IoFilterOutline } from "react-icons/io5";
-import { TbArrowNarrowDownDashed, TbBrandFacebookFilled } from "react-icons/tb";
+import { TbArrowNarrowDownDashed } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let hiddenMenu = useRef(null);
   let searchDiv = useRef(null);
   let account = useRef(null);
+
+  let userData = JSON.parse(localStorage.getItem("userData"));
+  let navigate = useNavigate();
 
   const showMenu = (e, variant) => {
     let elements = [
@@ -150,23 +154,64 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           </ul>
         </div>
         <div className={styles.account}>
-          <div className={styles.addOffert}>
-            <p>Dodaj ogłoszenie</p>
-          </div>
-          <button
-            onClick={() => {
-              account.current.classList.toggle(styles.accountDivHide);
-            }}
-          >
-            <IoPersonOutline className={styles.icon} />
-          </button>
+          {userData ? (
+            ""
+          ) : (
+            <div className={styles.addOffert}>
+              <p>Dodaj ogłoszenie</p>
+            </div>
+          )}
+
+          {userData ? (
+            <>
+              Witaj {userData.name || ""} {userData.surname || ""}
+              <button
+                onClick={() => {
+                  account.current.classList.toggle(styles.accountDivHide);
+                }}
+              >
+                <IoPersonOutline className={styles.icon} />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                account.current.classList.toggle(styles.accountDivHide);
+              }}
+            >
+              <IoPersonOutline className={styles.icon} />
+            </button>
+          )}
         </div>
         <div
           className={styles.accountDiv + " " + styles.accountDivHide}
           ref={account}
         >
-          <Link to="/login">Zaloguj się</Link>
-          <Link to="/register">Zarejestruj się</Link>
+          {userData ? (
+            <>
+              {" "}
+              <Link to="/user/setting">Ustawienia</Link>
+              <Link to="/user/add-ad">Dodaj ogłoszenie</Link>
+              <Link to="/user/my-ad">Moje ogłoszenia</Link>
+              <Link
+                onClick={() => {
+                  navigate("/");
+                  localStorage.setItem(
+                    "userData",
+                    JSON.parse({ info: "Wylogowano" })
+                  );
+                }}
+              >
+                Wyloguj
+              </Link>
+            </>
+          ) : (
+            <>
+              {""}
+              <Link to="/login">Zaloguj się</Link>
+              <Link to="/register">Zarejestruj się</Link>
+            </>
+          )}
         </div>
       </nav>
       <div

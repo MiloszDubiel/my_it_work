@@ -7,13 +7,11 @@ const CACHE_KEY = "jobOffertsCache";
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 
 const fetchData = async (amount) => {
-  const request = await axios.get(
-    `http://192.168.100.2:3001/api/get-job-offerts`
-  );
+  const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
   return request.data;
 };
 
-const JobOfferttsComponent = ({ amount, styles, ofertDetailsStyle }) => {
+const JobOfferttsComponent = ({ amount }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [jobOfferts, setJobOfferts] = useState(null);
 
