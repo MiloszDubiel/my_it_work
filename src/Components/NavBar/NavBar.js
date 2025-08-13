@@ -157,7 +157,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             </ul>
           </div>
           <div className={styles.account}>
-            {userData ? (
+            {userData?.email ? (
               ""
             ) : (
               <div className={styles.addOffert}>
@@ -165,7 +165,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               </div>
             )}
 
-            {userData ? (
+            {userData?.email ? (
               <>
                 Witaj {userData.name || ""} {userData.surname || ""}
                 <button
@@ -190,7 +190,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             className={styles.accountDiv + " " + styles.accountDivHide}
             ref={account}
           >
-            {userData ? (
+            {userData?.email ? (
               <>
                 {" "}
                 <Link
@@ -205,11 +205,11 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                 <Link to="/user/my-ad">Moje ogłoszenia</Link>
                 <Link
                   onClick={() => {
-                    navigate("/");
                     localStorage.setItem(
                       "userData",
-                      JSON.parse({ info: "Wylogowano" })
+                      JSON.stringify({ info: "Wylogowano" })
                     );
+                    navigate("/");
                   }}
                 >
                   Wyloguj

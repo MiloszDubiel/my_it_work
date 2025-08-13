@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./settings.module.css";
 import { IoCloseOutline } from "react-icons/io5";
+import axios from "axios";
 
 const SettingPage = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setFirstName] = useState("");
+  const [surname, setSurnName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -28,14 +29,14 @@ const SettingPage = () => {
   }, [successMsg, errorMsg]);
 
   useEffect(() => {
-    setFirstName(userData.name);
-    setLastName(userData.lastname);
-    setEmail(userData.email);
-    setPhone(userData.phone_number);
+    setFirstName(userData?.name);
+    setSurnName(userData?.surname);
+    setEmail(userData?.email);
+    setPhone(userData?.phone_number);
   }, []);
 
   const validate = () => {
-    if (!firstName.trim() || !lastName.trim()) return "Podaj imię i nazwisko.";
+    if (!name?.trim() || !surname?.trim()) return "Podaj imię i nazwisko.";
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!re.test(email)) return "Nieprawidłowy adres e-mail.";
     if (phone && !/^[+\d][\d\s\-()]{4,}$/.test(phone))
@@ -60,17 +61,16 @@ const SettingPage = () => {
 
     setLoading(true);
     try {
-      const payload = {
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        ...(password ? { password } : {}), // only include password if changed
-      };
+      let id = userData.id;
 
-      setSuccessMsg("Ustawienia zapisane pomyślnie.");
-      setPassword("");
-      setConfirmPassword("");
+      let res = await axios.post("http://192.168.100.2:3001/user/settings", {
+        id,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      setSuccessMsg(res.data.info);
     } catch (err) {
       setErrorMsg(err?.message || "Błąd zapisu ustawień.");
     } finally {
@@ -105,7 +105,7 @@ const SettingPage = () => {
               <span className={styles.label}>Imię</span>
               <input
                 className={styles.input}
-                value={firstName}
+                value={name}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Imię"
                 required
@@ -116,8 +116,8 @@ const SettingPage = () => {
               <span className={styles.label}>Nazwisko</span>
               <input
                 className={styles.input}
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={name}
+                onChange={(e) => setSurnName(e.target.value)}
                 placeholder="Nazwisko"
                 required
               />
@@ -195,7 +195,7 @@ const SettingPage = () => {
               className={styles.btnSecondary}
               onClick={() => {
                 setFirstName("");
-                setLastName("");
+                setSurnName("");
                 setEmail("");
                 setPhone("");
                 setPassword("");
