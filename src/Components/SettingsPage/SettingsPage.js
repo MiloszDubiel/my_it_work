@@ -68,9 +68,17 @@ const SettingPage = () => {
         email,
         password,
         confirmPassword,
+        name,
+        surname,
+        phone,
       });
 
+      localStorage.setItem("userData", JSON.stringify(res.data.user));
       setSuccessMsg(res.data.info);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
     } catch (err) {
       setErrorMsg(err?.message || "Błąd zapisu ustawień.");
     } finally {
@@ -116,7 +124,7 @@ const SettingPage = () => {
               <span className={styles.label}>Nazwisko</span>
               <input
                 className={styles.input}
-                value={name}
+                value={surname}
                 onChange={(e) => setSurnName(e.target.value)}
                 placeholder="Nazwisko"
                 required
@@ -125,14 +133,27 @@ const SettingPage = () => {
           </div>
 
           <label className={styles.field}>
-            <span className={styles.label}>E-mail</span>
+            <span className={styles.label}>
+              E-mail{" "}
+              <button
+                className={styles.btnSecondary}
+                onClick={(e) => {
+                  e.preventDefault();
+                  let isDisabled = document.querySelector("#email").disabled;
+                  document.querySelector("#email").disabled = !isDisabled;
+                }}
+              >
+                Odblokuj pole
+              </button>
+            </span>
             <input
               className={styles.input}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              required
+              disabled
+              id="email"
             />
           </label>
 
@@ -142,12 +163,24 @@ const SettingPage = () => {
               className={styles.input}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+48 600 000 000"
+              placeholder="600 000 000"
             />
           </label>
 
           <div className={styles.sectionDivider}>
-            Zmiana hasła (opcjonalnie)
+            Zmiana hasła
+            <button
+              className={styles.btnSecondary}
+              onClick={(e) => {
+                e.preventDefault();
+                let isDisabled = document.querySelector("#password").disabled;
+                document.querySelector("#password").disabled = !isDisabled;
+                document.querySelector("#confirmPassword").disabled =
+                  !isDisabled;
+              }}
+            >
+              Odblokuj pola
+            </button>
           </div>
 
           <label className={styles.field}>
@@ -159,6 +192,8 @@ const SettingPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Nowe hasło"
+                disabled
+                id="password"
               />
               <button
                 type="button"
@@ -179,6 +214,8 @@ const SettingPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Powtórz nowe hasło"
+              disabled
+              id="confirmPassword"
             />
           </label>
 
@@ -189,22 +226,6 @@ const SettingPage = () => {
               disabled={loading}
             >
               {loading ? "Zapisuję..." : "Zapisz zmiany"}
-            </button>
-            <button
-              type="button"
-              className={styles.btnSecondary}
-              onClick={() => {
-                setFirstName("");
-                setSurnName("");
-                setEmail("");
-                setPhone("");
-                setPassword("");
-                setConfirmPassword("");
-                setErrorMsg("");
-                setSuccessMsg("");
-              }}
-            >
-              Anuluj
             </button>
           </div>
         </form>

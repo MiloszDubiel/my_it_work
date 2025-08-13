@@ -64,6 +64,9 @@
   font-size: 13px;
   color: #6b7280;
   font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .pwdWrap {
@@ -110,11 +113,12 @@
 }
 
 .btnSecondary {
-  padding: 10px 16px;
+  padding: 2px 4px;
   border-radius: 10px;
+  font-size: 11px;
   border: 1px solid #e6e9ee;
-  background: white;
-  color: #374151;
+  background: #37415180;
+  color: white;
   cursor: pointer;
 }
 

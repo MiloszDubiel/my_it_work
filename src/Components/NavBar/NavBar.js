@@ -167,7 +167,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
             {userData?.email ? (
               <>
-                Witaj {userData.name || ""} {userData.surname || ""}
+                Witaj, {userData.name || "Użytkowniku"} {userData.surname || ""}
                 <button
                   onClick={() => {
                     account.current.classList.toggle(styles.accountDivHide);
