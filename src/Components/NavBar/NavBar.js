@@ -4,10 +4,11 @@ import { IoFilterOutline } from "react-icons/io5";
 import { TbArrowNarrowDownDashed } from "react-icons/tb";
 import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, use } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import SettingPage from "../SettingsPage/SettingsPage";
+import { current } from "@reduxjs/toolkit";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let hiddenMenu = useRef(null);
@@ -16,6 +17,9 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
   let userData = JSON.parse(localStorage.getItem("userData"));
   let navigate = useNavigate();
+
+  const [cities, setCities] = useState(null);
+  const [currentCity, setCurrentCity] = useState("");
 
   const showMenu = (e, variant) => {
     let elements = [
@@ -93,6 +97,20 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
   const toggleFilter = () => {
     hiddenMenu.current.classList.toggle(styles.toggleFilter);
+  };
+
+  const searchOptions = (e, options) => {
+    const text = String(e.currentTarget.value).toLowerCase().trim();
+
+    const filteredElements =
+      options
+        .filter((el) => el.toLowerCase().trim().includes(text))
+        .map((tag) => {
+          return <p>{tag[0].toUpperCase() + tag.substr(1)}</p>;
+        }) || [];
+
+    console.log(filteredElements);
+    return filteredElements;
   };
 
   useEffect(() => {
@@ -269,17 +287,41 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       type="text"
                       id="searchLocalization"
                       placeholder="Szukaj..."
+                      onKeyUpCapture={(e) => {
+                        setCities(
+                          searchOptions(e, [
+                            "Remote",
+                            "Rzeszów",
+                            "Kraków",
+                            "Warszawa",
+                            "Poznań",
+                            "Opole",
+                            "Katowice",
+                            "Wrocław",
+                          ])
+                        );
+                      }}
+                      onChange={(e) => {
+                        setCurrentCity(e.target.value);
+                      }}
+                      value={currentCity}
                     />
                   </div>
                   <div className={styles.options}>
-                    <p>Remote</p>
-                    <p>Rzeszów</p>
-                    <p>Kraków</p>
-                    <p>Warszawa</p>
-                    <p>Poznań</p>
-                    <p>Opole</p>
-                    <p>Katowice</p>
-                    <p>Wrocław</p>
+                    {cities == null ? (
+                      <>
+                        <p>Remote</p>
+                        <p>Rzeszów</p>
+                        <p>Kraków</p>
+                        <p>Warszawa</p>
+                        <p>Poznań</p>
+                        <p>Opole</p>
+                        <p>Katowice</p>
+                        <p>Wrocław</p>
+                      </>
+                    ) : (
+                      cities
+                    )}
                   </div>
                 </div>
               </div>
@@ -472,17 +514,41 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                         type="text"
                         id="searchLocalization"
                         placeholder="Szukaj..."
+                        onKeyUpCapture={(e) => {
+                          setCities(
+                            searchOptions(e, [
+                              "Remote",
+                              "Rzeszów",
+                              "Kraków",
+                              "Warszawa",
+                              "Poznań",
+                              "Opole",
+                              "Katowice",
+                              "Wrocław",
+                            ])
+                          );
+                        }}
+                        onChange={(e) => {
+                          setCurrentCity(e.target.value);
+                        }}
+                        value={currentCity}
                       />
                     </div>
                     <div className={styles.options}>
-                      <p>Remote</p>
-                      <p>Rzeszów</p>
-                      <p>Kraków</p>
-                      <p>Warszawa</p>
-                      <p>Poznań</p>
-                      <p>Opole</p>
-                      <p>Katowice</p>
-                      <p>Wrocław</p>
+                      {cities == null ? (
+                        <>
+                          <p>Remote</p>
+                          <p>Rzeszów</p>
+                          <p>Kraków</p>
+                          <p>Warszawa</p>
+                          <p>Poznań</p>
+                          <p>Opole</p>
+                          <p>Katowice</p>
+                          <p>Wrocław</p>
+                        </>
+                      ) : (
+                        cities
+                      )}
                     </div>
                   </div>
                 </div>
