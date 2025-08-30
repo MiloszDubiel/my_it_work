@@ -2,26 +2,43 @@ import styles from "./MainPage.module.css";
 import NewJobOfferts from "../NewJobOfferts/NewJobOfferts";
 import Navbar from "../NavBar/NavBar";
 import Footer from "../Footer/Fotter";
+import { IoFilterOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import Filter from "../FilterComponent/Filter";
 
 const MainPage = () => {
+  const toggleFilter = () => {
+    document.querySelector("fillterMenu").classList.toggle("toggleFilter");
+  };
+
   return (
     <>
       <div className={styles.page}>
         <Navbar offertPage={true} />
+        <Filter type={"job-offerts"} />
         <h1 className={styles.header}>Praca w IT</h1>
         <h2 className={styles.header} style={{ marginTop: 0 }}>
-          Najnowsze oferty pracy
+          Najnowsze oferty pracy{" "}
+          <button
+            onClick={() => {
+              document.querySelector("#filter").style.display = "flex";
+            }}
+          >
+            Filtruj
+          </button>
         </h2>
         <div className={styles.recommended}>
           <div className={styles.parent}>
-            <NewJobOfferts
-              amount={9}
-            />
+            <NewJobOfferts amount={9} />
           </div>
         </div>
         <div className={styles.showMoreOfferts}>
-          {" "}
+          <div className={styles.filter} onClick={toggleFilter}>
+            <p>
+              <IoFilterOutline />
+            </p>
+            <p>Filtruj</p>
+          </div>{" "}
           <Link
             to={"/job-offerts"}
             style={{ textDecoration: "none", color: "inherit" }}
