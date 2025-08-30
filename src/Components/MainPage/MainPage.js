@@ -7,15 +7,11 @@ import { Link } from "react-router-dom";
 import Filter from "../FilterComponent/Filter";
 
 const MainPage = () => {
-  const toggleFilter = () => {
-    document.querySelector("fillterMenu").classList.toggle("toggleFilter");
-  };
-
   return (
     <>
       <div className={styles.page}>
         <Navbar offertPage={true} />
-        <Filter type={"job-offerts"} />
+        <Filter offertPage={true} />
         <h1 className={styles.header}>Praca w IT</h1>
         <h2 className={styles.header} style={{ marginTop: 0 }}>
           Najnowsze oferty pracy{" "}
@@ -33,12 +29,6 @@ const MainPage = () => {
           </div>
         </div>
         <div className={styles.showMoreOfferts}>
-          <div className={styles.filter} onClick={toggleFilter}>
-            <p>
-              <IoFilterOutline />
-            </p>
-            <p>Filtruj</p>
-          </div>{" "}
           <Link
             to={"/job-offerts"}
             style={{ textDecoration: "none", color: "inherit" }}

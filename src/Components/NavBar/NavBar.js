@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import SettingPage from "../SettingsPage/SettingsPage";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
-  let hiddenMenu = useRef(null);
   let searchDiv = useRef(null);
   let account = useRef(null);
 

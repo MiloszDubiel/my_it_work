@@ -5,7 +5,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Filter = ({ type }) => {
+const Filter = ({ offertPage, candidatePage, employersPage }) => {
   //Stałe do wyszukwania - Lokalizacja
   const [cities, setCities] = useState(null);
   const [currentCity, setCurrentCity] = useState("");
@@ -23,75 +23,15 @@ const Filter = ({ type }) => {
 
   //Metoda do wysiwetlania osobno pol - Lokalizacja Stanowisko i yechnologia
   const showMenu = (e, variant) => {
-    let elements = [
-      styles.localizations,
-      styles.positions,
-      styles.technologies,
-    ];
+    let menu = e.currentTarget.querySelector("div");
 
-    if (e.target.tagName === "P" && !e.target.classList.contains("name")) {
+    if (
+      (e.target.tagName === "P" && !e.target.classList.contains("name")) ||
+      e.target.tagName === "INPUT"
+    ) {
       return;
     }
-
-    if (e.currentTarget === e.target) {
-      let parent = e.target.parentElement;
-      let grandParent = e.target.parentElement.parentElement;
-
-      for (let el of elements) {
-        if (
-          parent.classList.contains(styles.optionsFilter) ||
-          grandParent.classList.contains(styles.optionsFilter)
-        ) {
-          if (variant === el) {
-            grandParent
-              .querySelector(`.${el}`)
-              .classList.toggle(styles.showMenu);
-          } else {
-            grandParent.querySelector(`.${el}`).classList.add(styles.showMenu);
-          }
-        } else {
-          if (variant === el) {
-            document.querySelector(`.${el}`).classList.toggle(styles.showMenu);
-          } else {
-            document.querySelector(`.${el}`).classList.add(styles.showMenu);
-          }
-        }
-      }
-      e.target.querySelector("svg").classList.toggle(styles.rotate);
-    }
-
-    if (e.target.tagName === "P" || e.target.tagName === "svg") {
-      for (let el of elements) {
-        if (
-          e.currentTarget.parentElement.parentElement.classList.contains(
-            styles.optionsFilter
-          ) ||
-          e.target.parentElement.parentElement.classList.contains(
-            styles.optionsFilter
-          ) ||
-          e.target.parentElement.parentElement.parentElement.classList.contains(
-            styles.optionsFilter
-          )
-        ) {
-          if (variant === el) {
-            e.currentTarget.parentElement.parentElement
-              .querySelector(`.${el}`)
-              .classList.toggle(styles.showMenu);
-          } else {
-            e.currentTarget.parentElement.parentElement
-              .querySelector(`.${el}`)
-              .classList.add(styles.showMenu);
-          }
-        } else {
-          if (variant === el) {
-            document.querySelector(`.${el}`).classList.toggle(styles.showMenu);
-          } else {
-            document.querySelector(`.${el}`).classList.add(styles.showMenu);
-          }
-        }
-      }
-      e.currentTarget.querySelector("svg").classList.toggle(styles.rotate);
-    }
+    menu.classList.toggle(styles.showMenu);
   };
 
   //Zmiana styli
@@ -105,12 +45,11 @@ const Filter = ({ type }) => {
   const searchOptions = (e, options) => {
     const text = String(e.currentTarget.value).toLowerCase().trim();
 
-    const filteredElements =
-      options
-        .filter((el) => el.toLowerCase().trim().includes(text))
-        .map((tag) => {
-          return <p>{tag[0].toUpperCase() + tag.substr(1)}</p>;
-        }) || [];
+    const filteredElements = options
+      .filter((el) => el.toLowerCase().trim().includes(text))
+      .map((tag) => {
+        return <p>{tag[0].toUpperCase() + tag.substr(1)}</p>;
+      });
 
     return filteredElements;
   };
@@ -175,10 +114,6 @@ const Filter = ({ type }) => {
                           ])
                         );
                       }}
-                      onChange={(e) => {
-                        setCurrentCity(e.target.value);
-                      }}
-                      value={currentCity}
                     />
                   </div>
                   <div className={styles.options}>
@@ -206,78 +141,98 @@ const Filter = ({ type }) => {
                   </div>
                 </div>
               </div>
-              <div
-                className={styles.position}
-                onClick={(e) => {
-                  showMenu(e, styles.positions);
-                }}
-              >
-                <p className="name">Stanowisko</p>
-                <p className={styles.arrow}>
-                  <TbArrowNarrowDownDashed />
-                </p>
-                <div className={styles.positions + " " + styles.showMenu}>
-                  <div className={styles.searchBox}>
-                    <CiSearch
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        transform: "translateX(23px)",
-                        color: "grey",
-                      }}
-                    />
-                    <input
-                      type="text"
-                      id="searchLocalization"
-                      placeholder="Szukaj..."
-                      onKeyUpCapture={(e) => {
-                        setPositions(
-                          searchOptions(e, [
-                            "Backend",
-                            "Analityk IT",
-                            "DevOps",
-                            "Frontend",
-                            "Administrator IT",
-                            "Full-stack",
-                            "Architekt IT",
-                            "Cyber Seciurity",
-                            "GameDev",
-                            "Data Science",
-                            "Embedded",
-                          ])
-                        );
-                      }}
-                      onChange={(e) => {
-                        setCurrentPosition(e.target.value);
-                      }}
-                      value={currentPosition}
-                    />
-                  </div>
-                  <div className={styles.options}>
-                    {positions == null ? (
-                      <span
-                        onClick={(e) => {
-                          toggleOption(e);
+              {offertPage ? (
+                <div
+                  className={styles.position}
+                  onClick={(e) => {
+                    showMenu(e, styles.positions);
+                  }}
+                >
+                  <p className="name">Stanowisko</p>
+                  <p className={styles.arrow}>
+                    <TbArrowNarrowDownDashed />
+                  </p>
+                  <div className={styles.positions + " " + styles.showMenu}>
+                    <div className={styles.searchBox}>
+                      <CiSearch
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          transform: "translateX(23px)",
+                          color: "grey",
                         }}
-                      >
-                        <p>Backend</p>
-                        <p>Analityk IT</p>
-                        <p>DevOps</p>
-                        <p>Frontend</p>
-                        <p>Administrator IT</p>
-                        <p>Full-stack</p>
-                        <p>Architekt IT</p>
-                        <p>Cyber Seciurity</p>
-                        <p>GameDev</p>
-                        <p>Data Science</p>
-                        <p>Embedded</p>
-                      </span>
-                    ) : (
-                      positions
-                    )}
+                      />
+                      <input
+                        type="text"
+                        id="searchLocalization"
+                        placeholder="Szukaj..."
+                        onKeyUpCapture={(e) => {
+                          setPositions(
+                            searchOptions(e, [
+                              "Backend",
+                              "Analityk IT",
+                              "DevOps",
+                              "Frontend",
+                              "Administrator IT",
+                              "Full-stack",
+                              "Architekt IT",
+                              "Cyber Seciurity",
+                              "GameDev",
+                              "Data Science",
+                              "Embedded",
+                            ])
+                          );
+                        }}
+
+                      />
+                    </div>
+                    <div className={styles.options}>
+                      {positions == null ? (
+                        <span
+                          onClick={(e) => {
+                            toggleOption(e);
+                          }}
+                        >
+                          <p>Backend</p>
+                          <p>Analityk IT</p>
+                          <p>DevOps</p>
+                          <p>Frontend</p>
+                          <p>Administrator IT</p>
+                          <p>Full-stack</p>
+                          <p>Architekt IT</p>
+                          <p>Cyber Seciurity</p>
+                          <p>GameDev</p>
+                          <p>Data Science</p>
+                          <p>Embedded</p>
+                        </span>
+                      ) : (
+                        positions
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : employersPage ? (
+                <div className={styles.position}>
+                  <input
+                    type="text"
+                    className={styles.companyName}
+                    placeholder="Nazwa firmy"
+                  />
+                </div>
+              ) : (
+                <div className={styles.position}>
+                  <input
+                    type="text"
+                    className={styles.name}
+                    placeholder="Imię"
+                  />
+                  <input
+                    type="text"
+                    className={styles.name}
+                    placeholder="Nazwisko"
+                  />
+                </div>
+              )}
               <div
                 className={styles.technologie}
                 onClick={(e) => {
@@ -319,10 +274,6 @@ const Filter = ({ type }) => {
                           ])
                         );
                       }}
-                      onChange={(e) => {
-                        setCurrentTechnology(e.target.value);
-                      }}
-                      value={currentTechnology}
                     />
                   </div>
                   <div className={styles.options}>
@@ -350,81 +301,188 @@ const Filter = ({ type }) => {
                 </div>
               </div>
             </div>
-            <div className={styles.experienceDiv}>
-              <p style={{ fontWeight: "bolder", margin: 0 }}>
-                Poziom doświadczenia
-              </p>
-              <div
-                className={styles.experiencesTypes}
-                onClick={(e) => toggleStyle(e)}
-              >
-                <p>Intern</p>
-                <p>Junior</p>
-                <p>Senior</p>
-                <p>Lead/Principal</p>
-              </div>
-            </div>
-            <div className={styles.contract}>
-              <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
-              <div
-                className={styles.contractTypes}
-                onClick={(e) => toggleStyle(e)}
-              >
-                <p>Kontrakt B2B</p>
-                <p>Umowa o pracę</p>
-                <p>Umowa zlecenie</p>
-              </div>
-            </div>
+            {offertPage ? (
+              <>
+                <div className={styles.experienceDiv}>
+                  <p style={{ fontWeight: "bolder", margin: 0 }}>
+                    Poziom doświadczenia
+                  </p>
+                  <div
+                    className={styles.experiencesTypes}
+                    onClick={(e) => toggleStyle(e)}
+                  >
+                    <p>Intern</p>
+                    <p>Junior</p>
+                    <p>Senior</p>
+                    <p>Lead/Principal</p>
+                  </div>
+                </div>
+                <div className={styles.contract}>
+                  <p style={{ fontWeight: "bolder", margin: 0 }}>Typ umowy</p>
+                  <div
+                    className={styles.contractTypes}
+                    onClick={(e) => toggleStyle(e)}
+                  >
+                    <p>Kontrakt B2B</p>
+                    <p>Umowa o pracę</p>
+                    <p>Umowa zlecenie</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              ""
+            )}
           </div>
           <div className={styles.setFilter}>
-            <Link
-              to="/filltred-job-offerts"
-              state={{ parma }}
-              onClick={(e) => {
-                e.preventDefault();
+            {offertPage ? (
+              <Link
+                to="/job-offerts/filltred"
+                state={{ parma }}
+                onClick={() => {
+                  const locations = [
+                    ...document.querySelectorAll(
+                      `.${styles.localizations} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
 
-                const locations = [
-                  ...document.querySelectorAll(
-                    `.${styles.localizations} .${styles.options} span p`
-                  ),
-                ]
-                  .filter((el) => el.classList.contains(styles.checked))
-                  .map((tag) => tag.textContent);
+                  const position = [
+                    ...document.querySelectorAll(
+                      `.${styles.positions} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
 
-                const position = [
-                  ...document.querySelectorAll(
-                    `.${styles.positions} .${styles.options} span p`
-                  ),
-                ]
-                  .filter((el) => el.classList.contains(styles.checked))
-                  .map((tag) => tag.textContent);
+                  const technologie = [
+                    ...document.querySelectorAll(
+                      `.${styles.technologies} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
 
-                const technologie = [
-                  ...document.querySelectorAll(
-                    `.${styles.technologies} .${styles.options} span p`
-                  ),
-                ]
-                  .filter((el) => el.classList.contains(styles.checked))
-                  .map((tag) => tag.textContent);
+                  const exprience = [
+                    ...document.querySelectorAll(`.${styles.experienceDiv} p`),
+                  ]
+                    .filter((el) => el.classList.contains(styles.toggleColor))
+                    .map((tag) => tag.textContent);
 
-                const exprience = [
-                  ...document.querySelectorAll(`.${styles.experienceDiv} p`),
-                ]
-                  .filter((el) => el.classList.contains(styles.toggleColor))
-                  .map((tag) => tag.textContent);
+                  const type = [
+                    ...document.querySelectorAll(`.${styles.contractTypes} p`),
+                  ]
+                    .filter((el) => el.classList.contains(styles.toggleColor))
+                    .map((tag) => tag.textContent);
 
-                const type = [
-                  ...document.querySelectorAll(`.${styles.contractTypes} p`),
-                ]
-                  .filter((el) => el.classList.contains(styles.toggleColor))
-                  .map((tag) => tag.textContent);
+                  const filters = {
+                    locations,
+                    position,
+                    technologie,
+                    exprience,
+                    type,
+                  };
 
-                setParma();
-              }}
-            >
-              {" "}
-              Zastosuj
-            </Link>
+                  setParma(filters);
+                }}
+              >
+                {" "}
+                Zastosuj
+              </Link>
+            ) : employersPage ? (
+              <Link
+                to="/employers/filltred"
+                state={{ parma }}
+                onClick={() => {
+                  const locations = [
+                    ...document.querySelectorAll(
+                      `.${styles.localizations} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
+
+                  const company = document.querySelector(
+                    `.${styles.companyName}`
+                  );
+
+                  const technologie = [
+                    ...document.querySelectorAll(
+                      `.${styles.technologies} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
+
+
+                  const filters = {
+                    locations,
+                    company,
+                    technologie,
+                  };
+
+                  setParma(filters);
+                }}
+              >
+                {" "}
+                Zastosuj
+              </Link>
+            ) : (
+              <Link
+                to="/job-offerts/filltred"
+                state={{ parma }}
+                onClick={(e) => {
+                  const locations = [
+                    ...document.querySelectorAll(
+                      `.${styles.localizations} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
+
+                  const position = [
+                    ...document.querySelectorAll(
+                      `.${styles.positions} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
+
+                  const technologie = [
+                    ...document.querySelectorAll(
+                      `.${styles.technologies} .${styles.options} span p`
+                    ),
+                  ]
+                    .filter((el) => el.classList.contains(styles.checked))
+                    .map((tag) => tag.textContent);
+
+                  const exprience = [
+                    ...document.querySelectorAll(`.${styles.experienceDiv} p`),
+                  ]
+                    .filter((el) => el.classList.contains(styles.toggleColor))
+                    .map((tag) => tag.textContent);
+
+                  const type = [
+                    ...document.querySelectorAll(`.${styles.contractTypes} p`),
+                  ]
+                    .filter((el) => el.classList.contains(styles.toggleColor))
+                    .map((tag) => tag.textContent);
+
+                  const filters = {
+                    locations,
+                    position,
+                    technologie,
+                    exprience,
+                    type,
+                  };
+
+                  setParma(filters);
+                }}
+              >
+                {" "}
+                Zastosuj
+              </Link>
+            )}
           </div>
         </div>
       </div>

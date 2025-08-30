@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import Filter from "../FilterComponent/Filter";
 
 const fetchData = async () => {
   const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
@@ -102,7 +103,17 @@ const JobOffertsPage = () => {
     <>
       <div className={styles.page}>
         <Navbar offertPage={true} />
-        <h1 className={styles.header}>Przeglądaj oferty pracy</h1>
+        <Filter offertPage={true} />
+        <h1 className={styles.header}>
+          Przeglądaj oferty pracy{" "}
+          <button
+            onClick={() => {
+              document.querySelector("#filter").style.display = "flex";
+            }}
+          >
+            Filtruj
+          </button>
+        </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
             <PaginatedItems itemsPerPage={9} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "../NavBar/NavBar";
 import styles from "./employers.module.css";
 import axios from "axios";
@@ -6,11 +6,10 @@ import { CiLocationOn } from "react-icons/ci";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import ReactPaginate from "react-paginate";
 import Footer from "../Footer/Fotter";
+import Filter from "../FilterComponent/Filter";
 
 const fetchData = async () => {
-  const request = await axios.get(
-    `http://192.168.100.2:3001/api/employers`
-  );
+  const request = await axios.get(`http://192.168.100.2:3001/api/employers`);
   return request.data;
 };
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
@@ -176,8 +175,18 @@ const EmployersComponent = () => {
   return (
     <>
       <Navbar employersPage={true} />
+      <Filter employersPage={true} />
       <div className={styles.page}>
-        <h1 className={styles.header}>Pracodawcy w IT</h1>
+        <h1 className={styles.header}>
+          Pracodawcy w IT{" "}
+          <button
+            onClick={() => {
+              document.querySelector("#filter").style.display = "flex";
+            }}
+          >
+            Filtruj
+          </button>
+        </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
             <PaginatedItems itemsPerPage={9} />

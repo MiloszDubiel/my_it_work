@@ -113,6 +113,7 @@
   justify-content: space-between;
   position: relative;
   cursor: pointer;
+  user-select: none;
 }
 .searchInput {
   border: none;
@@ -130,6 +131,7 @@
 .position p,
 .technologie p {
   margin-left: 20px;
+  user-select: none;
 }
 .arrow {
   margin-right: 10px;

@@ -57,12 +57,25 @@
   align-items: center;
 }
 
-.hiddenMenu {
-  display: none;
+/*Pole wyszukwiania w filtorowaniu*/
+.companyName,
+.name {
+  all: unset;
+  width: 100%;
+  padding-left: 20px;
+  font-size: 14px;
+  color: black;
+  cursor: text;
 }
-.active {
-  display: block !important;
+.name:nth-child(2) {
+  border-left: 1px solid rgba(128, 128, 128, 0.137);
 }
+.companyName::placeholder,
+.name::placeholder {
+  font-size: 16px;
+  color: black;
+}
+
 /*Filtrowanie*/
 .searchOfferts {
   width: 615px;
@@ -175,19 +188,10 @@
   justify-content: space-around;
   align-items: center;
 }
-.setFilter button:nth-child(1) {
-  border: 1px solid gray;
-  background-color: inherit;
-  width: 200px;
-  border-radius: 50px;
-  font-size: 16px;
-  font-weight: bolder;
-  height: 50px;
-  cursor: pointer;
-}
+
 .setFilter a {
   border: none;
-  background: linear-gradient(180deg, #ff8a00, #ff5a00);
+  background: black;
   width: 250px;
   border-radius: 50px;
   font-size: 16px;
