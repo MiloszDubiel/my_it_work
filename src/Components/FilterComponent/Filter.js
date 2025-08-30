@@ -183,7 +183,6 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                             ])
                           );
                         }}
-
                       />
                     </div>
                     <div className={styles.options}>
@@ -414,7 +413,6 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-
                   const filters = {
                     locations,
                     company,
@@ -429,7 +427,7 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
               </Link>
             ) : (
               <Link
-                to="/job-offerts/filltred"
+                to="/candidates/filltred"
                 state={{ parma }}
                 onClick={(e) => {
                   const locations = [
@@ -440,13 +438,12 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-                  const position = [
-                    ...document.querySelectorAll(
-                      `.${styles.positions} .${styles.options} span p`
-                    ),
-                  ]
-                    .filter((el) => el.classList.contains(styles.checked))
-                    .map((tag) => tag.textContent);
+                  const name = document.querySelectorAll(`.${styles.name}`)[0]
+                    .value;
+
+                  const surnName = document.querySelectorAll(
+                    `.${styles.name}`
+                  )[1].value;
 
                   const technologie = [
                     ...document.querySelectorAll(
@@ -456,24 +453,13 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-                  const exprience = [
-                    ...document.querySelectorAll(`.${styles.experienceDiv} p`),
-                  ]
-                    .filter((el) => el.classList.contains(styles.toggleColor))
-                    .map((tag) => tag.textContent);
-
-                  const type = [
-                    ...document.querySelectorAll(`.${styles.contractTypes} p`),
-                  ]
-                    .filter((el) => el.classList.contains(styles.toggleColor))
-                    .map((tag) => tag.textContent);
+                
 
                   const filters = {
                     locations,
-                    position,
+                    name,
+                    surnName,
                     technologie,
-                    exprience,
-                    type,
                   };
 
                   setParma(filters);
