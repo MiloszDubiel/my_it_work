@@ -21,6 +21,12 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   const [cities, setCities] = useState(null);
   const [currentCity, setCurrentCity] = useState("");
 
+  const [positions, setPositions] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState("");
+
+  const [technology, setTechnology] = useState(null);
+  const [currentTechnology, setCurrentTechnology] = useState("");
+
   const showMenu = (e, variant) => {
     let elements = [
       styles.localizations,
@@ -109,7 +115,6 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           return <p>{tag[0].toUpperCase() + tag.substr(1)}</p>;
         }) || [];
 
-    console.log(filteredElements);
     return filteredElements;
   };
 
@@ -298,6 +303,9 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                             "Opole",
                             "Katowice",
                             "Wrocław",
+                            "Białystok",
+                            "Polska",
+                            "Łódź",
                           ])
                         );
                       }}
@@ -318,6 +326,9 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                         <p>Opole</p>
                         <p>Katowice</p>
                         <p>Wrocław</p>
+                        <p>Białystok</p>
+                        <p>Polska</p>
+                        <p>Łódź</p>
                       </>
                     ) : (
                       cities
@@ -360,17 +371,47 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       type="text"
                       id="searchLocalization"
                       placeholder="Szukaj..."
+                      onKeyUpCapture={(e) => {
+                        setPositions(
+                          searchOptions(e, [
+                            "Backend",
+                            "Analityk IT",
+                            "DevOps",
+                            "Frontend",
+                            "Administrator IT",
+                            "Full-stack",
+                            "Architekt IT",
+                            "Cyber Seciurity",
+                            "GameDev",
+                            "Data Science",
+                            "Embedded",
+                          ])
+                        );
+                      }}
+                      onChange={(e) => {
+                        setCurrentPosition(e.target.value);
+                      }}
+                      value={currentPosition}
                     />
                   </div>
                   <div className={styles.options}>
-                    <p>Remote</p>
-                    <p>Rzeszów</p>
-                    <p>Kraków</p>
-                    <p>Warszawa</p>
-                    <p>Poznań</p>
-                    <p>Opole</p>
-                    <p>Katowice</p>
-                    <p>Wrocław</p>
+                    {positions == null ? (
+                      <>
+                        <p>Backend</p>
+                        <p>Analityk IT</p>
+                        <p>DevOps</p>
+                        <p>Frontend</p>
+                        <p>Administrator IT</p>
+                        <p>Full-stack</p>
+                        <p>Architekt IT</p>
+                        <p>Cyber Seciurity</p>
+                        <p>GameDev</p>
+                        <p>Data Science</p>
+                        <p>Embedded</p>
+                      </>
+                    ) : (
+                      positions
+                    )}
                   </div>
                 </div>
               </div>
@@ -399,17 +440,47 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       type="text"
                       id="searchLocalization"
                       placeholder="Szukaj..."
+                      onKeyUpCapture={(e) => {
+                        setCities(
+                          searchOptions(e, [
+                            "Remote",
+                            "Rzeszów",
+                            "Kraków",
+                            "Warszawa",
+                            "Poznań",
+                            "Opole",
+                            "Katowice",
+                            "Wrocław",
+                            "Białystok",
+                            "Polska",
+                            "Łódź",
+                          ])
+                        );
+                      }}
+                      onChange={(e) => {
+                        setCurrentCity(e.target.value);
+                      }}
+                      value={currentCity}
                     />
                   </div>
                   <div className={styles.options}>
-                    <p>Remote</p>
-                    <p>Rzeszów</p>
-                    <p>Kraków</p>
-                    <p>Warszawa</p>
-                    <p>Poznań</p>
-                    <p>Opole</p>
-                    <p>Katowice</p>
-                    <p>Wrocław</p>
+                    {cities == null ? (
+                      <>
+                        <p>Remote</p>
+                        <p>Rzeszów</p>
+                        <p>Kraków</p>
+                        <p>Warszawa</p>
+                        <p>Poznań</p>
+                        <p>Opole</p>
+                        <p>Katowice</p>
+                        <p>Wrocław</p>
+                        <p>Białystok</p>
+                        <p>Polska</p>
+                        <p>Łódź</p>
+                      </>
+                    ) : (
+                      cities
+                    )}
                   </div>
                 </div>
               </div>
@@ -441,17 +512,46 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                     type="text"
                     id="searchLocalization"
                     placeholder="Szukaj..."
+                    onKeyUpCapture={(e) => {
+                      setTechnology(
+                        searchOptions(e, [
+                          "JavaScript",
+                          "TypeScript",
+                          "Java",
+                          "C",
+                          "C#",
+                          "C++",
+                          "PHP",
+                          "Kotlin",
+                          "Phyton",
+                          ".NET",
+                          "SQL",
+                        ])
+                      );
+                    }}
+                    onChange={(e) => {
+                      setCurrentTechnology(e.target.value);
+                    }}
+                    value={currentTechnology}
                   />
                 </div>
                 <div className={styles.options}>
-                  <p>JavaScript</p>
-                  <p>Java</p>
-                  <p>C</p>
-                  <p>C#</p>
-                  <p>C++</p>
-                  <p>PHP</p>
-                  <p>Kotlin</p>
-                  <p>Python</p>
+                  {technology == null ? (
+                    <>
+                      <p>JavaScript</p>
+                      <p>TypeScript</p>
+                      <p>Java</p>
+                      <p>C</p>
+                      <p>C#</p>
+                      <p>PHP</p>
+                      <p>Kotlin</p>
+                      <p>Phyton</p>
+                      <p>.NET</p>
+                      <p>SQL</p>
+                    </>
+                  ) : (
+                    technology
+                  )}
                 </div>
               </div>
             </div>
@@ -468,7 +568,14 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                 <p>Filtruj</p>
               </div>
             ) : (
-              ""
+              <div
+                className={styles.filter}
+              >
+                <p>
+                  <IoFilterOutline />
+                </p>
+                <p>Filtruj</p>
+              </div>
             )}
           </div>
         </div>
@@ -525,6 +632,9 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                               "Opole",
                               "Katowice",
                               "Wrocław",
+                              "Białystok",
+                              "Polska",
+                              "Łódź",
                             ])
                           );
                         }}
@@ -545,6 +655,9 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                           <p>Opole</p>
                           <p>Katowice</p>
                           <p>Wrocław</p>
+                          <p>Białystok</p>
+                          <p>Polska</p>
+                          <p>Łódź</p>
                         </>
                       ) : (
                         cities
@@ -576,17 +689,47 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                         type="text"
                         id="searchLocalization"
                         placeholder="Szukaj..."
+                        onKeyUpCapture={(e) => {
+                          setPositions(
+                            searchOptions(e, [
+                              "Backend",
+                              "Analityk IT",
+                              "DevOps",
+                              "Frontend",
+                              "Administrator IT",
+                              "Full-stack",
+                              "Architekt IT",
+                              "Cyber Seciurity",
+                              "GameDev",
+                              "Data Science",
+                              "Embedded",
+                            ])
+                          );
+                        }}
+                        onChange={(e) => {
+                          setCurrentPosition(e.target.value);
+                        }}
+                        value={currentPosition}
                       />
                     </div>
                     <div className={styles.options}>
-                      <p>Remote</p>
-                      <p>Rzeszów</p>
-                      <p>Kraków</p>
-                      <p>Warszawa</p>
-                      <p>Poznań</p>
-                      <p>Opole</p>
-                      <p>Katowice</p>
-                      <p>Wrocław</p>
+                      {positions == null ? (
+                        <>
+                          <p>Backend</p>
+                          <p>Analityk IT</p>
+                          <p>DevOps</p>
+                          <p>Frontend</p>
+                          <p>Administrator IT</p>
+                          <p>Full-stack</p>
+                          <p>Architekt IT</p>
+                          <p>Cyber Seciurity</p>
+                          <p>GameDev</p>
+                          <p>Data Science</p>
+                          <p>Embedded</p>
+                        </>
+                      ) : (
+                        positions
+                      )}
                     </div>
                   </div>
                 </div>
@@ -614,17 +757,46 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                         type="text"
                         id="searchLocalization"
                         placeholder="Szukaj..."
+                        onKeyUpCapture={(e) => {
+                          setTechnology(
+                            searchOptions(e, [
+                              "JavaScript",
+                              "TypeScript",
+                              "Java",
+                              "C",
+                              "C#",
+                              "C++",
+                              "PHP",
+                              "Kotlin",
+                              "Phyton",
+                              ".NET",
+                              "SQL",
+                            ])
+                          );
+                        }}
+                        onChange={(e) => {
+                          setCurrentTechnology(e.target.value);
+                        }}
+                        value={currentTechnology}
                       />
                     </div>
                     <div className={styles.options}>
-                      <p>JavaScript</p>
-                      <p>Java</p>
-                      <p>C</p>
-                      <p>C#</p>
-                      <p>C++</p>
-                      <p>PHP</p>
-                      <p>Kotlin</p>
-                      <p>Python</p>
+                      {technology == null ? (
+                        <>
+                          <p>JavaScript</p>
+                          <p>TypeScript</p>
+                          <p>Java</p>
+                          <p>C</p>
+                          <p>C#</p>
+                          <p>PHP</p>
+                          <p>Kotlin</p>
+                          <p>Phyton</p>
+                          <p>.NET</p>
+                          <p>SQL</p>
+                        </>
+                      ) : (
+                        technology
+                      )}
                     </div>
                   </div>
                 </div>
@@ -649,8 +821,8 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   className={styles.contractTypes}
                   onClick={(e) => toggleStyle(e)}
                 >
-                  <p>Umowa B2B</p>
-                  <p>Umowa o prace</p>
+                  <p>kontrakt B2B</p>
+                  <p>Umowa o pracę</p>
                   <p>Umowa zlecenie</p>
                 </div>
               </div>

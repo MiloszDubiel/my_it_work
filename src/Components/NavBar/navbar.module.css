@@ -159,7 +159,7 @@
 }
 .filter {
   border: 1px solid white;
-  width: 100px;
+  width: 95px;
   height: 50px;
   display: flex;
   justify-content: space-evenly;
@@ -298,16 +298,18 @@
   font-size: 16px;
   font-weight: bolder;
   height: 50px;
+  cursor: pointer;
 }
 .setFilter button:nth-child(2) {
-  border: 1px solid rgb(255, 181, 45);
-  background-color: rgb(255, 181, 45);
+  border: none;
+  background: linear-gradient(180deg, #ff8a00, #ff5a00);
   width: 250px;
   border-radius: 50px;
   font-size: 16px;
   color: white;
   font-weight: bolder;
   height: 50px;
+  cursor: pointer;
 }
 
 /*Okna opcji w menu*/
