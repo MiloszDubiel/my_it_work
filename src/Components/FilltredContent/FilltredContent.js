@@ -9,11 +9,49 @@ import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
 import Footer from "../Footer/Fotter";
 
-const fetchData = async () => {
-  const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
-  return request.data;
-};
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
+
+const fetchData = async (offertPage, employersPage, candidatePage, state) => {
+  if (offertPage) {
+    try {
+      const request = await axios.post(
+        `http://192.168.100.2:3001/api/job-offerts/filltred`,
+        {
+          state,
+        }
+      );
+      return request.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  if (employersPage) {
+    try {
+      const request = await axios.post(
+        `http://192.168.100.2:3001/api/employers/filltred`,
+        {
+          state,
+        }
+      );
+      return request.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  if (candidatePage) {
+    try {
+      const request = await axios.post(
+        `http://192.168.100.2:3001/api/candidate/filltred`,
+        {
+          state,
+        }
+      );
+      return request.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
 
 const Items = ({ currentItems }) => {
   return (
@@ -24,7 +62,13 @@ const Items = ({ currentItems }) => {
   );
 };
 
-const PaginatedItems = ({ itemsPerPage }) => {
+const PaginatedItems = ({
+  itemsPerPage,
+  offertPage,
+  employersPage,
+  candidatePage,
+  state,
+}) => {
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
@@ -32,22 +76,13 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const cached = localStorage.getItem("offerts");
-    const parsed = cached ? JSON.parse(cached) : null;
-    setIsLoading(true);
-
     window.scrollTo(0, 0);
+      fetchData(offertPage, employersPage, candidatePage, state).then((res) => {
+       
 
-    if (parsed && Date.now() < parsed.expiry) {
-      const endOffset = itemOffset + itemsPerPage;
-      setCurrentItems(parsed.res.slice(itemOffset, endOffset));
-      setPageCount(Math.ceil(parsed.res.length / itemsPerPage));
-      setIsLoading(false);
-    } else {
-      fetchData().then((res) => {
         setOfferts(res);
         localStorage.setItem(
-          "offerts",
+          "offertsFilttered",
           JSON.stringify({ res, expiry: Date.now() + CACHE_DURATION_MS })
         );
         const endOffset = itemOffset + itemsPerPage;
@@ -55,7 +90,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
         setPageCount(Math.ceil(res.length / itemsPerPage));
         setIsLoading(false);
       });
-    }
+    
   }, [itemOffset, itemsPerPage]);
 
   const handlePageClick = (event) => {
@@ -65,7 +100,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
     } else {
       const newOffset =
         (event.selected * itemsPerPage) %
-        JSON.parse(localStorage.getItem("offerts")).res.length;
+        JSON.parse(localStorage.getItem("offertsFilttered")).res.length;
       setItemOffset(newOffset);
     }
   };
@@ -133,7 +168,14 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
         </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
-            <PaginatedItems itemsPerPage={9} />
+            <PaginatedItems
+              itemsPerPage={9}
+              state={state}
+              candidatePage={candidatePage}
+              offertPage={offertPage}
+              employersPage={employersPage}
+            />
+            ;
           </div>
         </div>
         <Footer />

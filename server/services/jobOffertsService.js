@@ -29,3 +29,50 @@ export function saveOffertsToDb(offers) {
 export function getAllOfferts() {
   return connection.query("SELECT * FROM job_offerts");
 }
+
+export async function getFillteredOfferts({
+  locations,
+  position,
+  technologie,
+  experience,
+  type,
+}) {
+  let sql = "SELECT * FROM job_offerts WHERE 1=1"; // 1=1 żeby łatwo dokładać warunki
+  const params = [];
+
+  if (locations?.length > 0) {
+    // np. locations to tablica: ["Warszawa", "Kraków"]
+    sql += ` AND (${locations.map(() => "workingMode LIKE ?").join(" OR ")})`;
+    locations.forEach((loc) => params.push(`%${loc}%`));
+  }
+  if (technologie?.length > 0) {
+    // technologie to tablica: ["React", "Node.js"]
+    sql += ` AND (${technologie
+      .map(() => "technologies LIKE ?")
+      .join(" OR ")})`;
+    technologie.forEach((tech) => params.push(`%${tech}%`));
+  }
+  if (position?.length > 0) {
+    // stanowisko to tablica: ["GameDev", "FrontEnd"]
+    sql += ` AND (${position.map(() => "title LIKE ?").join(" OR ")})`;
+    position.forEach((pos) => params.push(`%${pos}%`));
+  }
+  if (type?.length > 0) {
+    // typ kontraktu to tablica: ["Kontrakt B2B", "Umowa o pracę"]
+    sql += ` AND (${type.map(() => "contractType LIKE ?").join(" OR ")})`;
+    type.forEach((typ) => params.push(`%${typ}%`));
+  }
+  if (experience?.length > 0) {
+    // typ kontraktu to tablica: ["Kontrakt B2B", "Umowa o pracę"]
+    sql += ` AND (${experience.map(() => "experience LIKE ?").join(" OR ")})`;
+    experience.forEach((exp) => params.push(`%${exp}%`));
+  }
+
+  try {
+    const [rows] = await connection.query(sql, params);
+    return rows;
+  } catch (err) {
+    console.error("Błąd w zapytaniu SQL:", err);
+    throw err;
+  }
+}
