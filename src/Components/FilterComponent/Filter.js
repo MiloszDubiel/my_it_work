@@ -4,11 +4,14 @@ import { CiSearch } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Filter = ({ offertPage, candidatePage, employersPage }) => {
   //Stałe do wyszukwania - Lokalizacja
   const [cities, setCities] = useState(null);
   const [currentCity, setCurrentCity] = useState("");
+
+  const navigate = useNavigate();
 
   //Stałe do wyszukwania  - Stanowisko
   const [positions, setPositions] = useState(null);
@@ -45,13 +48,25 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
   const searchOptions = (e, options) => {
     const text = String(e.currentTarget.value).toLowerCase().trim();
 
+    
+
+
+
     const filteredElements = options
       .filter((el) => el.toLowerCase().trim().includes(text))
       .map((tag) => {
         return <p>{tag[0].toUpperCase() + tag.substr(1)}</p>;
       });
 
-    return filteredElements;
+    return (
+      <span
+        onClick={(e) => {
+          toggleOption(e);
+        }}
+      >
+        {filteredElements}
+      </span>
+    );
   };
 
   //Funkcja zo zebrania informacji które zaznaczył użytkownik w polach Technologia, Lokalizacja i Stanowisko i chce za pomoca nich filtrować i wyszukiwac ofert
@@ -334,9 +349,7 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
           </div>
           <div className={styles.setFilter}>
             {offertPage ? (
-              <Link
-                to="/job-offerts/filltred"
-                state={{ parma }}
+              <button
                 onClick={() => {
                   const locations = [
                     ...document.querySelectorAll(
@@ -383,15 +396,15 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                   };
 
                   setParma(filters);
+
+                  navigate("/job-offerts/filltred", { state: filters });
                 }}
               >
                 {" "}
                 Zastosuj
-              </Link>
+              </button>
             ) : employersPage ? (
-              <Link
-                to="/employers/filltred"
-                state={{ parma }}
+              <button
                 onClick={() => {
                   const locations = [
                     ...document.querySelectorAll(
@@ -401,9 +414,9 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-                  const company = document.querySelector(
-                    `.${styles.companyName}`
-                  );
+                  const company =
+                    document.querySelector(`.${styles.companyName}`)
+                      ?.textContent || "";
 
                   const technologie = [
                     ...document.querySelectorAll(
@@ -413,22 +426,17 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-                  const filters = {
-                    locations,
-                    company,
-                    technologie,
-                  };
-
+                  const filters = { locations, company, technologie };
                   setParma(filters);
+
+                  navigate("/employers/filltred", { state: filters });
                 }}
               >
                 {" "}
                 Zastosuj
-              </Link>
+              </button>
             ) : (
-              <Link
-                to="/candidates/filltred"
-                state={{ parma }}
+              <button
                 onClick={(e) => {
                   const locations = [
                     ...document.querySelectorAll(
@@ -453,8 +461,6 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                     .filter((el) => el.classList.contains(styles.checked))
                     .map((tag) => tag.textContent);
 
-                
-
                   const filters = {
                     locations,
                     name,
@@ -463,11 +469,12 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                   };
 
                   setParma(filters);
+                  navigate("/candidates/filltred", { state: filters });
                 }}
               >
                 {" "}
                 Zastosuj
-              </Link>
+              </button>
             )}
           </div>
         </div>

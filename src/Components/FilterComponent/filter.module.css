@@ -189,7 +189,7 @@
   align-items: center;
 }
 
-.setFilter a {
+.setFilter button {
   border: none;
   background: black;
   width: 250px;
