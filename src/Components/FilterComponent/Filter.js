@@ -48,10 +48,6 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
   const searchOptions = (e, options) => {
     const text = String(e.currentTarget.value).toLowerCase().trim();
 
-    
-
-
-
     const filteredElements = options
       .filter((el) => el.toLowerCase().trim().includes(text))
       .map((tag) => {
@@ -398,6 +394,7 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                   setParma(filters);
 
                   navigate("/job-offerts/filltred", { state: filters });
+                  document.querySelector("#filter").style.display = "none";
                 }}
               >
                 {" "}
@@ -430,6 +427,7 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
                   setParma(filters);
 
                   navigate("/employers/filltred", { state: filters });
+                  document.querySelector("#filter").style.display = "none";
                 }}
               >
                 {" "}
@@ -470,6 +468,7 @@ const Filter = ({ offertPage, candidatePage, employersPage }) => {
 
                   setParma(filters);
                   navigate("/candidates/filltred", { state: filters });
+                  document.querySelector("#filter").style.display = "none";
                 }}
               >
                 {" "}

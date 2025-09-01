@@ -8,8 +8,7 @@ import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
 import Footer from "../Footer/Fotter";
-
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
+import Employer from "../Employer/Employer";
 
 const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (offertPage) {
@@ -53,11 +52,23 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   }
 };
 
-const Items = ({ currentItems }) => {
+const Items = ({ currentItems, offertPage, employersPage, candidatePage }) => {
+  if (currentItems === "Error") {
+    return <div className={styles.error}>Nie znaleziono ofert</div>;
+  }
+
   return (
     <>
       {currentItems &&
-        currentItems.map((el, index) => <Offert offert={el} index={index} />)}
+        (offertPage
+          ? currentItems.map((el, index) => (
+              <Offert offert={el} index={index} />
+            ))
+          : employersPage
+          ? currentItems.map((el, index) => {
+              return <Employer offert={el} index={index} />;
+            })
+          : " ")}
     </>
   );
 };
@@ -77,36 +88,39 @@ const PaginatedItems = ({
 
   useEffect(() => {
     window.scrollTo(0, 0);
-      fetchData(offertPage, employersPage, candidatePage, state).then((res) => {
-       
+    fetchData(offertPage, employersPage, candidatePage, state).then((res) => {
+      if (res.length < 1) {
+        setCurrentItems("Error");
+        return;
+      }
 
-        setOfferts(res);
-        localStorage.setItem(
-          "offertsFilttered",
-          JSON.stringify({ res, expiry: Date.now() + CACHE_DURATION_MS })
-        );
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(res.slice(itemOffset, endOffset));
-        setPageCount(Math.ceil(res.length / itemsPerPage));
-        setIsLoading(false);
-      });
-    
-  }, [itemOffset, itemsPerPage]);
+      setOfferts(res);
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(res.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(res.length / itemsPerPage));
+      setIsLoading(false);
+    });
+  }, [
+    itemOffset,
+    itemsPerPage,
+    offertPage,
+    employersPage,
+    candidatePage,
+    state,
+  ]);
 
   const handlePageClick = (event) => {
-    if (offerts) {
-      const newOffset = (event.selected * itemsPerPage) % offerts.length;
-      setItemOffset(newOffset);
-    } else {
-      const newOffset =
-        (event.selected * itemsPerPage) %
-        JSON.parse(localStorage.getItem("offertsFilttered")).res.length;
-      setItemOffset(newOffset);
-    }
+    const newOffset = (event.selected * itemsPerPage) % offerts.length;
+    setItemOffset(newOffset);
   };
   return (
     <>
-      <Items currentItems={currentItems} />
+      <Items
+        currentItems={currentItems}
+        offertPage={offertPage}
+        employersPage={employersPage}
+        candidatePage={candidatePage}
+      />
       {isLoading ? (
         <LoadingComponent />
       ) : (
@@ -139,6 +153,8 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
   const location = useLocation();
   const { state } = location;
 
+  console.log(state);
+
   return (
     <>
       <div className={styles.page}>
@@ -162,6 +178,7 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
             onClick={() => {
               document.querySelector("#filter").style.display = "flex";
             }}
+            className={styles.filter}
           >
             Filtruj
           </button>
@@ -175,7 +192,6 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
               offertPage={offertPage}
               employersPage={employersPage}
             />
-            ;
           </div>
         </div>
         <Footer />

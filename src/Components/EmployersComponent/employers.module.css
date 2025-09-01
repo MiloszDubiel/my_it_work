@@ -1,9 +1,9 @@
 .page {
   background: linear-gradient(180deg, #f5f5f5 0%, #fbfbfb 100%);
 }
-.page h1{
+.page h1 {
   margin: 0;
-  padding: 40px 0px ;
+  padding: 40px 0px;
 }
 .header {
   margin-top: 40px;
@@ -138,6 +138,17 @@
 .showCities {
   display: block !important;
 }
+.filter {
+  position: relative;
+  left: 400px;
+  height: 40px;
+  border-radius: 50px;
+  width: 100px;
+  background-color: inherit;
+  font-size: 14px;
+  border: 1px solid gray;
+  cursor: pointer;
+}
 
 @keyframes fadeInUp {
   from {
@@ -156,6 +167,9 @@
     grid-template-columns: repeat(1, 1fr);
     width: 1000px;
   }
+  .filter {
+    left: 250px;
+  }
 }
 @media screen and (min-width: 521px) and (max-width: 1064px) {
   .recommended {
@@ -164,6 +178,14 @@
   .parent {
     grid-template-columns: repeat(1, 1fr);
     width: calc(100% - 10px);
+  }
+  .filter {
+    left: 100px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .filter {
+    display: none;
   }
 }
 @media screen and (max-width: 880px) {

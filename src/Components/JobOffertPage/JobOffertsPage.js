@@ -6,6 +6,7 @@ import axios from "axios";
 import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
+import Footer from "../Footer/Fotter";
 
 const fetchData = async () => {
   const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
@@ -107,6 +108,7 @@ const JobOffertsPage = () => {
         <h1 className={styles.header}>
           Przeglądaj oferty pracy{" "}
           <button
+            className={styles.filter}
             onClick={() => {
               document.querySelector("#filter").style.display = "flex";
             }}
@@ -119,9 +121,7 @@ const JobOffertsPage = () => {
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
-        <footer className={styles.footer}>
-          <p>Tu coś kiedy bedzie</p>
-        </footer>
+        <Footer />
       </div>
     </>
   );

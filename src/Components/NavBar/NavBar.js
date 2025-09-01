@@ -142,6 +142,16 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               : "Kandydaci IT"}
           </h1>
         </div>
+
+        <div className={styles.hiddenMenu}>
+          <button
+            onClick={() => {
+              document.querySelector("#filter").style.display = "flex";
+            }}
+          >
+            Filtruj
+          </button>
+        </div>
       </header>
     </>
   );

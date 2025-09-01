@@ -495,11 +495,6 @@
   .hiddenMenu button:hover {
     background-color: rgba(253, 253, 253, 0.096);
   }
-  .hiddenMenu svg {
-    width: 20px;
-    height: 20px;
-    transform: translateY(1px);
-  }
   .searchOfferts {
     width: 100%;
   }

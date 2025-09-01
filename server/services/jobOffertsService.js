@@ -34,7 +34,7 @@ export async function getFillteredOfferts({
   locations,
   position,
   technologie,
-  experience,
+  exprience,
   type,
 }) {
   let sql = "SELECT * FROM job_offerts WHERE 1=1"; // 1=1 żeby łatwo dokładać warunki
@@ -62,10 +62,10 @@ export async function getFillteredOfferts({
     sql += ` AND (${type.map(() => "contractType LIKE ?").join(" OR ")})`;
     type.forEach((typ) => params.push(`%${typ}%`));
   }
-  if (experience?.length > 0) {
+  if (exprience?.length > 0) {
     // typ kontraktu to tablica: ["Kontrakt B2B", "Umowa o pracę"]
-    sql += ` AND (${experience.map(() => "experience LIKE ?").join(" OR ")})`;
-    experience.forEach((exp) => params.push(`%${exp}%`));
+    sql += ` AND (${exprience.map(() => "experience LIKE ?").join(" OR ")})`;
+    exprience.forEach((exp) => params.push(`%${exp}%`));
   }
 
   try {

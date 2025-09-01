@@ -4,8 +4,18 @@ import {
   saveEmployersToDb,
   getAllEmployers,
 } from "../services/employerService.js";
-
+import { getFillteredEmployers } from "../services/employerService.js";
 const router = express.Router();
+
+router.post("/filltred", async (req, res) => {
+  try {
+    const { state } = req.body;
+    const rows = await getFillteredEmployers(state);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.get("/", async (req, res) => {
   try {
