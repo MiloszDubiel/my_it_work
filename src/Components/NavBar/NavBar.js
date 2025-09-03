@@ -1,12 +1,9 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
-import { TbArrowNarrowDownDashed } from "react-icons/tb";
-import { CiSearch } from "react-icons/ci";
-import { IoCloseOutline } from "react-icons/io5";
-import { useRef, useEffect, useState, use } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import SettingPage from "../SettingsPage/SettingsPage";
+import AddOffert from "../AddOffert/AddJobOffert";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let searchDiv = useRef(null);
@@ -18,7 +15,11 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
   return (
     <>
-      <SettingPage />
+      <AddOffert
+        offertPage={offertPage}
+        candidatePage={candidatePage}
+        employersPage={employersPage}
+      />
       <header className={styles.headerElement}>
         <nav className={styles.navBar}>
           <div className={styles.header}>
@@ -56,14 +57,6 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           </div>
           <div className={styles.account}>
             {userData?.email ? (
-              ""
-            ) : (
-              <div className={styles.addOffert}>
-                <p>Dodaj ogłoszenie</p>
-              </div>
-            )}
-
-            {userData?.email ? (
               <>
                 Witaj, {userData.name || "Użytkowniku"} {userData.surname || ""}
                 <button
@@ -90,17 +83,33 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           >
             {userData?.email ? (
               <>
-                {" "}
-                <Link
-                  onClick={() => {
-                    document.querySelector("#userSettings").style.display =
-                      "flex";
-                  }}
-                >
-                  Ustawienia
-                </Link>
-                <Link to="/user/add-ad">Dodaj ogłoszenie</Link>
-                <Link to="/user/my-ad">Moje ogłoszenia</Link>
+                <Link to="/user/settings">Ustawienia</Link>
+                {userData.role === "Employer" ? (
+                  <>
+                    <Link to="/user/add-your-company">Dodaj swoją firmę</Link>
+                    <Link
+                      onClick={() => {
+                        document.querySelector(
+                          "#jobOffertContainer"
+                        ).style.display = "flex";
+                      }}
+                    >
+                      Dodaj ogłoszenie o pracę
+                    </Link>
+                  </>
+                ) : (
+                  ""
+                )}
+                {userData.role === "Candidate" ? (
+                  <>
+                    <Link to="/user/add-candidate">
+                      Dodaj swoją kandydaturę
+                    </Link>
+                  </>
+                ) : (
+                  ""
+                )}
+
                 <Link
                   onClick={() => {
                     localStorage.setItem(

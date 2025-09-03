@@ -16,6 +16,7 @@ const MainPage = () => {
         <h2 className={styles.header} style={{ marginTop: 0 }}>
           Najnowsze oferty pracy{" "}
           <button
+            className={styles.filter}
             onClick={() => {
               document.querySelector("#filter").style.display = "flex";
             }}

@@ -6,6 +6,8 @@ import JobOffertsPage from "./Components/JobOffertPage/JobOffertsPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
 import FilltredContent from "./Components/FilltredContent/FilltredContent";
+import MoreSettings from "./Components/SettingsPage/MoreSettings";
+import AddJobOffert from "./Components/AddOffert/AddJobOffert";
 const App = () => {
   return (
     <>
