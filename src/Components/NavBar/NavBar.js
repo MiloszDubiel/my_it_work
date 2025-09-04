@@ -86,16 +86,21 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                 <Link to="/user/settings">Ustawienia</Link>
                 {userData.role === "Employer" ? (
                   <>
-                    <Link to="/user/add-your-company">Dodaj swoją firmę</Link>
-                    <Link
-                      onClick={() => {
-                        document.querySelector(
-                          "#jobOffertContainer"
-                        ).style.display = "flex";
-                      }}
-                    >
-                      Dodaj ogłoszenie o pracę
-                    </Link>
+                    {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
+
+                    {offertPage ? (
+                      <Link
+                        onClick={() => {
+                          document.querySelector(
+                            "#jobOffertContainer"
+                          ).style.display = "flex";
+                        }}
+                      >
+                        Dodaj ogłoszenie o pracę
+                      </Link>
+                    ) : (
+                      ""
+                    )}
                   </>
                 ) : (
                   ""

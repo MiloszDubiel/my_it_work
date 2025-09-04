@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./addJobOffert.module.css";
 import { IoMdClose } from "react-icons/io";
 
 const AddJobOffert = () => {
   const userData = JSON.parse(localStorage.getItem("userData"));
-
   const [cities, setCities] = useState(new Set());
   const [technologie, setTechnologie] = useState(new Set());
 
@@ -17,21 +16,7 @@ const AddJobOffert = () => {
     technologies: [],
   });
 
-  const deleteElement = (e, type) => {
-    if (type === "city") {
-      cities.forEach((el) => {
-        if (el === e.target.textContent) {
-          let location = String(e.target.textContent);
-          e.target.remove();
-        }
-      });
-    } else {
-      setTechnologie(technologie.delete(e.currentTarget.textContent));
-    }
-  };
-
-  const EXPERIENCES = ["Intern", "Junior", "Mid/Regular", "Senior"];
-  const CONTRACTS = ["B2B", "Umowa o pracę"];
+  console.log(cities);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,62 +50,106 @@ const AddJobOffert = () => {
     });
   };
 
-  return (
-    <div className={styles.container} id="jobOffertContainer">
-      <div className={styles.addLocations} style={{ display: "none" }}>
-        <label>Lokalizacja</label>
-        <input
-          type="text"
-          name="location"
-          placeholder="np. Rzeszów"
-          required
-          id="location"
-        />
-        <input
-          type="button"
-          name="add-location"
-          value="Dodaj"
-          className={styles.citiesButton}
-          onClick={() => {
-            let location = document.querySelector("#location").value.trim();
-            if (location.length === 0) {
-              return alert("Niepoprawna wartosc w polu Lokalizacja");
-            }
-            setCities(new Set([...cities, <span>{location}</span>]));
+  const removeElement = (e, type) => {
+    if (type === "city") {
+      cities.forEach((el) => {
+        if (el === e.target.textContent) {
+          cities.delete(el);
+        }
+      });
+      setCities(new Set([...cities]));
+    } else {
+      technologie.forEach((el) => {
+        if (el === e.target.textContent) {
+          technologie.delete(el);
+        }
+      });
+      setTechnologie(new Set([...technologie]));
+    }
+  };
 
-            document.querySelector(`.${styles.addLocations}`).style.display =
-              "none";
-          }}
-        />
+  return (
+    <div
+      className={styles.container}
+      id="jobOffertContainer"
+      style={{ display: "none" }}
+    >
+      <div className={styles.addLocations} style={{ display: "none" }}>
+        <div className={styles.close}>
+          <IoMdClose
+            onClick={() => {
+              document.querySelector(`.${styles.addLocations}`).style.display =
+                "none";
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <label>Lokalizacja</label>
+          <input
+            type="text"
+            name="location"
+            placeholder="np. Rzeszów"
+            required
+            id="location"
+          />
+          <input
+            type="button"
+            name="add-location"
+            value="Dodaj"
+            className={styles.citiesButton}
+            onClick={() => {
+              let location = document.querySelector("#location").value.trim();
+              if (location.length === 0) {
+                return alert("Niepoprawna wartosc w polu Lokalizacja");
+              }
+
+              document.querySelector(`.${styles.addLocations}`).style.display =
+                "none";
+
+              setCities(new Set([...cities, location]));
+            }}
+          />
+        </div>
       </div>
       <div className={styles.addTechnologie} style={{ display: "none" }}>
-        <label>Technologia:</label>
-        <input
-          type="text"
-          name="technologie"
-          placeholder="np. TypeScript"
-          required
-          id="technologie"
-        />
-        <input
-          type="button"
-          name="add-technologie"
-          value="Dodaj"
-          className={styles.citiesButton}
-          onClick={() => {
-            let technologie = document
-              .querySelector("#technologie")
-              .value.trim();
+        <div className={styles.close}>
+          <IoMdClose
+            onClick={() => {
+              document.querySelector(
+                `.${styles.addTechnologie}`
+              ).style.display = "none";
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <label>Technologia:</label>
+          <input
+            type="text"
+            name="technologie"
+            placeholder="np. TypeScript"
+            required
+            id="technologie"
+          />
+          <input
+            type="button"
+            name="add-technologie"
+            value="Dodaj"
+            className={styles.citiesButton}
+            onClick={() => {
+              let tech = document.querySelector("#technologie").value.trim();
 
-            if (technologie.length === 0) {
-              return alert("Niepoprawna wartosc w polu Technologia");
-            }
-            setTechnologie(new Set([...cities, technologie]));
+              if (tech.length === 0) {
+                return alert("Niepoprawna wartosc w polu Technologia");
+              }
 
-            document.querySelector(`.${styles.addTechnologie}`).style.display =
-              "none";
-          }}
-        />
+              setTechnologie(new Set([...technologie, tech]));
+
+              document.querySelector(
+                `.${styles.addTechnologie}`
+              ).style.display = "none";
+            }}
+          />
+        </div>
       </div>
       <div className={styles.wrap}>
         <div className={styles.close}>
@@ -153,24 +182,42 @@ const AddJobOffert = () => {
               onChange={handleChange}
               required
             >
-              <option value="">-- wybierz firmę --</option>
-              {/* {companies.map((c) => (
-              <option key={c.id} value={c.name}>
-                {c.name}
+              <option value="" disabled>
+                -- wybierz firmę --
               </option>
-            ))} */}
+              <option>Brak firmy</option>
             </select>
           </div>
 
           <div className={styles.row}>
-            <label>Lokalizacja:</label>
+            <label>
+              Lokalizacja:{" "}
+              <span style={{ fontSize: "10px" }}>
+                (kliknij podwójnie, aby usunąć)
+              </span>
+            </label>
             <div className={styles.rowDiv}>
-              <div className={styles.cities}>{cities}</div>
+              <div className={styles.cities}>
+                {[...cities].map((el) => {
+                  return (
+                    <span
+                      onDoubleClick={(e) => {
+                        removeElement(e, "city");
+                      }}
+                    >
+                      {el}
+                    </span>
+                  );
+                })}
+              </div>
               <input
                 type="button"
                 name="Remote"
                 value="Remote"
                 className={styles.citiesButton}
+                onClick={() => {
+                  setCities(new Set([...cities, "Remote"]));
+                }}
               />
               <input
                 type="button"
@@ -193,11 +240,8 @@ const AddJobOffert = () => {
               value={form.contractType}
               onChange={handleChange}
             >
-              {CONTRACTS.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
+              <option value="Kontrakt B2B">Kontrakt B2B</option>
+              <option value="Umowa o pracę">Umowa o pracę</option>
             </select>
           </div>
 
@@ -208,27 +252,42 @@ const AddJobOffert = () => {
               value={form.experience}
               onChange={handleChange}
             >
-              {EXPERIENCES.map((e) => (
-                <option key={e} value={e}>
-                  {e}
-                </option>
-              ))}
+              <option value="Intern">Intern</option>
+              <option value="Junior">Junior</option>
+              <option value="Mid/Regular">Mid/Regular</option>
+              <option value="Senior">Senior</option>
+              <option value="Lead/Principal">Lead/Principal</option>
             </select>
           </div>
 
           <div className={styles.row}>
-            <label>Technologie</label>
+            <label>
+              Technologie:
+              <span style={{ fontSize: "10px" }}>
+                (kliknij podwójnie, aby usunąć)
+              </span>
+            </label>
             <div className={styles.rowDiv}>
               <div className={styles.cities}>
-                {[...technologie].map((el) => (
-                  <span>{el}</span>
-                ))}
+                {[...technologie].map((el) => {
+                  return (
+                    <span
+                      onDoubleClick={(e) => {
+                        removeElement(e, "technology");
+                      }}
+                    >
+                      {el}
+                    </span>
+                  );
+                })}
               </div>
               <input
                 type="button"
                 name="Remote"
                 value="Remote"
                 className={styles.citiesButton}
+                disabled
+                style={{ visibility: "hidden" }}
               />
               <input
                 type="button"
