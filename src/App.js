@@ -6,8 +6,7 @@ import JobOffertsPage from "./Components/JobOffertPage/JobOffertsPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
 import FilltredContent from "./Components/FilltredContent/FilltredContent";
-import MoreSettings from "./Components/SettingsPage/MoreSettings";
-import AddJobOffert from "./Components/AddOffert/AddJobOffert";
+import AdminPanel from "./Components/AdminPanel/AdminPanel";
 const App = () => {
   return (
     <>
@@ -47,6 +46,9 @@ const App = () => {
             path="/candidates/filltred"
             element={<FilltredContent candidatePage={true} />}
           />
+        </Routes>
+        <Routes>
+          <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </BrowserRouter>
     </>

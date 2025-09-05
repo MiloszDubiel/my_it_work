@@ -4,6 +4,7 @@ import jobOffertsRoutes from "./routes//jobOffertsRoutes.js";
 import employersRoutes from "./routes/employersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoute/settingRoute.js";
+import usersRoute from "./routes/usersRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,5 +16,6 @@ app.use("/api/job-offerts", jobOffertsRoutes);
 app.use("/api/employers", employersRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
+app.use("/admin", usersRoute);
 
 app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));
