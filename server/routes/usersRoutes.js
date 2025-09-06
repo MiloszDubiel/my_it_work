@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, deleteUser } from "../services/usersService.js";
+import { getUsers, deleteUser, editUser } from "../services/usersService.js";
 
 const router = express.Router();
 
@@ -16,6 +16,15 @@ router.post("/delete-users", async (req, res) => {
     const { id, email } = req.body;
     const rows = await deleteUser(id, email);
     res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/edit-user", async (req, res) => {
+  try {
+    const userData = req.body;
+    const rows = await editUser(userData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
