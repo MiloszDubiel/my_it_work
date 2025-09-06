@@ -1,235 +1,115 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useReducer } from "react";
 import styles from "./AdminPanel.module.css";
 import axios from "axios";
-import { IoMdClose } from "react-icons/io";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import ReactPaginate from "react-paginate";
+import UserItem from "./UserAdmin/UserItem";
 const fetchUsers = async () => {
   try {
     let response = await axios.get("http://localhost:3001/admin/get-users");
 
-    return response;
+    return response.data;
+  } catch (e) {
+    console.log(e);
+  }
+};
+const fetchOfferts = async () => {
+  try {
+    const request = await axios.get(
+      `http://192.168.100.2:3001/api/job-offerts`
+    );
+    return request.data;
   } catch (e) {
     console.log(e);
   }
 };
 
-const AdminPanel = ({ users, jobOffers, companies }) => {
-  const [activeTab, setActiveTab] = useState("users");
-  const [user, setUser] = useState([]);
-  const [editedUser, setEditedUser] = useState([]);
-  const [name, setName] = useState(null);
-  const [surname, setSurname] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [phone, setPhone] = useState(null);
-  const [role, setRole] = useState(null);
-  const [id, setID] = useState(null);
+const Items = ({ currentItems, users, offerts, forceUpdate }) => {
+  let content = null;
+
+  if (currentItems && users) {
+    content = <UserItem listOfUsers={currentItems} forceUpdate={forceUpdate} />;
+  }
+  return <>{content}</>;
+};
+
+const PaginatedItems = ({
+  itemsPerPage,
+  users,
+  offerts,
+  forceUpdate,
+  forceUpdateItem,
+}) => {
+  const [currentItems, setCurrentItems] = useState(null);
+  const [pageCount, setPageCount] = useState(0);
+  const [itemOffset, setItemOffset] = useState(0);
+  const [items, setItems] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchUsers().then((res) => {
-      setUser(res.data[0]);
-    });
-  }, []);
-
-  const hadleSubmit = (e) => {
-    const name = document.querySelector("#name").value.trim();
-    const surname = document.querySelector("#surname").value.trim();
-    const email = document.querySelector("#email").value.trim();
-    const phone = document.querySelector("#phone").value.trim();
-    const role = document.querySelector("#role").value;
-    const checkbox = document.querySelector("#unlock");
-
-    let password = null;
-    let repeat = null;
-    if (!name || !surname || !email || !phone || !role) {
-      alert("Wszystkie pola muszą być wypełnione!");
-      return;
-    }
-    if (!/^\d{9}$/.test(phone)) {
-      alert("Telefon musi składać się z dokładnie 9 cyfr!");
-      return;
+    setIsLoading(true);
+    if (users) {
+      fetchUsers().then((res) => {
+        setItems(res);
+        const endOffset = itemOffset + itemsPerPage;
+        setCurrentItems(res.slice(itemOffset, endOffset));
+        setPageCount(Math.ceil(res.length / itemsPerPage));
+        setIsLoading(false);
+      });
+    } else if (offerts) {
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Podaj poprawny adres email!");
-      return;
-    }
+    console.log("RERENDER");
+  }, [itemOffset, itemsPerPage, forceUpdateItem]);
 
-    if (checkbox.checked) {
-      password = document.querySelector("#password").value.trim();
-      repeat = document.querySelector("#repeat-password").value.trim();
-
-      const passwordRegex =
-        /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$/;
-
-      if (!passwordRegex.test(password)) {
-        alert(
-          "Hasło musi mieć min. 8 znaków, jedną wielką literę, jedną cyfrę i znak specjalny!"
-        );
-        return;
-      }
-
-      if (password !== repeat) {
-        alert("Hasła muszą się zgadzać!");
-        return;
-      }
-    }
-
-    const userData = {
-      id: id,
-      name,
-      surname,
-      email,
-      phone,
-      role,
-      password: checkbox.checked ? password : null,
-    };
-
-    try {
-      axios.post("http://localhost:3001/admin/edit-user", userData);
-      fetchUsers().then((res) => setUser(res.data[0]));
-    } catch (e) {
-      console.log(e);
-    }
-    alert("Zapisano");
-    document.querySelector(`#showMenu`).style.display = "none";
+  const handlePageClick = (event) => {
+    const newOffset = (event.selected * itemsPerPage) % items.length;
+    setItemOffset(newOffset);
   };
+
+  return (
+    <>
+      <Items
+        currentItems={currentItems}
+        users={users}
+        offerts={offerts}
+        forceUpdate={forceUpdate}
+        forceUpdateItem={forceUpdateItem}
+      />
+      {isLoading ? (
+        <LoadingComponent />
+      ) : (
+        <ReactPaginate
+          nextLabel=">"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          pageCount={pageCount}
+          previousLabel="<"
+          pageClassName="page-item-for-employers"
+          pageLinkClassName="page-link-for-employers"
+          previousClassName="page-item-for-employers"
+          previousLinkClassName="page-link-for-employers"
+          nextClassName="page-item-for-employers"
+          nextLinkClassName="page-link-for-employers"
+          breakLabel="..."
+          breakClassName="page-item-for-employers"
+          breakLinkClassName="page-link-for-employers"
+          containerClassName="pagination-for-employers"
+          activeClassName="active-for-employers"
+          renderOnZeroPageCount={null}
+        />
+      )}
+    </>
+  );
+};
+
+const AdminPanel = ({ users, jobOffers, companies }) => {
+  const [activeTab, setActiveTab] = useState("users");
+  const [forceUpdateItem, forceUpdate] = useReducer((x) => x + 1, 0);
   return (
     <div className={styles.panel}>
       <h2>Panel administratora</h2>
-
-      <div className={styles.showEditMenu} id="showMenu">
-        {" "}
-        <div className={styles.overlay}>
-          <div className={styles.modal}>
-            <div className={styles.close}>
-              <IoMdClose
-                onClick={() => {
-                  document.querySelector(`#showMenu`).style.display = "none";
-                }}
-              />
-            </div>
-            <h2>Edytuj użytkownika</h2>
-            <form className={styles.form}>
-              <label>
-                Imię
-                <input
-                  type="text"
-                  name="firstName"
-                  value={name}
-                  id="name"
-                  onChange={(e) => {
-                    setName(e.target.value);
-                  }}
-                />
-              </label>
-
-              <label>
-                Nazwisko
-                <input
-                  type="text"
-                  name="lastName"
-                  value={surname}
-                  id="surname"
-                  onChange={(e) => {
-                    setSurname(e.target.value);
-                  }}
-                />
-              </label>
-
-              <label>
-                Email
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
-                />
-              </label>
-
-              <label>
-                Telefon
-                <input
-                  type="text"
-                  name="phone"
-                  value={phone}
-                  id="phone"
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                  }}
-                />
-              </label>
-
-              <label>
-                Rola
-                <select
-                  name="role"
-                  id="role"
-                  onChange={(e) => {
-                    setRole(e.target.value);
-                  }}
-                >
-                  <option value="Candidate">Candidate</option>
-                  <option value="Employer">Employer</option>
-                  <option value="Admin">Admin</option>
-                </select>
-              </label>
-
-              <label style={{ flexDirection: "row", alignItems: "center" }}>
-                <input
-                  type="checkbox"
-                  name="unlock"
-                  id="unlock"
-                  className={styles.unlock}
-                  onChange={(e) => {
-                    let password = document.querySelector("#password");
-                    let repeat = document.querySelector("#repeat-password");
-                    let isDisabled = password.disabled;
-                    password.disabled = !isDisabled;
-                    repeat.disabled = !isDisabled;
-                  }}
-                />
-                Odblokuj edycja hasła
-              </label>
-              <label>
-                Hasło
-                <input type="password" name="password" id="password" disabled />
-              </label>
-
-              <label>
-                Powtórz Hasło
-                <input
-                  type="password"
-                  name="repeat-password"
-                  id="repeat-password"
-                  disabled
-                />
-              </label>
-
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.cancel}
-                  onClick={() => {
-                    document.querySelector(`#showMenu`).style.display = "none";
-                  }}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  className={styles.save}
-                  onClick={(e) => hadleSubmit(e)}
-                >
-                  Zapisz
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
 
       {/* Zakładki */}
       <div className={styles.tabs}>
@@ -269,58 +149,13 @@ const AdminPanel = ({ users, jobOffers, companies }) => {
                   <th>Akcje</th>
                 </tr>
               </thead>
-              <tbody>
-                {user?.map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.id}</td>
-                    <td>{u.email}</td>
-                    <td>{u.name}</td>
-                    <td>{u.surname}</td>
-                    <td>{u.role}</td>
-                    <td>
-                      <button
-                        className={styles.danger}
-                        onClick={() => {
-                          if (window.confirm("Czy usunąć użytkownika?")) {
-                            axios.post(
-                              "http://localhost:3001/admin/delete-users",
-                              {
-                                id: u.id,
-                                email: u.email,
-                              }
-                            );
-                          }
-
-                          setUser(user.filter((el) => el.id != u.id));
-                        }}
-                      >
-                        Usuń
-                      </button>
-                      <button
-                        className={styles.primary}
-                        onClick={() => {
-                          document.querySelector(`#showMenu`).style.display =
-                            "flex";
-
-                          const selected = user.filter(
-                            (el) => el.id == u.id && el.email == u.email
-                          );
-                          console.log(selected[0]);
-
-                          setName(selected[0]?.name);
-                          setSurname(selected[0]?.surname);
-                          setEmail(selected[0]?.email);
-                          setPhone(selected[0].phone_number);
-                          setRole(selected[0]?.role);
-                          setID(selected[0]?.id);
-                        }}
-                      >
-                        Edytuj
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              <PaginatedItems
+                itemsPerPage={9}
+                users={true}
+                forceUpdate={forceUpdate}
+                forceUpdateItem={forceUpdateItem}
+              />
+              <tbody></tbody>
             </table>
           </div>
         )}
