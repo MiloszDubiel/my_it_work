@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2025 at 07:25 PM
+-- Generation Time: Wrz 07, 2025 at 10:18 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -26,6 +26,9 @@ SET time_zone = "+00:00";
 --
 -- Struktura tabeli dla tabeli `companies`
 --
+
+CREATE DATABASE myworkit;
+USE myworkit;
 
 CREATE TABLE `companies` (
   `id` int(11) NOT NULL,
@@ -3391,11 +3394,20 @@ CREATE TABLE `technologies` (
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `type` enum('Administrator','Aplikujący','Pracodawca') DEFAULT NULL,
-  `password_hash` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `name` varchar(50) DEFAULT NULL,
+  `surname` varchar(100) DEFAULT NULL,
+  `email` text NOT NULL,
+  `password` text NOT NULL,
+  `role` enum('Employer','Candidate','Admin','') NOT NULL,
+  `phone_number` varchar(9) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `surname`, `email`, `password`, `role`, `phone_number`) VALUES
+(13, NULL, NULL, 'miloszdubiel02@wp.pl', '$2b$10$hTr74FFEPr9P9J7mMOjg/OrWl.FCaSeYX.gSBY7i/YsCSG6ejzPNi', 'Candidate', NULL);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -3427,7 +3439,7 @@ ALTER TABLE `technologies`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `pass_unique` (`email`) USING HASH;
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -3437,7 +3449,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2306;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2286;
 
 --
 -- AUTO_INCREMENT for table `job_offerts`
@@ -3455,7 +3467,7 @@ ALTER TABLE `technologies`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
