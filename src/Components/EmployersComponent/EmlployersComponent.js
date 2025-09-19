@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../NavBar/NavBar";
 import styles from "./employers.module.css";
 import axios from "axios";
@@ -7,12 +7,12 @@ import ReactPaginate from "react-paginate";
 import Footer from "../Footer/Fotter";
 import Filter from "../FilterComponent/Filter";
 import Employer from "../Employer/Employer";
+import SortButton, { Sort } from "../SortButton/SortButton";
 
 const fetchData = async () => {
   const request = await axios.get(`http://localhost:3001/api/employers`);
   return request.data;
 };
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 
 const Items = ({ currentItems }) => {
   return (
@@ -29,33 +29,54 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
-  const [offerts, setOfferts] = useState(null);
+  const [offerts, setOfferts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     window.scrollTo(0, 0);
 
-    fetchData().then((res) => {
-      setOfferts(res);
-      localStorage.setItem("employers", JSON.stringify({ res }));
-      const endOffset = itemOffset + itemsPerPage;
-      setCurrentItems(res.slice(itemOffset, endOffset));
-      setPageCount(Math.ceil(res.length / itemsPerPage));
-      setIsLoading(false);
-    });
+    if (offerts.length === 0) {
+      fetchData()
+        .then((res) => {
+          setOfferts(res);
+          sessionStorage.setItem("offerts", JSON.stringify({ res }));
+          const endOffset = itemOffset + itemsPerPage;
+          setCurrentItems(res.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(res.length / itemsPerPage));
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsLoading(true);
+        });
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
+    const endOffset = itemOffset + itemsPerPage;
+    setCurrentItems(offerts.slice(itemOffset, endOffset));
+    setPageCount(Math.ceil(offerts.length / itemsPerPage));
+    setIsLoading(false);
   }, [itemOffset, itemsPerPage]);
 
+  useEffect(() => {
+    window.addEventListener("changed-sort-option", () => {
+      let option = sessionStorage.getItem("sort-option");
+      let copyOfferts = [...offerts];
+
+      const endOffset = itemOffset + itemsPerPage;
+      setOfferts(Sort(copyOfferts, option));
+      setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+      setOfferts(Sort(copyOfferts, option));
+      setItemOffset(0);
+    });
+  });
+
   const handlePageClick = (event) => {
-    if (offerts) {
-      const newOffset = (event.selected * itemsPerPage) % offerts.length;
-      setItemOffset(newOffset);
-    } else {
-      const newOffset =
-        (event.selected * itemsPerPage) %
-        JSON.parse(localStorage.getItem("employers")).res.length;
-      setItemOffset(newOffset);
-    }
+    const newOffset = (event.selected * itemsPerPage) % offerts.length;
+    setItemOffset(newOffset);
   };
   return (
     <>
@@ -107,6 +128,7 @@ const EmployersComponent = () => {
         </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
+            <SortButton employersPage={true} />
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>

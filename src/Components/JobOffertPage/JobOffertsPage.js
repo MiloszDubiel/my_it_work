@@ -7,7 +7,7 @@ import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
 import Footer from "../Footer/Fotter";
-import SortButton from "../SortButton/SortButton";
+import SortButton, { Sort } from "../SortButton/SortButton";
 
 const fetchData = async () => {
   const request = await axios.get(`http://localhost:3001/api/job-offerts`);
@@ -35,14 +35,17 @@ const PaginatedItems = ({ itemsPerPage }) => {
     window.scrollTo(0, 0);
 
     if (offerts.length === 0) {
-      fetchData().then((res) => {
-        setOfferts(res);
-        sessionStorage.setItem("offerts", JSON.stringify({ res }));
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(res.slice(itemOffset, endOffset));
-        setPageCount(Math.ceil(res.length / itemsPerPage));
-        setIsLoading(false);
-      });
+      fetchData()
+        .then((res) => {
+          setOfferts(res);
+          const endOffset = itemOffset + itemsPerPage;
+          setCurrentItems(res.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(res.length / itemsPerPage));
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsLoading(true);
+        });
       return;
     }
   }, []);
@@ -59,126 +62,13 @@ const PaginatedItems = ({ itemsPerPage }) => {
       let option = sessionStorage.getItem("sort-option");
       let copyOfferts = [...offerts];
 
-      switch (option) {
-        case "default": {
-          copyOfferts?.sort((a, b) => {
-            const nameA = a.id;
-            const nameB = b.id;
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          sessionStorage.setItem(
-            "offerts",
-            JSON.stringify({ res: copyOfferts })
-          );
-          const endOffset = itemOffset + itemsPerPage;
-          setOfferts(copyOfferts);
-          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
-          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
-          setItemOffset(0);
-          break;
-        }
-        case "title-a-z": {
-          copyOfferts?.sort((a, b) => {
-            const nameA = a.title.toUpperCase();
-            const nameB = b.title.toUpperCase();
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          sessionStorage.setItem(
-            "offerts",
-            JSON.stringify({ res: copyOfferts })
-          );
-          const endOffset = itemOffset + itemsPerPage;
-          setOfferts(copyOfferts);
-          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
-          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
-          setItemOffset(0);
-          break;
-        }
-        case "title-z-a": {
-          copyOfferts?.sort((a, b) => {
-            const nameA = a.title.toUpperCase();
-            const nameB = b.title.toUpperCase();
-            if (nameA > nameB) {
-              return -1;
-            }
-            if (nameA < nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          sessionStorage.setItem(
-            "offerts",
-            JSON.stringify({ res: copyOfferts })
-          );
-          const endOffset = itemOffset + itemsPerPage;
-          setOfferts(copyOfferts);
-          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
-          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
-          setItemOffset(0);
-          break;
-        }
-        case "name-a-z": {
-          copyOfferts?.sort((a, b) => {
-            const nameA = a.companyName.toUpperCase();
-            const nameB = b.companyName.toUpperCase();
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          sessionStorage.setItem(
-            "offerts",
-            JSON.stringify({ res: copyOfferts })
-          );
-          const endOffset = itemOffset + itemsPerPage;
-          setOfferts(copyOfferts);
-          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
-          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
-          setItemOffset(0);
-          break;
-        }
-        case "name-z-a": {
-          copyOfferts?.sort((a, b) => {
-            const nameA = a.companyName.toUpperCase();
-            const nameB = b.companyName.toUpperCase();
-            if (nameA > nameB) {
-              return -1;
-            }
-            if (nameA < nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          sessionStorage.setItem(
-            "offerts",
-            JSON.stringify({ res: copyOfferts })
-          );
-          const endOffset = itemOffset + itemsPerPage;
-          setOfferts(copyOfferts);
-          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
-          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
-          setItemOffset(0);
-          break;
-        }
-      }
+      const endOffset = itemOffset + itemsPerPage;
+      setOfferts(Sort(copyOfferts, option));
+      setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+      setItemOffset(0);
     });
   });
-  console.log(offerts);
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * itemsPerPage) % offerts.length;
@@ -234,7 +124,7 @@ const JobOffertsPage = () => {
         </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
-            <SortButton />
+            <SortButton offertPage={true} />
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>
