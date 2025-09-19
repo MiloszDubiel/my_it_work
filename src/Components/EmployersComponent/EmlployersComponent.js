@@ -9,7 +9,7 @@ import Filter from "../FilterComponent/Filter";
 import Employer from "../Employer/Employer";
 
 const fetchData = async () => {
-  const request = await axios.get(`http://192.168.100.2:3001/api/employers`);
+  const request = await axios.get(`http://localhost:3001/api/employers`);
   return request.data;
 };
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
@@ -33,29 +33,17 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const cached = localStorage.getItem("employers");
-    const parsed = cached ? JSON.parse(cached) : null;
     setIsLoading(true);
     window.scrollTo(0, 0);
 
-    if (parsed && Date.now() < parsed.expiry) {
+    fetchData().then((res) => {
+      setOfferts(res);
+      localStorage.setItem("employers", JSON.stringify({ res }));
       const endOffset = itemOffset + itemsPerPage;
-      setCurrentItems(parsed.res.slice(itemOffset, endOffset));
-      setPageCount(Math.ceil(parsed.res.length / itemsPerPage));
+      setCurrentItems(res.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(res.length / itemsPerPage));
       setIsLoading(false);
-    } else {
-      fetchData().then((res) => {
-        setOfferts(res);
-        localStorage.setItem(
-          "employers",
-          JSON.stringify({ res, expiry: Date.now() + CACHE_DURATION_MS })
-        );
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(res.slice(itemOffset, endOffset));
-        setPageCount(Math.ceil(res.length / itemsPerPage));
-        setIsLoading(false);
-      });
-    }
+    });
   }, [itemOffset, itemsPerPage]);
 
   const handlePageClick = (event) => {

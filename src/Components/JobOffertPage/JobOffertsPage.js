@@ -7,12 +7,12 @@ import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
 import Footer from "../Footer/Fotter";
+import SortButton from "../SortButton/SortButton";
 
 const fetchData = async () => {
-  const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
+  const request = await axios.get(`http://localhost:3001/api/job-offerts`);
   return request.data;
 };
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minut
 
 const Items = ({ currentItems }) => {
   return (
@@ -27,46 +27,162 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
-  const [offerts, setOfferts] = useState(null);
+  const [offerts, setOfferts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const cached = localStorage.getItem("offerts");
-    const parsed = cached ? JSON.parse(cached) : null;
     setIsLoading(true);
-
     window.scrollTo(0, 0);
 
-    if (parsed && Date.now() < parsed.expiry) {
-      const endOffset = itemOffset + itemsPerPage;
-      setCurrentItems(parsed.res.slice(itemOffset, endOffset));
-      setPageCount(Math.ceil(parsed.res.length / itemsPerPage));
-      setIsLoading(false);
-    } else {
+    if (offerts.length === 0) {
       fetchData().then((res) => {
         setOfferts(res);
-        localStorage.setItem(
-          "offerts",
-          JSON.stringify({ res, expiry: Date.now() + CACHE_DURATION_MS })
-        );
+        sessionStorage.setItem("offerts", JSON.stringify({ res }));
         const endOffset = itemOffset + itemsPerPage;
         setCurrentItems(res.slice(itemOffset, endOffset));
         setPageCount(Math.ceil(res.length / itemsPerPage));
         setIsLoading(false);
       });
+      return;
     }
+  }, []);
+
+  useEffect(() => {
+    const endOffset = itemOffset + itemsPerPage;
+    setCurrentItems(offerts.slice(itemOffset, endOffset));
+    setPageCount(Math.ceil(offerts.length / itemsPerPage));
+    setIsLoading(false);
   }, [itemOffset, itemsPerPage]);
 
+  useEffect(() => {
+    window.addEventListener("changed-sort-option", () => {
+      let option = sessionStorage.getItem("sort-option");
+      let copyOfferts = [...offerts];
+
+      switch (option) {
+        case "default": {
+          copyOfferts?.sort((a, b) => {
+            const nameA = a.id;
+            const nameB = b.id;
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          sessionStorage.setItem(
+            "offerts",
+            JSON.stringify({ res: copyOfferts })
+          );
+          const endOffset = itemOffset + itemsPerPage;
+          setOfferts(copyOfferts);
+          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+          setItemOffset(0);
+          break;
+        }
+        case "title-a-z": {
+          copyOfferts?.sort((a, b) => {
+            const nameA = a.title.toUpperCase();
+            const nameB = b.title.toUpperCase();
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          sessionStorage.setItem(
+            "offerts",
+            JSON.stringify({ res: copyOfferts })
+          );
+          const endOffset = itemOffset + itemsPerPage;
+          setOfferts(copyOfferts);
+          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+          setItemOffset(0);
+          break;
+        }
+        case "title-z-a": {
+          copyOfferts?.sort((a, b) => {
+            const nameA = a.title.toUpperCase();
+            const nameB = b.title.toUpperCase();
+            if (nameA > nameB) {
+              return -1;
+            }
+            if (nameA < nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          sessionStorage.setItem(
+            "offerts",
+            JSON.stringify({ res: copyOfferts })
+          );
+          const endOffset = itemOffset + itemsPerPage;
+          setOfferts(copyOfferts);
+          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+          setItemOffset(0);
+          break;
+        }
+        case "name-a-z": {
+          copyOfferts?.sort((a, b) => {
+            const nameA = a.companyName.toUpperCase();
+            const nameB = b.companyName.toUpperCase();
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          sessionStorage.setItem(
+            "offerts",
+            JSON.stringify({ res: copyOfferts })
+          );
+          const endOffset = itemOffset + itemsPerPage;
+          setOfferts(copyOfferts);
+          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+          setItemOffset(0);
+          break;
+        }
+        case "name-z-a": {
+          copyOfferts?.sort((a, b) => {
+            const nameA = a.companyName.toUpperCase();
+            const nameB = b.companyName.toUpperCase();
+            if (nameA > nameB) {
+              return -1;
+            }
+            if (nameA < nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          sessionStorage.setItem(
+            "offerts",
+            JSON.stringify({ res: copyOfferts })
+          );
+          const endOffset = itemOffset + itemsPerPage;
+          setOfferts(copyOfferts);
+          setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+          setItemOffset(0);
+          break;
+        }
+      }
+    });
+  });
+  console.log(offerts);
+
   const handlePageClick = (event) => {
-    if (offerts) {
-      const newOffset = (event.selected * itemsPerPage) % offerts.length;
-      setItemOffset(newOffset);
-    } else {
-      const newOffset =
-        (event.selected * itemsPerPage) %
-        JSON.parse(localStorage.getItem("offerts")).res.length;
-      setItemOffset(newOffset);
-    }
+    const newOffset = (event.selected * itemsPerPage) % offerts.length;
+    setItemOffset(newOffset);
   };
   return (
     <>
@@ -118,6 +234,7 @@ const JobOffertsPage = () => {
         </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
+            <SortButton />
             <PaginatedItems itemsPerPage={9} />
           </div>
         </div>

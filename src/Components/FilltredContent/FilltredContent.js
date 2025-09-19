@@ -14,7 +14,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (offertPage) {
     try {
       const request = await axios.post(
-        `http://192.168.100.2:3001/api/job-offerts/filltred`,
+        `http://localhost:3001/api/job-offerts/filltred`,
         {
           state,
         }
@@ -27,7 +27,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (employersPage) {
     try {
       const request = await axios.post(
-        `http://192.168.100.2:3001/api/employers/filltred`,
+        `http://localhost:3001/api/employers/filltred`,
         {
           state,
         }
@@ -40,7 +40,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (candidatePage) {
     try {
       const request = await axios.post(
-        `http://192.168.100.2:3001/api/candidate/filltred`,
+        `http://localhost:3001/api/candidate/filltred`,
         {
           state,
         }
@@ -93,7 +93,7 @@ const PaginatedItems = ({
         setCurrentItems("Error");
         return;
       }
-
+      localStorage.setItem("fillteredOfferts", JSON.stringify({ res }));
       setOfferts(res);
       const endOffset = itemOffset + itemsPerPage;
       setCurrentItems(res.slice(itemOffset, endOffset));

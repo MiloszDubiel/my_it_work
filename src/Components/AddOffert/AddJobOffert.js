@@ -3,7 +3,6 @@ import styles from "./addJobOffert.module.css";
 import { IoMdClose } from "react-icons/io";
 
 const AddJobOffert = () => {
-  const userData = JSON.parse(localStorage.getItem("userData"));
   const [cities, setCities] = useState(new Set());
   const [technologie, setTechnologie] = useState(new Set());
 
@@ -16,7 +15,7 @@ const AddJobOffert = () => {
     technologies: [],
   });
 
-  console.log(cities);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
