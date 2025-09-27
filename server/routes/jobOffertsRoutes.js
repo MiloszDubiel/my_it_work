@@ -32,6 +32,7 @@ router.get("/scrape", async (req, res) => {
     const offers = await getJobOfferts();
     const [result] = await saveOffertsToDb(offers);
     res.json({ inserted: result.affectedRows });
+    res.json(offers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

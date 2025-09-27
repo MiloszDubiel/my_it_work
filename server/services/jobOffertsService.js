@@ -3,7 +3,7 @@ import { connection } from "../config/db.js";
 export function saveOffertsToDb(offers) {
   const insertQuery = `
     INSERT IGNORE INTO job_offers 
-      (title, companyName, workingMode, contractType, experience, technologies, salary, img, link) 
+      (title, companyName, workingMode, contractType, experience, technologies, salary, type, img, link) 
     VALUES ?`;
 
   const values = offers.map((offer) => [
@@ -14,6 +14,7 @@ export function saveOffertsToDb(offers) {
     offer.experience || null,
     JSON.stringify(offer.technologies || []),
     offer.salary || null,
+    offer.type || null,
     offer.img || null,
     offer.link || null,
   ]);
