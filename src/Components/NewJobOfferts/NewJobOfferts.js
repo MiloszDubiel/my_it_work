@@ -4,7 +4,7 @@ import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const fetchData = async (amount) => {
-  const request = await axios.get(`http://192.168.100.2:3001/api/job-offerts`);
+  const request = await axios.get(`http://localhost:5000/api/job-offerts`);
   return request.data;
 };
 

@@ -18,7 +18,7 @@ const Offert = ({ offert, index }) => {
               .classList.toggle(styles.showCities);
           }}
         >
-          {JSON.parse(offert.workingMode)[0] + " i więcej"}
+          {JSON.parse(offert?.workingMode)[0] + " i więcej"}
         </button>
         <div className={styles.cities}>
           {JSON.parse(offert.workingMode)[1].map((el) => {
@@ -54,7 +54,7 @@ const Offert = ({ offert, index }) => {
               paddingTop: "10px",
               gap: "20px",
               display: "flex",
-              position: "relative"
+              position: "relative",
             }}
           >
             {offert.title}

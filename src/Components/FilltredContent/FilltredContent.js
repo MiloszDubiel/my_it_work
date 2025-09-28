@@ -14,7 +14,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (offertPage) {
     try {
       const request = await axios.post(
-        `http://localhost:3001/api/job-offerts/filltred`,
+        `http://localhost:5000/api/job-offerts/filltred`,
         {
           state,
         }
@@ -27,7 +27,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (employersPage) {
     try {
       const request = await axios.post(
-        `http://localhost:3001/api/employers/filltred`,
+        `http://localhost:5000/api/employers/filltred`,
         {
           state,
         }
@@ -40,7 +40,7 @@ const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (candidatePage) {
     try {
       const request = await axios.post(
-        `http://localhost:3001/api/candidate/filltred`,
+        `http://localhost:5000/api/candidate/filltred`,
         {
           state,
         }

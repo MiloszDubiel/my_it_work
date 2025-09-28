@@ -21,7 +21,7 @@ const LoginForm = () => {
 
     setLoading(true);
     try {
-      let res = await axios.post("http://192.168.100.2:3001/auth/login", {
+      let res = await axios.post("http://localhost:5000/auth/login", {
         email,
         password,
       });

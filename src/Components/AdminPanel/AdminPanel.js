@@ -16,7 +16,7 @@ const fetchUsers = async () => {
 const fetchOfferts = async () => {
   try {
     const request = await axios.get(
-      `http://localhost:3001/api/job-offerts`
+      `http://localhost:5000/api/job-offerts`
     );
     return request.data;
   } catch (e) {

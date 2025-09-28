@@ -37,7 +37,7 @@ const RegisterPage = () => {
         setError("Nie wybrano roli");
         return;
       }
-      let res = await axios.post("http://192.168.100.2:3001/auth/registre", {
+      let res = await axios.post("http://localhost:5000/auth/registre", {
         email,
         password,
         repeatPassword,

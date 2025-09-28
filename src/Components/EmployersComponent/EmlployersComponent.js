@@ -10,7 +10,7 @@ import Employer from "../Employer/Employer";
 import SortButton, { Sort } from "../SortButton/SortButton";
 
 const fetchData = async () => {
-  const request = await axios.get(`http://localhost:3001/api/employers`);
+  const request = await axios.get(`http://localhost:5000/api/employers`);
   return request.data;
 };
 
