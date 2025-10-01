@@ -32,15 +32,12 @@ router.get("/", async (req, res) => {
 router.get("/scrape/:code", async (req, res) => {
   try {
     const { code } = req.params;
-
     if (code !== process.env.KEY_TO_SCRAPE) {
       return res.status(403).json({ error: "Unauthorized" });
     }
-
     const offers = await getJobOfferts();
-    // const [result] = await saveOffertsToDb(offers);
-    // res.json({ inserted: result.affectedRows });
-    res.json(offers);
+    const [result] = await saveOffertsToDb(offers);
+    res.json({ inserted: result.affectedRows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

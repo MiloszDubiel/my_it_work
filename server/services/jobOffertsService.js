@@ -10,8 +10,8 @@ export function saveOffertsToDb(offers) {
     offer.title || null,
     offer.companyName || null,
     JSON.stringify(offer.workingMode || []),
-    offer.contractType || null,
-    offer.experience || null,
+    JSON.stringify(offer.contractType || []),
+    JSON.stringify(offer.experience || []),
     JSON.stringify(offer.technologies || []),
     offer.salary || null,
     offer.type || null,
@@ -38,7 +38,7 @@ export async function getFillteredOfferts({
   exprience,
   type,
 }) {
-  let sql = "SELECT * FROM job_offerts WHERE 1=1"; // 1=1 żeby łatwo dokładać warunki
+  let sql = "SELECT * FROM job_offers WHERE 1=1"; // 1=1 żeby łatwo dokładać warunki
   const params = [];
 
   if (locations?.length > 0) {
