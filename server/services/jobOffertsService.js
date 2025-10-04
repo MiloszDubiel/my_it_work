@@ -28,7 +28,7 @@ export function saveOffertsToDb(offers) {
 }
 
 export function getAllOfferts() {
-  return connection.query("SELECT * FROM job_offerts");
+  return connection.query("SELECT * FROM job_offers");
 }
 
 export async function getFillteredOfferts({

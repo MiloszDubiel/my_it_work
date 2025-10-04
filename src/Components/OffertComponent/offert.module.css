@@ -43,13 +43,13 @@
   gap: 2px;
   justify-content: center;
   align-items: center;
-  font-size: 13px;
+  font-size: 11px;
 }
 .info2 span svg {
   height: 20px;
 }
 .info2 div {
-  width: 100%;
+  width: 70%;
   display: flex;
   align-items: end;
   padding-bottom: 15px;
@@ -61,11 +61,13 @@
 .info2 div:last-child {
   justify-content: end;
   gap: 10px;
+  width: 30%;
+  overflow-x: auto;
 }
 .info2 div:last-child span {
   background-color: rgba(211, 211, 211, 0.322);
   padding: 4px;
-  font-size: 12px;
+  font-size: 11px;
   border-radius: 2px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -117,7 +119,7 @@
 .showCities {
   display: block !important;
 }
-.apply{
+.apply {
   background: linear-gradient(90deg, #ff8a00, #ff5a00);
   color: white;
   font-weight: bold;
@@ -130,13 +132,23 @@
   width: 100px;
   cursor: pointer;
 }
-
+.offertDetails {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  z-index: 1111;
+  background-color: rgba(112, 112, 112, 0.274);
+}
 
 @media screen and (max-width: 880px) {
   .offerts {
     height: 200px;
   }
-  .apply{
+  .apply {
     top: 80px;
     left: 0;
   }
@@ -173,7 +185,6 @@
 
   .info2 div:first-child span:nth-child(2),
   .info2 div:first-child span:nth-child(3) {
-   
   }
   .info2 div {
     padding: 0px;

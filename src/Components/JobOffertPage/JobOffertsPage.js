@@ -10,7 +10,7 @@ import Footer from "../Footer/Fotter";
 import SortButton, { Sort } from "../SortButton/SortButton";
 
 const fetchData = async () => {
-  const request = await axios.get(`http://localhost:3001/api/job-offerts`);
+  const request = await axios.get(`http://localhost:5000/api/job-offerts`);
   return request.data;
 };
 
