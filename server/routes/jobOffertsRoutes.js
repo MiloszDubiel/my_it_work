@@ -1,6 +1,9 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
-import { getJobOfferts } from "../scrappers/jobOffertsScraper.js";
+import {
+  getJobOfferts,
+  getJobOffertDetail,
+} from "../scrappers/jobOffertsScraper.js";
 import {
   saveOffertsToDb,
   getAllOfferts,
@@ -38,6 +41,20 @@ router.get("/scrape/:code", async (req, res) => {
     const offers = await getJobOfferts();
     const [result] = await saveOffertsToDb(offers);
     res.json({ inserted: result.affectedRows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/scrape/details", async (req, res) => {
+  try {
+    const { link, type } = req.body;
+
+    if (!link || !type) {
+      return res.status(400).json("Niepoprawne dane");
+    }
+    const details = await getJobOffertDetail(link, type);
+    res.json({ details: details });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

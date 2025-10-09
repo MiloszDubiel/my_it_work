@@ -9,6 +9,7 @@ import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import Filter from "../FilterComponent/Filter";
 import Footer from "../Footer/Fotter";
 import Employer from "../Employer/Employer";
+import SortButton, { Sort } from "../SortButton/SortButton";
 
 const fetchData = async (offertPage, employersPage, candidatePage, state) => {
   if (offertPage) {
@@ -90,10 +91,9 @@ const PaginatedItems = ({
     window.scrollTo(0, 0);
     fetchData(offertPage, employersPage, candidatePage, state).then((res) => {
       if (res.length < 1) {
-        setCurrentItems("Error");
         return;
       }
-      localStorage.setItem("fillteredOfferts", JSON.stringify({ res }));
+      sessionStorage.setItem("fillteredOfferts", JSON.stringify({ res }));
       setOfferts(res);
       const endOffset = itemOffset + itemsPerPage;
       setCurrentItems(res.slice(itemOffset, endOffset));
@@ -108,6 +108,19 @@ const PaginatedItems = ({
     candidatePage,
     state,
   ]);
+
+  useEffect(() => {
+    window.addEventListener("changed-sort-option", () => {
+      let option = sessionStorage.getItem("sort-option");
+      let copyOfferts = [...offerts];
+
+      const endOffset = itemOffset + itemsPerPage;
+      setOfferts(Sort(copyOfferts, option));
+      setCurrentItems(copyOfferts.slice(itemOffset, endOffset));
+      setPageCount(Math.ceil(copyOfferts.length / itemsPerPage));
+      setItemOffset(0);
+    });
+  });
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * itemsPerPage) % offerts.length;
@@ -154,6 +167,7 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
   const { state } = location;
 
   console.log(state);
+  console.log(offertPage);
 
   return (
     <>
@@ -185,6 +199,7 @@ const FilltredContent = ({ offertPage, candidatePage, employersPage }) => {
         </h1>
         <div className={styles.recommended}>
           <div className={styles.parent}>
+            <SortButton offertPage={true} />
             <PaginatedItems
               itemsPerPage={9}
               state={state}

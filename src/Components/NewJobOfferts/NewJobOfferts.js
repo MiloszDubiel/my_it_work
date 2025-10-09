@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Offert from "../OffertComponent/Offert";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import OffertInfo from "../OffertComponent/OffertInfo";
 
 const fetchData = async (amount) => {
   const request = await axios.get(`http://localhost:5000/api/job-offerts`);
@@ -11,14 +12,16 @@ const fetchData = async (amount) => {
 const JobOfferttsComponent = ({ amount }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [jobOfferts, setJobOfferts] = useState(null);
+  const [details, setDetails] = useState(<OffertInfo />);
 
   useEffect(() => {
     setIsLoading(true);
-      fetchData(amount).then((data) => {
-        setJobOfferts(data);
-        setIsLoading(false);
-      });
+    fetchData(amount).then((data) => {
+      setJobOfferts(data);
+      setIsLoading(false);
+    });
   }, [amount]);
+
 
   let jobOffertsDivs = [];
 

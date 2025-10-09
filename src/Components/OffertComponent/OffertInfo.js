@@ -3,25 +3,44 @@ import { useEffect, useState } from "react";
 import styles from "./ofertinfo.module.css";
 import { useNavigate } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
+import axios from "axios";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
-/**
- * Props:
- * - offer (optional) : object with all fields (if już masz dane)
- * - fetchUrl (optional) : endpoint do pobrania oferty po id, np '/api/offers'
- * - offerId (optional) : jeśli podajesz fetchUrl, podaj też offerId
- *
- * Example offer shape:
- * {
- *   id, title, companyName, companyId, location, contractType,
- *   experience, technologies: [], salary, img, description, linkToApply
- * }
- */
+async function fetchDetails(link, type) {
+  const response = await axios.post(
+    "http://localhost:5000/api/job-offerts/scrape/details",
+    {
+      link,
+      type,
+    }
+  );
+
+  return response.data;
+}
 
 const OffertInfo = ({ offert, id }) => {
-  console.log(offert);
+  const [details, setDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    try {
+      fetchDetails(offert.link, offert.type).then((res) => {
+        setDetails(res.details);
+        setIsLoading(false);
+      });
+    } catch (err) {
+      setIsLoading(true);
+      console.log(err);
+    }
+  }, []);
 
   return (
-    <>
+    <div
+      id="offert-details-container"
+      className={styles.container + " " + `offert-details-container${id}`}
+    >
       <main className={styles.wrapper} aria-labelledby="job-title">
         <nav
           className={styles.actionsBar}
@@ -34,8 +53,11 @@ const OffertInfo = ({ offert, id }) => {
             <button style={{ all: "unset", cursor: "pointer" }}>
               <IoMdClose
                 onClick={() => {
-                  document.querySelector(`#offertDetails${id}`).style.display =
-                    "none";
+                  document.querySelector(
+                    `.offert-details-container${id}`
+                  ).style.display = "none";
+
+                  document.querySelector("#root").style.overflow = "auto";
                 }}
               />
             </button>
@@ -45,39 +67,58 @@ const OffertInfo = ({ offert, id }) => {
         <section className={styles.hero}>
           <div className={styles.headerLeft}>
             <h1 id="job-title" className={styles.title}>
-              {offert.title}
+              {offert?.title}
             </h1>
             <div className={styles.sub}>
               <div className={styles.company}>
-                <span className={styles.companyName}>{offert.companyName}</span>
+                <span className={styles.companyName}>
+                  {offert?.companyName}
+                </span>
               </div>
 
               <div className={styles.meta}>
                 Zarobki:
-                {offert.salary === "not available" ? (
+                {offert?.salary === "not available" ? (
                   <span className={styles.salary}>Nie podano</span>
                 ) : (
-                  <span className={styles.salary}>{offert.salary}</span>
+                  <span className={styles.salary}>{offert?.salary}</span>
                 )}
               </div>
             </div>
           </div>
-
           <div className={styles.headerRight}>
-            <button className={styles.applyBtn}>Aplikuj teraz</button>
-            <a className={styles.applyAlt}>Szczegóły aplikacji</a>
-          </div>
+            <button className={styles.applyBtn}>
+              <a href={offert.link} target="_blank" style={{ all: "unset" }}>
+                Szczegóły aplikacji
+              </a>
+            </button>
+          </div>{" "}
         </section>
 
         <section className={styles.contentGrid}>
           <article className={styles.leftCol}>
-            <h2 className={styles.sectionTitle}>Opis stanowiska</h2>
-            <div className={styles.description} />
-
             <h3 className={styles.sectionTitle}>Wymagane technologie</h3>
             <ul className={styles.techList}>
-              <li>lista technologi</li>
+              {JSON.parse(offert.technologies).length != 0 ? (
+                JSON.parse(offert.technologies).map((el) => <li>{el}</li>)
+              ) : (
+                <li>Brak podanych technologii</li>
+              )}
             </ul>
+            {isLoading ? (
+              <LoadingComponent />
+            ) : (
+              <>
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: details.willDo }}
+                ></div>
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: details.offer }}
+                ></div>
+              </>
+            )}
           </article>
 
           <aside
@@ -90,11 +131,11 @@ const OffertInfo = ({ offert, id }) => {
             <div className={styles.companyBox}>
               <div className={styles.companyRow}>
                 <div className={styles.companyLogoSmall}>
-                  <img src={offert.img} alt="zdjecie" />
+                  <img src={offert?.img} alt="zdjecie" />
                 </div>
                 <div>
                   <div className={styles.companyNameSmall}>
-                    {offert.companyName}
+                    {offert?.companyName}
                   </div>
                 </div>
               </div>
@@ -111,7 +152,7 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Typ umowy:
                   <ul>
-                    {JSON.parse(offert.contractType).map((el) => {
+                    {JSON.parse(offert?.contractType || "[]").map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>
@@ -123,7 +164,7 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Doświadczenie:{" "}
                   <ul>
-                    {JSON.parse(offert.experience).map((el) => {
+                    {JSON.parse(offert?.experience || "[]").map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>
@@ -135,12 +176,15 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Lokalizacja:{" "}
                   <ul>
-                    {JSON.parse(offert.workingMode)[1]?.length === 0 ? (
+                    {JSON.parse(offert?.workingMode || "[]")[1]?.length ===
+                    0 ? (
                       <li>
-                        <strong>{JSON.parse(offert.workingMode)[0]}</strong>
+                        <strong>
+                          {JSON.parse(offert?.workingMode || "[]")[0]}
+                        </strong>
                       </li>
                     ) : (
-                      JSON.parse(offert.workingMode)[1]?.map((el) => {
+                      JSON.parse(offert?.workingMode || "[]")[1]?.map((el) => {
                         return (
                           <li>
                             <strong>{el}</strong>
@@ -155,7 +199,7 @@ const OffertInfo = ({ offert, id }) => {
           </aside>
         </section>
       </main>
-    </>
+    </div>
   );
 };
 

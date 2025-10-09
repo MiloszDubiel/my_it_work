@@ -8,15 +8,16 @@ import styles from "./offert.module.css";
 const Offert = ({ offert, index }) => {
   return (
     <>
-      <div className={styles.offertDetails} id={"offertDetails" + index}>
-        <OffertInfo offert={offert} id={index} />
-      </div>
+      <OffertInfo offert={offert} id={index} />
       <div
         className={styles.offerts}
         key={index}
         onClick={() => {
-          document.querySelector(`#offertDetails${index}`).style.display =
-            "flex";
+          document.querySelector(
+            `.offert-details-container${index}`
+          ).style.display = "flex";
+
+          document.querySelector("#root").style.overflow = "hidden";
         }}
         onLoad={() => {
           let el = document.querySelector(".pagination");

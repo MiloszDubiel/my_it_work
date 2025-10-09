@@ -194,3 +194,71 @@ export async function getJobOfferts() {
   await browser.close();
   return allJobs;
 }
+
+export async function getJobOffertDetail(link, type) {
+  const browser = await puppeteer.launch({
+    headless: "new",
+    defaultViewport: {
+      width: 1920,
+      height: 1080,
+    },
+    args: ["--window-size=1920,1080"],
+  });
+  const page = await browser.newPage();
+
+  await page.goto(link, {
+    waitUntil: "networkidle2",
+  });
+
+  if (type === "bulldogjob.pl") {
+    try {
+      await page.waitForSelector(".JobListItem_item__fYh8y");
+    } catch (err) {
+      console.log(err);
+      return "Błąd";
+    }
+
+    const details = await page.evaluate(() => {
+      return {
+        willDo: document.querySelectorAll("#accordionGroup")[0].innerHTML,
+        offer: document.querySelectorAll("#accordionGroup")[1].innerHTML,
+        expect: document.querySelectorAll("#accordionGroup")[2].innerHTML,
+      };
+    });
+
+    browser.close();
+    return details;
+  } else if (type === "theprotocol.it") {
+    try {
+      await page.waitForSelector(".JobListItem_item__fYh8y");
+    } catch (err) {
+      console.log(err);
+      return "Błąd";
+    }
+
+    const details = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll(".JobListItem_item__fYh8y")
+      ).map((el) => ({}));
+    });
+
+    browser.close();
+    return details;
+  } else {
+    try {
+      await page.waitForSelector(".JobListItem_item__fYh8y");
+    } catch (err) {
+      console.log(err);
+      return "Błąd";
+    }
+
+    const details = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll(".JobListItem_item__fYh8y")
+      ).map((el) => ({}));
+    });
+
+    browser.close();
+    return details;
+  }
+}

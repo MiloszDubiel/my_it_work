@@ -1,3 +1,15 @@
+.container {
+  display: none;
+  position: fixed;
+  z-index: 1111;
+  background-color: #4444444f;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
 .wrapper {
   padding: 18px;
   color: #0f172a;
@@ -122,6 +134,7 @@
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
+  height: 100px !important;
 }
 
 .applyBtn {
@@ -145,6 +158,10 @@
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 18px;
+  height: calc();
+  height: 70%;
+
+  overflow: hidden;
 }
 
 /* left column */
@@ -153,6 +170,14 @@
   border: 1px solid #eef2f6;
   border-radius: 12px;
   padding: 18px;
+  height: 100%;
+  overflow: auto;
+}
+.leftCol button {
+  all: unset;
+}
+.leftCol button svg {
+  display: none;
 }
 
 .sectionTitle {
@@ -164,15 +189,6 @@
 .description {
   line-height: 1.6;
   color: #111827;
-}
-
-.techList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 0 0;
-  list-style: none;
-  padding: 0;
 }
 
 .techItem {
