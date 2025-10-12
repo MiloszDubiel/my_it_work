@@ -197,11 +197,12 @@ export async function getJobOfferts() {
 
 export async function getJobOffertDetail(link, type) {
   const browser = await puppeteer.launch({
-    headless: "new",
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
     },
+    userDataDir: "./puppeteer_profile",
     args: ["--window-size=1920,1080"],
   });
   const page = await browser.newPage();

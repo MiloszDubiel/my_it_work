@@ -16,7 +16,7 @@
     "express": "^4.21.2",
     "json2csv": "^6.0.0-alpha.2",
     "mysql2": "^3.14.3",
-    "puppeteer": "^24.15.0",
+    "puppeteer": "^24.23.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "react-redux": "^9.2.0",

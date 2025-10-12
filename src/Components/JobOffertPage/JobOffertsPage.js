@@ -31,12 +31,11 @@ const PaginatedItems = ({ itemsPerPage }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    window.scrollTo(0, 0);
-
     if (offerts.length === 0) {
+      setIsLoading(true);
       fetchData()
         .then((res) => {
+          console.log("WYSAŁNO");
           setOfferts(res);
           const endOffset = itemOffset + itemsPerPage;
           setCurrentItems(res.slice(itemOffset, endOffset));
@@ -48,7 +47,7 @@ const PaginatedItems = ({ itemsPerPage }) => {
         });
       return;
     }
-  }, []);
+  });
 
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
