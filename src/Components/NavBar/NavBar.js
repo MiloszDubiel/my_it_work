@@ -4,13 +4,14 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import AddOffert from "../AddOffert/AddJobOffert";
+import MoreSettings from "../SettingsPage/MoreSettings";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let searchDiv = useRef(null);
   let account = useRef(null);
 
   //Dane użytkownika po zalogowaniu
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  let userData = JSON.parse(sessionStorage.getItem("user-data"));
   let navigate = useNavigate();
 
   return (
@@ -20,6 +21,12 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
         candidatePage={candidatePage}
         employersPage={employersPage}
       />
+      <MoreSettings
+        offertPage={offertPage}
+        candidatePage={candidatePage}
+        employersPage={employersPage}
+      />
+
       <header className={styles.headerElement}>
         <nav className={styles.navBar}>
           <div className={styles.header}>
@@ -83,7 +90,14 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           >
             {userData?.email ? (
               <>
-                <Link to="/user/settings">Ustawienia</Link>
+                <Link
+                  onClick={() => {
+                    document.querySelector("#settings").style.display = "flex";
+                    document.querySelector("#root").style.overflow = "hidden";
+                  }}
+                >
+                  Ustawienia
+                </Link>
                 {userData.role === "Employer" ? (
                   <>
                     {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
@@ -117,8 +131,8 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
                 <Link
                   onClick={() => {
-                    localStorage.setItem(
-                      "userData",
+                    sessionStorage.setItem(
+                      "user-data",
                       JSON.stringify({ info: "Wylogowano" })
                     );
                     navigate("/");

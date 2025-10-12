@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./login.module.css";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +28,7 @@ const LoginForm = () => {
 
       setInfo(res.data.info);
 
-      localStorage.setItem("userData", JSON.stringify(res.data.user));
+      sessionStorage.setItem("user-data", JSON.stringify(res.data.user));
       setTimeout(() => navigate("/", { replace: true }), 1000);
     } catch (err) {
       setError(JSON.parse(err.request.response).error);

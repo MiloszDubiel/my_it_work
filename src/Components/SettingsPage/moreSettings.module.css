@@ -1,10 +1,44 @@
+.container {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 1111;
+  background-color: #11111133;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.main {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: calc(100% - 10px);
+}
+.close {
+  display: flex;
+  height: 25px;
+  justify-content: end;
+  width: 100%;
+  cursor: pointer;
+}
+.main aside {
+  width: 300px;
+  height: 100%;
+}
+.main main {
+  width: calc(100% - 310px);
+}
+
 .wrap {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
   padding: 24px;
-  min-height: 100dvh;
+  max-width: 1200px;
+  min-height: 800px;
+  height: 80%;
+  width: 80%;
   background: #fafafa;
+  border-radius: 5px;
 }
 
 .sidebar {
@@ -41,9 +75,30 @@
   background: #f4f6f8;
 }
 
+/* error */
+.error {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid rgba(197, 47, 47, 0.08);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+/* info */
+.info {
+  background: #fafff5;
+  color: #1d5e0d;
+  border: 1px solid rgba(197, 47, 47, 0.08);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .active {
-  background: #eef6ff;
-  border-color: #cfe5ff;
+  background: #55555523;
+  border-color: rgb(168, 168, 168);
 }
 
 .panel {
@@ -56,6 +111,18 @@
   border: 1px solid #eee;
   border-radius: 16px;
   padding: 20px;
+}
+.unlock {
+  width: 100px;
+  font-size: 12px;
+  background-color: #acacac1a;
+  border: #585858 1px solid;
+  height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.disabled {
+  cursor: not-allowed;
 }
 
 .form {
@@ -85,8 +152,8 @@
 }
 
 .row input:focus {
-  border-color: #69a6ff;
-  box-shadow: 0 0 0 3px rgba(105, 166, 255, 0.15);
+  border-color: #242424;
+  box-shadow: 0 0 0 3px rgba(53, 53, 53, 0.15);
 }
 
 .actions {
@@ -96,7 +163,7 @@
 }
 
 .primary {
-  background: #2563eb;
+  background: #000000;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -110,7 +177,7 @@
 }
 
 .secondary {
-  background: #eef2f7;
+  background: #f3f3f3;
   color: #111;
   border: 1px solid #dfe3ea;
   border-radius: 10px;

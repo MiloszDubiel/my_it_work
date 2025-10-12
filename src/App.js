@@ -7,6 +7,7 @@ import EmployersComponent from "./Components/EmployersComponent/EmlployersCompon
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
 import FilltredContent from "./Components/FilltredContent/FilltredContent";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
+import MoreSettings from "./Components/SettingsPage/MoreSettings";
 const App = () => {
   return (
     <>
