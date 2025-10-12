@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./moreSettings.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
@@ -6,28 +6,34 @@ import axios from "axios";
 const TABS = ["Profil i hasło", "Zdjęcie", "Ulubione"];
 
 export default function MoreSettings() {
-  const [active, setActive] = useState(TABS[0]);
-
   const userData = JSON.parse(sessionStorage.getItem("user-data"));
 
+  const [active, setActive] = useState(TABS[0]);
+  const [avatar, setAvatar] = useState(sessionStorage.getItem("user-avatar"));
   // Profil
   const [profile, setProfile] = useState({
-    email: userData.email,
+    email: userData?.email || "",
     name: "",
     surname: "",
     phone_number: "",
     newPassword: "",
     repeatPassword: "",
-    id: userData.id,
-    role: userData.role,
+    id: userData?.id || "",
+    role: userData?.role || "",
+    avatar: avatar,
   });
 
   const [error, setError] = useState(["error", "none"]);
   const [info, setInfo] = useState(["info", "none"]);
+  const [isDisabled, setIsDisabled] = useState(false);
+  let fileInputRef = useRef(null);
+
+  const [preview, setPreview] = useState(null);
+  const [file, setFile] = useState(null);
 
   const sendForm = async (e) => {
     e.preventDefault();
-    if (!profile.name || !profile.surname || !profile.email) {
+    if (!profile?.name || !profile?.surname || !profile?.email) {
       setError(["Niektóre pola nie zostały wypełnione", "block"]);
       return;
     }
@@ -53,6 +59,41 @@ export default function MoreSettings() {
         window.location.reload();
       }, 1000);
     }
+  };
+
+  const onPickAvatar = () => {
+    setIsDisabled(!isDisabled);
+
+    const selected = fileInputRef.current.files[0];
+    if (!selected) return;
+
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+  };
+
+  const uploadAvatar = async () => {
+    // if (!file) {
+    //   setError(["Nie wybrano pliku!", "block"]);
+    //   return;
+    // }
+    // const formData = new FormData();
+    // formData.append("avatar", file);
+    // formData.append("id", profile.id);
+    // try {
+    //   const res = await axios.post(
+    //     `http://localhost:5000/user/upload-avatar`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     }
+    //   );
+    //   setInfo(["Avatar został zapisany!", "block"]);
+    // } catch (err) {
+    //   console.error(err);
+    //   setError(["Błąd przy zapisie avatara", "block"]);
+    // }
   };
 
   return (
@@ -123,7 +164,7 @@ export default function MoreSettings() {
                       onChange={(e) =>
                         setProfile({ ...profile, name: e.target.value })
                       }
-                      placeholder={userData.name || "Nie podano"}
+                      placeholder={userData?.name || "Nie podano"}
                     />
                   </div>
                   <div className={styles.row}>
@@ -135,7 +176,7 @@ export default function MoreSettings() {
                       onChange={(e) =>
                         setProfile({ ...profile, surname: e.target.value })
                       }
-                      placeholder={userData.surname || "Nie podano"}
+                      placeholder={userData?.surname || "Nie podano"}
                     />
                   </div>
                   <div className={styles.row}>
@@ -147,7 +188,7 @@ export default function MoreSettings() {
                       onChange={(e) =>
                         setProfile({ ...profile, email: e.target.value })
                       }
-                      placeholder={userData.email}
+                      placeholder={userData?.email}
                     />
                   </div>
                   <div className={styles.row}>
@@ -162,7 +203,7 @@ export default function MoreSettings() {
                           phone_number: e.target.value,
                         })
                       }
-                      placeholder={userData.phone_number || "Nie podano"}
+                      placeholder={userData?.phone_number || "Nie podano"}
                     />
                   </div>
                   <hr />
@@ -231,86 +272,65 @@ export default function MoreSettings() {
               </section>
             )}
 
-            {active === "Hasło" && (
-              <section className={styles.card}>
-                <h3>Zmień hasło</h3>
-                <form className={styles.form} onSubmit={""}>
-                  <div className={styles.actions}>
-                    <button type="submit" className={styles.primary}>
-                      Zmień hasło
-                    </button>
-                  </div>
-                </form>
-              </section>
-            )}
-
-            {active === "E-mail i login" && (
-              <section className={styles.card}>
-                <h3>E-mail i login</h3>
-                <form className={styles.form} onSubmit={"submitEmailLogin"}>
-                  <div className={styles.row}>
-                    <label>E-mail</label>
-                    <input
-                      type="email"
-                      // value={contact.email}
-                      // onChange={(e) =>
-                      //   setContact({ ...contact, email: e.target.value })
-                      // }
-                      placeholder="twoj@email.pl"
-                      required
-                    />
-                  </div>
-                  <div className={styles.row}>
-                    <label>Login</label>
-                    <input
-                      type="text"
-                      // value={contact.login}
-                      // onChange={(e) =>
-                      //   setContact({ ...contact, login: e.target.value })
-                      // }
-                      placeholder="Login"
-                    />
-                  </div>
-                  <div className={styles.actions}>
-                    <button type="submit" className={styles.primary}>
-                      Zapisz
-                    </button>
-                  </div>
-                </form>
-              </section>
-            )}
-
             {active === "Zdjęcie" && (
               <section className={styles.card}>
+                {error && (
+                  <div
+                    className={styles.error}
+                    style={{ display: error[1] }}
+                    role="alert"
+                    onClick={() => {
+                      setError([, "none"]);
+                    }}
+                  >
+                    {error[0]}
+                  </div>
+                )}
+                {info && (
+                  <div
+                    className={styles.info}
+                    role="alert"
+                    style={{ display: info[1] }}
+                    onClick={() => {
+                      setInfo([, "none"]);
+                    }}
+                  >
+                    {info[0]}
+                  </div>
+                )}
                 <h3>Zdjęcie profilowe</h3>
                 <div className={styles.avatarBlock}>
                   <div className={styles.avatar}>
-                    {/* {avatarUrl ? (
-                  // <img src={avatarUrl} alt="Avatar" />
-                ) : (
-                  <div className={styles.avatarPlaceholder}>Brak zdjęcia</div>
-                )} */}
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt="Podgląd avatara"
+                        className={styles.preview}
+                      />
+                    ) : (
+                      <p>Brak podglądu</p>
+                    )}
                   </div>
                   <div className={styles.avatarActions}>
                     <input
-                      // ref={fileInputRef}
+                      ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      // onChange={onPickAvatar}
+                      onChange={onPickAvatar}
                       style={{ display: "none" }}
                     />
                     <button
                       className={styles.secondary}
-                      // onClick={() => fileInputRef.current?.click()}
+                      onClick={() => fileInputRef.current?.click()}
                       type="button"
                     >
                       Wybierz plik
                     </button>
                     <button
-                      className={styles.primary}
-                      // onClick={uploadAvatar}
+                      className={styles.primary + " " + styles.setPicture}
+                      onClick={uploadAvatar}
                       type="button"
-                      // disabled={!avatarFile}
+                      disabled={!isDisabled}
                     >
                       Zapisz zdjęcie
                     </button>

@@ -405,6 +405,12 @@
   background-color: rgba(112, 112, 112, 0.062);
 }
 
+
+.profileAvatar{
+
+ 
+}
+
 /*MEDIA QUERY*/
 @media screen and (min-width: 1024px) and (max-width: 1336px) {
   .localization,

@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import { connection } from "../config/db.js";
 import bcrypt from "bcryptjs";
-
+import { fileTypeFromBuffer } from "file-type";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -44,6 +44,28 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Wewnętrzny błąd serwera" });
+  }
+});
+
+router.get("/avatar/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const [rows] = await connection.query(
+      "SELECT avatar FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (rows.length === 0 || !rows[0].avatar) {
+      return res.status(404).json({ error: "Avatar nie znaleziony" });
+    }
+
+    const type = await fileTypeFromBuffer(rows[0].avatar);
+    res.setHeader("Content-Type", type?.mime || "application/octet-stream");
+    res.send(rows[0].avatar);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd pobierania avatara" });
   }
 });
 

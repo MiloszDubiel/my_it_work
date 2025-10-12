@@ -1,6 +1,6 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import AddOffert from "../AddOffert/AddJobOffert";
@@ -13,6 +13,8 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   //Dane użytkownika po zalogowaniu
   let userData = JSON.parse(sessionStorage.getItem("user-data"));
   let navigate = useNavigate();
+
+  const [avatar, setAvatar] = useState(sessionStorage.getItem("user-avatar"));
 
   return (
     <>
@@ -70,8 +72,12 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   onClick={() => {
                     account.current.classList.toggle(styles.accountDivHide);
                   }}
+                  style={{
+                    background: `url(${avatar})`,
+                    backgroundSize: "cover",
+                  }}
                 >
-                  <IoPersonOutline className={styles.icon} />
+                  {!avatar ? <IoPersonOutline className={styles.icon} /> : ""}
                 </button>
               </>
             ) : (

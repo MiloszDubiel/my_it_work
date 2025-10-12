@@ -95,6 +95,14 @@
   font-size: 13px;
   cursor: pointer;
 }
+.setPicture {
+  cursor: not-allowed;
+}
+.preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .active {
   background: #55555523;

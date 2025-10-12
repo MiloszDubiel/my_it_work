@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./login.module.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -26,8 +26,20 @@ const LoginForm = () => {
         password,
       });
 
-      setInfo(res.data.info);
+      axios
+        .get(`http://localhost:5000/auth/avatar/${email}`, {
+          responseType: "blob",
+        })
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          sessionStorage.setItem("user-avatar", url);
+        })
+        .catch((err) => {
+          sessionStorage.setItem("user-avatar", "");
+          console.error("Błąd pobierania avatara:", err);
+        });
 
+      setInfo(res.data.info);
       sessionStorage.setItem("user-data", JSON.stringify(res.data.user));
       setTimeout(() => navigate("/", { replace: true }), 1000);
     } catch (err) {
