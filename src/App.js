@@ -2,12 +2,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./Components/MainPage/MainPage";
 import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
-import JobOffertsPage from "./Components/JobOffertPage/JobOffertsPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
 import FilltredContent from "./Components/FilltredContent/FilltredContent";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
-import MoreSettings from "./Components/SettingsPage/MoreSettings";
+import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
 const App = () => {
   return (
     <>
@@ -22,7 +21,7 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
         <Routes>
-          <Route path="/job-offerts" element={<JobOffertsPage />} />
+          <Route path="/job-offers" element={<JobOffersPage />} />
         </Routes>
         <Routes>
           <Route path="/employers" element={<EmployersComponent />} />

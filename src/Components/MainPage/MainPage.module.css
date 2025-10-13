@@ -1,191 +1,151 @@
-.page {
-  background: linear-gradient(180deg, #f5f5f5 0%, #fbfbfb 100%);
+.container {
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", sans-serif;
 }
-.header {
-  margin-top: 40px;
+
+/* HERO SECTION */
+.hero {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  text-align: center;
+  padding: 6rem 2rem;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.heroButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btnPrimary {
+  background: white;
+  color: #3b82f6;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btnPrimary:hover {
+  background: #e0e7ff;
+}
+
+.btnSecondary {
+  border: 2px solid white;
+  color: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* JOBS SECTION */
+.jobsSection {
+  padding: 2rem;
   text-align: center;
 }
-.recommended {
-  display: flex;
-  justify-content: center;
+
+.jobsSection h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
-.parent {
+
+.jobsGrid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  width: 1300px;
-  place-items: center;
-  gap: 25px;
-  position: relative;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-/*Prtzycisk pokaz wiecej*/
-.showMoreOfferts {
-  width: 100%;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.jobCard {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  text-align: left;
+  transition: transform 0.2s ease;
 }
-.showMoreOfferts button {
-  background-color: black;
-  width: 200px;
-  height: 40px;
-  border: none;
-  border-radius: 20px;
+
+.jobCard:hover {
+  transform: translateY(-4px);
+}
+
+.jobCard h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+.jobCard span {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.detailsBtn {
+  display: inline-block;
+  margin-top: 1rem;
+  background: #3b82f6;
   color: white;
-  font-weight: bold;
-  font-size: 16px;
-  transition: 0.2s;
-  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
 }
 
-.showMoreOfferts button:hover {
-  background-color: rgba(211, 211, 211, 0.301);
-  border: 1px solid rgba(211, 211, 211, 0.301);
-  color: black;
+.detailsBtn:hover {
+  background: #2563eb;
 }
 
-/*Pokaz okno*/
-.showWindow {
-  display: flex !important;
+/* ABOUT SECTION */
+.aboutSection {
+  background: #f9fafb;
+  padding: 4rem 2rem;
+  text-align: center;
 }
 
-.filter {
-  position: relative;
-  left: 400px;
-  height: 40px;
-  border-radius: 50px;
-  width: 100px;
-  background-color: inherit;
-  font-size: 14px;
-  border: 1px solid gray;
-  cursor: pointer;
+.aboutSection h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.aboutGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-/*MEDIA QUERY*/
-@media screen and (min-width: 1065px) and (max-width: 1336px) {
-  .parent {
-    grid-template-columns: repeat(1, 1fr);
-    width: 1000px;
-  }
-  .filter {
-    left: 250px;
-  }
-}
-@media screen and (min-width: 521px) and (max-width: 1064px) {
-  .recommended {
-    width: 100%;
-  }
-  .parent {
-    grid-template-columns: repeat(1, 1fr);
-    width: calc(100% - 10px);
-  }
-  .filter {
-    left: 100px;
-  }
-}
-@media screen and (max-width: 768px) {
-  .filter {
-    display: none;
-  }
-}
-@media screen and (max-width: 880px) {
-  .offerts {
-    height: 200px;
-  }
-  .recommended {
-    height: 2000px;
-  }
-  .parent {
-    height: 2000px;
-  }
-  .parent .offerts {
-    height: 200px;
-  }
-  .info1 {
-    height: 40%;
-  }
-  .info2 {
-    height: 50%;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .info2 div:last-child {
-    height: 40%;
-    justify-content: unset;
-    align-items: end;
-  }
-  .info2 div:first-child {
-    height: 60%;
-    flex-wrap: wrap;
-    justify-content: unset;
-    align-items: end;
-  }
-
-  .info2 div:first-child span:nth-child(2),
-  .info2 div:first-child span:nth-child(3) {
-    display: none;
-  }
-  .info2 div {
-    padding: 0px;
-  }
+.aboutGrid div {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-@media screen and (max-width: 520px) {
-  .ellipsis {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: all 0.2s linear;
-    white-space: nowrap;
-    padding: 0.5rem 1rem;
-  }
-  .ellipsis:focus,
-  .ellipsis:hover {
-    color: transparent;
-  }
-  .ellipsis:focus:after,
-  .ellipsis:hover:after {
-    content: attr(data-text);
-    overflow: visible;
-    text-overflow: inherit;
-    background: #fff;
-    position: absolute;
-    left: auto;
-    top: auto;
-    width: auto;
-    max-width: 20rem;
-    border: 1px solid #eaebec;
-    padding: 0 0.5rem;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
-    white-space: normal;
-    word-wrap: break-word;
-    display: block;
-    color: black;
-    margin-top: -1.25rem;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .recommended {
-    width: 100%;
-  }
-  .parent {
-    grid-template-columns: repeat(1, 1fr);
-    width: calc(100% - 10px);
-  }
+.aboutGrid h3 {
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
 }

@@ -1,6 +1,6 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import AddOffert from "../AddOffert/AddJobOffert";
@@ -39,7 +39,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
               <li>
                 {" "}
                 <Link
-                  to="/job-offerts"
+                  to="/job-offers"
                   style={{ textDecoration: "none", color: "black" }}
                 >
                   Oferty pracy
@@ -156,36 +156,6 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
             )}
           </div>
         </nav>
-        <div
-          className={
-            styles.searchDiv +
-            " " +
-            (employersPage
-              ? styles.darkSearchDiv
-              : candidatePage
-              ? styles.blueSearchDiv
-              : styles.orangeSearchDiv)
-          }
-          ref={searchDiv}
-        >
-          <h1>
-            {offertPage
-              ? "Rekrutacja IT, bez zbędnego kodu."
-              : employersPage
-              ? "Firmy IT"
-              : "Kandydaci IT"}
-          </h1>
-        </div>
-
-        <div className={styles.hiddenMenu}>
-          <button
-            onClick={() => {
-              document.querySelector("#filter").style.display = "flex";
-            }}
-          >
-            Filtruj
-          </button>
-        </div>
       </header>
     </>
   );
