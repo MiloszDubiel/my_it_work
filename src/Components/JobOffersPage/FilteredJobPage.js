@@ -1,26 +1,38 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "./employers.module.css";
+import styles from "./JobOffersPage.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
 import Filter from "../FilterComponent/Filter";
+import { useLocation } from "react-router-dom";
 
-const EmployersComponent = () => {
+const FiltredJobOffersPage = ({ offersPage }) => {
   const [offers, setOffers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const offersPerPage = 9;
 
+  const location = useLocation();
+  const { state } = location;
+
   useEffect(() => {
     const fetchOffers = async () => {
+      console.log("DUPA");
       try {
-        const res = await axios.get("http://localhost:5000/api/employers");
+        const res = await axios.post(
+          `http://localhost:5000/api/job-offerts/filltred`,
+          {
+            state,
+          }
+        );
+
         setOffers(res.data);
       } catch (err) {
         console.error("Błąd podczas pobierania ofert:", err);
       }
     };
     fetchOffers();
-  }, []);
+  }, [state]);
+
   useEffect(() => {
     window.addEventListener("changed-sort-option", () => {
       const copyOfOferts = [...offers];
@@ -35,8 +47,8 @@ const EmployersComponent = () => {
   // Paginacja
   const indexOfLast = currentPage * offersPerPage;
   const indexOfFirst = indexOfLast - offersPerPage;
-  const currentOffers = offers?.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(offers?.length / offersPerPage);
+  const currentOffers = offers.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(offers.length / offersPerPage);
 
   const handleNext = () => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
@@ -49,13 +61,13 @@ const EmployersComponent = () => {
   return (
     <>
       <Navbar />
-      <Filter employersPage={true} />
+      <Filter offersPage={true} />
       <div className={styles.container}>
-        <h1>Pracodawcy</h1>
+        <h1>Oferty pracy</h1>
 
         <div className={styles.offersList}>
-          <SortButton employersPage={true} />
-          {currentOffers?.length > 0 ? (
+          <SortButton offertPage={true} />
+          {currentOffers.length > 0 ? (
             currentOffers.map((offer, index) => (
               <div className={styles.offerRow} key={index}>
                 <div className={styles.logoSection}>
@@ -76,30 +88,33 @@ const EmployersComponent = () => {
 
                   <div className={styles.tags}>
                     <div className={styles.technologies}>
-                      {offer.technologies &&
-                        JSON.parse(offer.technologies)[0]
+                      <span className={styles.item}>Technologie:</span>{" "}
+                      {JSON.parse(offer.technologies).length > 0 &&
+                        JSON.parse(offer.technologies)
                           .slice(0, 2)
-                          .map((tech, i) => (
-                            <span key={i} className={styles.tag}>
-                              {tech}
-                            </span>
-                          ))}
-
-                      {JSON.parse(offer.technologies)[0].slice(0, 2).length <
-                      JSON.parse(offer.technologies)[0].length ? (
-                        <p className={styles.item}>i więcej... </p>
+                          .map((el) => {
+                            return <span className={styles.tag}>{el}</span>;
+                          })}
+                      {JSON.parse(offer.technologies).slice(0, 2).length <
+                      JSON.parse(offer.technologies).length ? (
+                        <span className={styles.item}>i więcej</span>
                       ) : (
                         ""
                       )}
+                      {JSON.parse(offer.technologies).length === 0 && (
+                        <span className={styles.item}>Nie podano</span>
+                      )}
                     </div>
+
                     <div className={styles.locations}>
-                      <p className={styles.item}>Lokalizacje: </p>{" "}
-                      {offer.locations ? (
+                      <span className={styles.item}>Lokalizacja:</span>{" "}
+                      {JSON.parse(offer.workingMode)?.length > 0 && (
                         <span className={styles.tag}>
-                          {JSON.parse(offer.locations)[0]}
+                          {JSON.parse(offer.workingMode)[0]}
                         </span>
-                      ) : (
-                        ""
+                      )}
+                      {JSON.parse(offer.workingMode)[1]?.length > 1 && (
+                        <span className={styles.item}>i więcej</span>
                       )}
                     </div>
                   </div>
@@ -148,4 +163,4 @@ const EmployersComponent = () => {
   );
 };
 
-export default EmployersComponent;
+export default FiltredJobOffersPage;

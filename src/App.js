@@ -4,9 +4,10 @@ import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
 import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
-import FilltredContent from "./Components/FilltredContent/FilltredContent";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
+import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
+import FilltredEmployers from "./Components/EmployersComponent/FiltredEmployerComponent";
 const App = () => {
   return (
     <>
@@ -31,21 +32,18 @@ const App = () => {
         </Routes>
         <Routes>
           <Route
-            path="/job-offerts/filltred"
-            element={<FilltredContent offertPage={true} />}
+            path="/job-offers/filltred"
+            element={<FiltredJobOffersPage offersPage={true} />}
           />
         </Routes>
         <Routes>
           <Route
             path="/employers/filltred"
-            element={<FilltredContent employersPage={true} />}
+            element={<FilltredEmployers employerPage={true} />}
           />
         </Routes>
         <Routes>
-          <Route
-            path="/candidates/filltred"
-            element={<FilltredContent candidatePage={true} />}
-          />
+          <Route path="/candidates/filltred" element={""} />
         </Routes>
         <Routes>
           <Route path="/admin" element={<AdminPanel />} />

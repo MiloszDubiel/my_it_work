@@ -4,23 +4,36 @@ import styles from "./employers.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
 import Filter from "../FilterComponent/Filter";
+import { useLocation } from "react-router-dom";
 
-const EmployersComponent = () => {
+const FilltredEmployers = ({}) => {
   const [offers, setOffers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const offersPerPage = 9;
 
+  const location = useLocation();
+  const { state } = location;
+
+  console.log(state);
+
   useEffect(() => {
     const fetchOffers = async () => {
+      console.log("DUPA");
       try {
-        const res = await axios.get("http://localhost:5000/api/employers");
+        const res = await axios.post(
+          `http://localhost:5000/api/employers/filltred`,
+          {
+            state,
+          }
+        );
+
         setOffers(res.data);
       } catch (err) {
         console.error("Błąd podczas pobierania ofert:", err);
       }
     };
     fetchOffers();
-  }, []);
+  }, [state]);
   useEffect(() => {
     window.addEventListener("changed-sort-option", () => {
       const copyOfOferts = [...offers];
@@ -148,4 +161,4 @@ const EmployersComponent = () => {
   );
 };
 
-export default EmployersComponent;
+export default FilltredEmployers;

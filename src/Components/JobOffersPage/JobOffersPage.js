@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./JobOffersPage.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
+import Filter from "../FilterComponent/Filter";
 
 const JobOffersPage = () => {
   const [offers, setOffers] = useState([]);
@@ -48,6 +49,7 @@ const JobOffersPage = () => {
   return (
     <>
       <Navbar />
+      <Filter offersPage={true} />
       <div className={styles.container}>
         <h1>Oferty pracy</h1>
 
