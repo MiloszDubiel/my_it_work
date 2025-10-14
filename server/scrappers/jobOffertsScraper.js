@@ -10,7 +10,13 @@ export async function getJobOfferts() {
       width: 1920,
       height: 1080,
     },
-    args: ["--window-size=1920,1080"],
+    args: [
+      "--window-size=1920,1080",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+    ],
+
+    ignoreDefaultArgs: ["--enable-automation"],
   });
   const page = await browser.newPage();
 
@@ -202,7 +208,6 @@ export async function getJobOffertDetail(link, type) {
       width: 1920,
       height: 1080,
     },
-    userDataDir: "./puppeteer_profile",
     args: ["--window-size=1920,1080"],
   });
   const page = await browser.newPage();

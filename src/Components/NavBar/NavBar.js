@@ -18,11 +18,6 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
   return (
     <>
-      <AddOffert
-        offertPage={offertPage}
-        candidatePage={candidatePage}
-        employersPage={employersPage}
-      />
       <MoreSettings
         offertPage={offertPage}
         candidatePage={candidatePage}
@@ -32,7 +27,14 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
       <header className={styles.headerElement}>
         <nav className={styles.navBar}>
           <div className={styles.header}>
-            <h3>MyITWork</h3>
+            <h3
+              onClick={() => {
+                navigate("/");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              MyITWork
+            </h3>
           </div>
           <div className={styles.list}>
             <ul>

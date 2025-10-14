@@ -10,7 +10,7 @@
   aspect-ratio: 1;
   border-radius: 50%;
   border: 2px solid rgb(121, 121, 121);
-  border-right-color: orange;
+  border-right-color: #3b82f6;
   animation: l2 1s infinite linear;
 }
 @keyframes l2 {

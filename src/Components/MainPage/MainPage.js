@@ -1,17 +1,27 @@
 import styles from "./MainPage.module.css";
 import Navbar from "../NavBar/NavBar";
 import { Link } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const MainPage = () => {
+  const [offers, setOffers] = useState([]);
 
-  
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/job-offerts");
 
+        let random = Math.floor(Math.random() * res.data.length - 4);
 
-
-
-
-
+        setOffers(res.data.slice(random, random + 3));
+      } catch (err) {
+        console.error("Błąd podczas pobierania ofert:", err);
+      }
+    };
+    fetchOffers();
+  }, []);
+  console.log(offers);
   return (
     <div className={styles.container}>
       <Navbar />
@@ -36,32 +46,21 @@ const MainPage = () => {
       <section className={styles.jobsSection}>
         <h2>Najnowsze oferty</h2>
         <div className={styles.jobsGrid}>
-          <div className={styles.jobCard}>
-            <h3>Frontend Developer</h3>
-            <p>TechCorp Sp. z o.o.</p>
-            <span>Warszawa • Umowa o pracę</span>
-            <Link to="/job-offers/1" className={styles.detailsBtn}>
-              Szczegóły
-            </Link>
-          </div>
-
-          <div className={styles.jobCard}>
-            <h3>Backend Developer (Node.js)</h3>
-            <p>Softify</p>
-            <span>Kraków • B2B</span>
-            <Link to="/job-offers/2" className={styles.detailsBtn}>
-              Szczegóły
-            </Link>
-          </div>
-
-          <div className={styles.jobCard}>
-            <h3>DevOps Engineer</h3>
-            <p>CloudX</p>
-            <span>Remote • B2B</span>
-            <Link to="/job-offers/3" className={styles.detailsBtn}>
-              Szczegóły
-            </Link>
-          </div>
+          {offers?.map((el) => {
+            return (
+              <div className={styles.jobCard}>
+                <h3>{el.title}</h3>
+                <p>{el.companyName}</p>
+                <span>
+                  {JSON.parse(el.workingMode)[0]} •
+                  {JSON.parse(el.contractType)[0]}
+                </span>
+                <Link to="/job-offers/1" className={styles.detailsBtn}>
+                  Szczegóły
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </section>
 

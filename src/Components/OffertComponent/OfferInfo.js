@@ -18,7 +18,7 @@ async function fetchDetails(link, type) {
   return response.data;
 }
 
-const OffertInfo = ({ offert, id }) => {
+const OfferInfo = ({ offer, id }) => {
   const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,7 +26,7 @@ const OffertInfo = ({ offert, id }) => {
     setIsLoading(true);
 
     try {
-      fetchDetails(offert.link, offert.type).then((res) => {
+      fetchDetails(offer.link, offer.type).then((res) => {
         setDetails(res.details);
         setIsLoading(false);
       });
@@ -38,8 +38,8 @@ const OffertInfo = ({ offert, id }) => {
 
   return (
     <div
-      id="offert-details-container"
-      className={styles.container + " " + `offert-details-container${id}`}
+      id="offer-details-container"
+      className={styles.container + " " + `offer-details-container${id}`}
     >
       <main className={styles.wrapper} aria-labelledby="job-title">
         <nav
@@ -47,14 +47,17 @@ const OffertInfo = ({ offert, id }) => {
           role="navigation"
           aria-label="Akcje oferty"
         >
-          <button className={styles.iconBtn}>Udostępnij</button>
+          <div style={{ display: "flex", gap: " 10px" }}>
+            <button className={styles.iconBtn}>Udostępnij</button>
+            <button className={styles.iconBtn}>Dodaj do ulubionych</button>
+          </div>
 
           <div className={styles.rightActions}>
             <button style={{ all: "unset", cursor: "pointer" }}>
               <IoMdClose
                 onClick={() => {
                   document.querySelector(
-                    `.offert-details-container${id}`
+                    `.offer-details-container${id}`
                   ).style.display = "none";
 
                   document.querySelector("#root").style.overflow = "auto";
@@ -67,28 +70,26 @@ const OffertInfo = ({ offert, id }) => {
         <section className={styles.hero}>
           <div className={styles.headerLeft}>
             <h1 id="job-title" className={styles.title}>
-              {offert?.title}
+              {offer?.title}
             </h1>
             <div className={styles.sub}>
               <div className={styles.company}>
-                <span className={styles.companyName}>
-                  {offert?.companyName}
-                </span>
+                <span className={styles.companyName}>{offer?.companyName}</span>
               </div>
 
               <div className={styles.meta}>
                 Zarobki:
-                {offert?.salary === "not available" ? (
+                {offer?.salary === "not available" ? (
                   <span className={styles.salary}>Nie podano</span>
                 ) : (
-                  <span className={styles.salary}>{offert?.salary}</span>
+                  <span className={styles.salary}>{offer?.salary}</span>
                 )}
               </div>
             </div>
           </div>
           <div className={styles.headerRight}>
             <button className={styles.applyBtn}>
-              <a href={offert.link} target="_blank" style={{ all: "unset" }}>
+              <a href={offer.link} target="_blank" style={{ all: "unset" }}>
                 Szczegóły aplikacji
               </a>
             </button>
@@ -99,8 +100,8 @@ const OffertInfo = ({ offert, id }) => {
           <article className={styles.leftCol}>
             <h3 className={styles.sectionTitle}>Wymagane technologie</h3>
             <ul className={styles.techList}>
-              {JSON.parse(offert.technologies).length != 0 ? (
-                JSON.parse(offert.technologies).map((el) => <li>{el}</li>)
+              {JSON.parse(offer.technologies).length > 0 ? (
+                JSON.parse(offer.technologies).map((el) => <li>{el}</li>)
               ) : (
                 <li>Brak podanych technologii</li>
               )}
@@ -131,11 +132,11 @@ const OffertInfo = ({ offert, id }) => {
             <div className={styles.companyBox}>
               <div className={styles.companyRow}>
                 <div className={styles.companyLogoSmall}>
-                  <img src={offert?.img} alt="zdjecie" />
+                  <img src={offer?.img} alt="zdjecie" />
                 </div>
                 <div>
                   <div className={styles.companyNameSmall}>
-                    {offert?.companyName}
+                    {offer?.companyName}
                   </div>
                 </div>
               </div>
@@ -152,7 +153,7 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Typ umowy:
                   <ul>
-                    {JSON.parse(offert?.contractType || "[]").map((el) => {
+                    {JSON.parse(offer?.contractType || "[]").map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>
@@ -164,7 +165,7 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Doświadczenie:{" "}
                   <ul>
-                    {JSON.parse(offert?.experience || "[]").map((el) => {
+                    {JSON.parse(offer?.experience || "[]").map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>
@@ -176,15 +177,14 @@ const OffertInfo = ({ offert, id }) => {
                 <li>
                   Lokalizacja:{" "}
                   <ul>
-                    {JSON.parse(offert?.workingMode || "[]")[1]?.length ===
-                    0 ? (
+                    {JSON.parse(offer?.workingMode || "[]")[1]?.length === 0 ? (
                       <li>
                         <strong>
-                          {JSON.parse(offert?.workingMode || "[]")[0]}
+                          {JSON.parse(offer?.workingMode || "[]")[0]}
                         </strong>
                       </li>
                     ) : (
-                      JSON.parse(offert?.workingMode || "[]")[1]?.map((el) => {
+                      JSON.parse(offer?.workingMode || "[]")[1]?.map((el) => {
                         return (
                           <li>
                             <strong>{el}</strong>
@@ -203,4 +203,4 @@ const OffertInfo = ({ offert, id }) => {
   );
 };
 
-export default OffertInfo;
+export default OfferInfo;

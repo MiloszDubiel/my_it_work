@@ -36,9 +36,6 @@ export async function getFillteredOfferts({ title, experience, location }) {
   const params = [];
 
 
-
-
-
   if (title && title.trim() !== "") {
     sql += " AND title LIKE ?";
     params.push(`%${title}%`);
