@@ -1,315 +1,236 @@
-import { useState } from "react";
-import styles from "./addJobOffert.module.css";
+import React, { useState } from "react";
+import axios from "axios";
+import styles from "./AddJobOffer.module.css"; // możesz użyć tego samego pliku CSS co wcześniej
 import { IoMdClose } from "react-icons/io";
 
-const AddJobOffert = () => {
-  const [cities, setCities] = useState(new Set());
-  const [technologie, setTechnologie] = useState(new Set());
-
-  const [form, setForm] = useState({
+const AddJobOffer = ({
+  currentUserId /* opcjonalnie jeśli nie masz auth */,
+}) => {
+  const [formData, setFormData] = useState({
     title: "",
-    company: "",
+    company_name: "",
     location: "",
-    contractType: "B2B",
-    experience: "Intern",
-    technologies: [],
+    contract_type: "B2B",
+    experience_level: "Junior",
+    technologies: "",
+    description: "",
+    salary_min: "",
+    salary_max: "",
   });
-
-
+  const [serverResp, setServerResp] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [existingOffer, setExistingOffer] = useState(null);
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTechToggle = (tech) => {
-    setForm((prev) => {
-      if (prev.technologies.includes(tech)) {
-        return {
-          ...prev,
-          technologies: prev.technologies.filter((t) => t !== tech),
-        };
-      } else {
-        return { ...prev, technologies: [...prev.technologies, tech] };
-      }
-    });
-  };
-
-  const submitForm = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.company || !form.location) return;
+    setMessage("");
+    setServerResp(null);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/employers/add-offer",
+        {
+          ...formData,
+          userId: currentUserId, // jeżeli nie masz auth middleware - inaczej backend użyje req.user
+        }
+      );
 
-    setForm({
-      title: "",
-      company: "",
-      location: "",
-      contractType: "B2B",
-      experience: "Intern",
-      technologies: [],
-    });
+      if (res.data.alreadyExists) {
+        setExistingOffer(res.data.existing);
+        setModalOpen(true);
+      } else if (res.data.inserted) {
+        setMessage("Oferta dodana pomyślnie.");
+        setFormData({
+          title: "",
+          company_name: "",
+          location: "",
+          contract_type: "B2B",
+          experience_level: "Junior",
+          technologies: "",
+          description: "",
+          salary_min: "",
+          salary_max: "",
+          external_link: "",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Błąd serwera");
+    }
   };
 
-  const removeElement = (e, type) => {
-    if (type === "city") {
-      cities.forEach((el) => {
-        if (el === e.target.textContent) {
-          cities.delete(el);
-        }
+  const handleClaim = async () => {
+    if (!existingOffer) return;
+    try {
+      const res = await axios.post("http://localhost:5000/job/claim", {
+        offerId: existingOffer.id,
+        userId: currentUserId, // jeśli brak auth - inaczej backend powinien korzystać z req.user
       });
-      setCities(new Set([...cities]));
-    } else {
-      technologie.forEach((el) => {
-        if (el === e.target.textContent) {
-          technologie.delete(el);
-        }
-      });
-      setTechnologie(new Set([...technologie]));
+      if (res.data.ok) {
+        setMessage("Oferta przypisana do Twojego konta.");
+        setModalOpen(false);
+      } else {
+        setMessage("Nie udało się przypisać oferty.");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Błąd serwera podczas przypisywania.");
     }
   };
 
   return (
-    <div
-      className={styles.container}
-      id="jobOffertContainer"
-      style={{ display: "none" }}
-    >
-      <div className={styles.addLocations} style={{ display: "none" }}>
-        <div className={styles.close}>
-          <IoMdClose
-            onClick={() => {
-              document.querySelector(`.${styles.addLocations}`).style.display =
-                "none";
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <label>Lokalizacja</label>
-          <input
-            type="text"
-            name="location"
-            placeholder="np. Rzeszów"
-            required
-            id="location"
-          />
-          <input
-            type="button"
-            name="add-location"
-            value="Dodaj"
-            className={styles.citiesButton}
-            onClick={() => {
-              let location = document.querySelector("#location").value.trim();
-              if (location.length === 0) {
-                return alert("Niepoprawna wartosc w polu Lokalizacja");
-              }
-
-              document.querySelector(`.${styles.addLocations}`).style.display =
-                "none";
-
-              setCities(new Set([...cities, location]));
-            }}
-          />
-        </div>
-      </div>
-      <div className={styles.addTechnologie} style={{ display: "none" }}>
-        <div className={styles.close}>
-          <IoMdClose
-            onClick={() => {
-              document.querySelector(
-                `.${styles.addTechnologie}`
-              ).style.display = "none";
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <label>Technologia:</label>
-          <input
-            type="text"
-            name="technologie"
-            placeholder="np. TypeScript"
-            required
-            id="technologie"
-          />
-          <input
-            type="button"
-            name="add-technologie"
-            value="Dodaj"
-            className={styles.citiesButton}
-            onClick={() => {
-              let tech = document.querySelector("#technologie").value.trim();
-
-              if (tech.length === 0) {
-                return alert("Niepoprawna wartosc w polu Technologia");
-              }
-
-              setTechnologie(new Set([...technologie, tech]));
-
-              document.querySelector(
-                `.${styles.addTechnologie}`
-              ).style.display = "none";
-            }}
-          />
-        </div>
-      </div>
-      <div className={styles.wrap}>
-        <div className={styles.close}>
-          <IoMdClose
-            onClick={() => {
-              document.querySelector("#jobOffertContainer").style.display =
-                "none";
-            }}
-          />
+    <div className={styles.container1} id="add-offer">
+      <div className={styles.container}>
+        <div className={styles.rightActions}>
+          <button style={{ all: "unset", cursor: "pointer" }}>
+            <IoMdClose
+              onClick={() => {
+                document.querySelector("#add-offer").style.display = "none";
+                document.querySelector("#root").style.overflow = "auto";
+              }}
+            />
+          </button>
         </div>
         <h2>Dodaj ofertę pracy</h2>
-        <form className={styles.form} onSubmit={submitForm}>
-          <div className={styles.row}>
-            <label>Nazwa stanowiska</label>
+        {message && <div className={styles.info}>{message}</div>}
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <label>
+            Stanowisko*
             <input
-              type="text"
               name="title"
-              value={form.title}
+              value={formData.title}
               onChange={handleChange}
-              placeholder="np. Frontend Developer"
               required
+            />
+          </label>
+          <label>
+            Firma*
+            <input
+              name="company_name"
+              value={formData.company_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <label>
+            Lokalizacja
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            Typ umowy
+            <select
+              name="contract_type"
+              value={formData.contract_type}
+              onChange={handleChange}
+            >
+              <option value="B2B">B2B</option>
+              <option value="Umowa o pracę">Umowa o pracę</option>
+            </select>
+          </label>
+          <label>
+            Doświadczenie
+            <select
+              name="experience_level"
+              value={formData.experience_level}
+              onChange={handleChange}
+            >
+              <option>Intern</option>
+              <option>Junior</option>
+              <option>Mid</option>
+              <option>Senior</option>
+            </select>
+          </label>
+          <label>
+            Technologie (oddziel przecinkami)
+            <input
+              name="technologies"
+              value={formData.technologies}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            Opis*
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <div className={styles.salary}>
+            <input
+              type="number"
+              name="salary_min"
+              placeholder="Min"
+              value={formData.salary_min}
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="salary_max"
+              placeholder="Max"
+              value={formData.salary_max}
+              onChange={handleChange}
             />
           </div>
 
-          <div className={styles.row}>
-            <label>Firma</label>
-            <select
-              name="company"
-              value={form.company}
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>
-                -- wybierz firmę --
-              </option>
-              <option>Brak firmy</option>
-            </select>
-          </div>
-
-          <div className={styles.row}>
-            <label>
-              Lokalizacja:{" "}
-              <span style={{ fontSize: "10px" }}>
-                (kliknij podwójnie, aby usunąć)
-              </span>
-            </label>
-            <div className={styles.rowDiv}>
-              <div className={styles.cities}>
-                {[...cities].map((el) => {
-                  return (
-                    <span
-                      onDoubleClick={(e) => {
-                        removeElement(e, "city");
-                      }}
-                    >
-                      {el}
-                    </span>
-                  );
-                })}
-              </div>
-              <input
-                type="button"
-                name="Remote"
-                value="Remote"
-                className={styles.citiesButton}
-                onClick={() => {
-                  setCities(new Set([...cities, "Remote"]));
-                }}
-              />
-              <input
-                type="button"
-                name="add-location"
-                value="+ Dodaj"
-                className={styles.citiesButton}
-                onClick={() => {
-                  document.querySelector(
-                    `.${styles.addLocations}`
-                  ).style.display = "flex";
-                }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.row}>
-            <label>Typ umowy</label>
-            <select
-              name="contractType"
-              value={form.contractType}
-              onChange={handleChange}
-            >
-              <option value="Kontrakt B2B">Kontrakt B2B</option>
-              <option value="Umowa o pracę">Umowa o pracę</option>
-            </select>
-          </div>
-
-          <div className={styles.row}>
-            <label>Doświadczenie</label>
-            <select
-              name="experience"
-              value={form.experience}
-              onChange={handleChange}
-            >
-              <option value="Intern">Intern</option>
-              <option value="Junior">Junior</option>
-              <option value="Mid/Regular">Mid/Regular</option>
-              <option value="Senior">Senior</option>
-              <option value="Lead/Principal">Lead/Principal</option>
-            </select>
-          </div>
-
-          <div className={styles.row}>
-            <label>
-              Technologie:
-              <span style={{ fontSize: "10px" }}>
-                (kliknij podwójnie, aby usunąć)
-              </span>
-            </label>
-            <div className={styles.rowDiv}>
-              <div className={styles.cities}>
-                {[...technologie].map((el) => {
-                  return (
-                    <span
-                      onDoubleClick={(e) => {
-                        removeElement(e, "technology");
-                      }}
-                    >
-                      {el}
-                    </span>
-                  );
-                })}
-              </div>
-              <input
-                type="button"
-                name="Remote"
-                value="Remote"
-                className={styles.citiesButton}
-                disabled
-                style={{ visibility: "hidden" }}
-              />
-              <input
-                type="button"
-                name="add-location"
-                value="+ Dodaj"
-                className={styles.citiesButton}
-                onClick={() => {
-                  document.querySelector(
-                    `.${styles.addTechnologie}`
-                  ).style.display = "flex";
-                }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <button type="submit" className={styles.primary}>
-              Dodaj ofertę
-            </button>
-          </div>
+          <button type="submit" className={styles.submitBtn}>
+            Wyślij
+          </button>
         </form>
+
+        {/* Modal potwierdzenia */}
+        {modalOpen && existingOffer && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <h3>Oferta podobna / istniejąca</h3>
+              <p>
+                Wygląda na to, że podobna oferta już istnieje w naszej bazie:
+              </p>
+              <div className={styles.existing}>
+                <h4>{existingOffer.title}</h4>
+                <p>
+                  <strong>Firma:</strong> {existingOffer.company_name}
+                </p>
+                <p>
+                  <strong>Lokalizacja:</strong> {existingOffer.location}
+                </p>
+                <p>
+                  <strong>Źródło:</strong> {existingOffer.source || "scraped"}
+                </p>
+                <p style={{ fontSize: 12, color: "#666" }}>
+                  Kliknij "Przypisz", aby przypisać ofertę do Twojego konta i
+                  przejąć nad nią kontrolę (edycja / publikacja).
+                </p>
+              </div>
+
+              <div className={styles.modalActions}>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className={styles.btnGray}
+                >
+                  Anuluj
+                </button>
+                <button onClick={handleClaim} className={styles.btnPrimary}>
+                  Przypisz ofertę
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-export default AddJobOffert;
+
+export default AddJobOffer;

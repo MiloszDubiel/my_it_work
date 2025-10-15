@@ -21,7 +21,7 @@ const MainPage = () => {
     };
     fetchOffers();
   }, []);
-  console.log(offers);
+
   return (
     <div className={styles.container}>
       <Navbar />
@@ -52,7 +52,6 @@ const MainPage = () => {
                 <h3>{el.title}</h3>
                 <p>{el.companyName}</p>
                 <span>
-                  {JSON.parse(el.workingMode)[0]} •
                   {JSON.parse(el.contractType)[0]}
                 </span>
                 <Link to="/job-offers/1" className={styles.detailsBtn}>

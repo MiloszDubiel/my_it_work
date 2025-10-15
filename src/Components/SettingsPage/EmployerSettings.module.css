@@ -1,0 +1,174 @@
+.container1 {
+  width: 100%;
+  position: fixed;
+  height: 100%;
+  background: #0000003d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 111111;
+  display: none;
+}
+.container {
+  display: flex;
+  height: 100vh;
+  background: #f9f9f9;
+  font-family: "Inter", sans-serif;
+  width: 80%;
+  height: 80%;
+  border-radius: 5px;
+  position: relative;
+}
+.rightActions {
+  width: calc(100% - 30px);
+  display: flex;
+  justify-content: end;
+  position: absolute;
+  top: 10px;
+  right: 30px;
+}
+.sidebar {
+  width: 260px;
+  background: #e7e7e7;
+  color: black;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-radius: 5px;
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  gap: 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar li {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar li:hover {
+  background: #0e49c7;
+}
+
+.active {
+  background: #2563eb;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.section h3 {
+  margin-bottom: 1.5rem;
+}
+
+.section form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section label {
+  font-weight: 500;
+}
+
+.section input,
+.section textarea {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.saveBtn,
+.addBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: fit-content;
+}
+
+.saveBtn:hover,
+.addBtn:hover {
+  background: #1d4ed8;
+}
+
+.table {
+  margin-top: 1rem;
+}
+
+.rowHeader,
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.rowHeader {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 0.3rem;
+}
+
+.userList {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.userCard {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 250px;
+}
+
+.error {
+  color: #d9534f;
+  font-size: 13px;
+  padding: 10px 0px;
+  margin-top: -6px;
+}
+
+.info {
+  color: #28a745;
+  padding: 10px 0px;
+   font-size: 13px;
+  margin-top: -6px;
+}

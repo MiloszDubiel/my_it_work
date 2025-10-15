@@ -1,7 +1,6 @@
 import NavBar from "../NavBar/NavBar";
 import { useEffect, useState } from "react";
 import styles from "./ofertinfo.module.css";
-import { useNavigate } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";

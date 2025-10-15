@@ -3,11 +3,9 @@ import styles from "./navbar.module.css";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import AddOffert from "../AddOffert/AddJobOffert";
-import MoreSettings from "../SettingsPage/MoreSettings";
+import EmployerSettings from "../SettingsPage/EmployerSettings";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
-  let searchDiv = useRef(null);
   let account = useRef(null);
 
   //Dane użytkownika po zalogowaniu
@@ -18,11 +16,13 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
 
   return (
     <>
-      <MoreSettings
-        offertPage={offertPage}
-        candidatePage={candidatePage}
-        employersPage={employersPage}
-      />
+      {userData?.role == "employer" ? (
+        <EmployerSettings />
+      ) : userData?.role === "Candidate" ? (
+        " "
+      ) : (
+        ""
+      )}
 
       <header className={styles.headerElement}>
         <nav className={styles.navBar}>
@@ -95,6 +95,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           <div
             className={styles.accountDiv + " " + styles.accountDivHide}
             ref={account}
+            id="accountDiv"
           >
             {userData?.email ? (
               <>
@@ -102,27 +103,27 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   onClick={() => {
                     document.querySelector("#settings").style.display = "flex";
                     document.querySelector("#root").style.overflow = "hidden";
+
+                    sessionStorage.setItem("tab", "company");
+                    window.dispatchEvent(new Event("setting-changed"));
                   }}
                 >
                   Ustawienia
                 </Link>
-                {userData.role === "Employer" ? (
+                {userData.role === "employer" ? (
                   <>
                     {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
 
-                    {offertPage ? (
-                      <Link
-                        onClick={() => {
-                          document.querySelector(
-                            "#jobOffertContainer"
-                          ).style.display = "flex";
-                        }}
-                      >
-                        Dodaj ogłoszenie o pracę
-                      </Link>
-                    ) : (
-                      ""
-                    )}
+                    <Link
+                      onClick={() => {
+                        document.querySelector("#settings").style.display =
+                          "flex";
+                        sessionStorage.setItem("tab", "offers");
+                        window.dispatchEvent(new Event("setting-changed"));
+                      }}
+                    >
+                      Zarządzaj ogłoszeniemi o pracę
+                    </Link>
                   </>
                 ) : (
                   ""
@@ -143,6 +144,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       "user-data",
                       JSON.stringify({ info: "Wylogowano" })
                     );
+                    account.current.classList.toggle(styles.accountDivHide);
                     navigate("/");
                   }}
                 >
