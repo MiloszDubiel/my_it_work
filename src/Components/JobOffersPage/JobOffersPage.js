@@ -5,23 +5,48 @@ import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
 import Filter from "../FilterComponent/Filter";
 import Offer from "../OffertComponent/Offer";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
 
 const JobOffersPage = () => {
   const [offers, setOffers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [info, setInfo] = useState("");
   const offersPerPage = 9;
+
+  const isEmptyObject = (obj) => {
+    for (var prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   useEffect(() => {
     const fetchOffers = async () => {
       try {
+        setIsLoading(true);
+
         const res = await axios.get("http://localhost:5000/api/job-offerts");
-        setOffers(res.data);
+
+        if (!isEmptyObject(res.data)) {
+          setIsLoading(false);
+          setOffers(res.data);
+        } 
+
+
+        
       } catch (err) {
+        setIsLoading(false);
+        setInfo("Brak ofert pracy ");
         console.error("Błąd podczas pobierania ofert:", err);
       }
     };
     fetchOffers();
   }, []);
+
   useEffect(() => {
     window.addEventListener("changed-sort-option", () => {
       const copyOfOferts = [...offers];
@@ -56,13 +81,10 @@ const JobOffersPage = () => {
 
         <div className={styles.offersList}>
           <SortButton offertPage={true} />
-          {currentOffers.length > 0 ? (
-            currentOffers.map((offer, index) => (
-            <Offer offer={offer}/>
-            ))
-          ) : (
-            <p className={styles.noOffers}>Brak dostępnych ofert.</p>
-          )}
+          {currentOffers.length > 0
+            ? currentOffers.map((offer, index) => <Offer offer={offer} />)
+            : isLoading && <LoadingComponent />}
+          {info && <p className={styles.noOffers}>{info}</p>}
         </div>
 
         {totalPages > 1 && (

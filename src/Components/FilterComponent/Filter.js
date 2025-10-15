@@ -18,10 +18,6 @@ const Filter = ({ cadidatePage, offersPage, employersPage }) => {
     setFilters(newFilters);
   };
 
-  const handleReset = () => {
-    const resetFilters = { title: "", experience: "", location: "" };
-    setFilters(resetFilters);
-  };
 
   const handleSearch = () => {
     if (offersPage) {

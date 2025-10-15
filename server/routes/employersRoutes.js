@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import { getEmployers } from "../scrappers/employerScraper.js";
 import {
   saveEmployersToDb,
@@ -58,6 +58,7 @@ router.post("/set-company-info", async (req, res) => {
   }
 
   const rows = await setCompanyInfo(req.body.company);
+  return res.json(rows);
 });
 
 router.post("/add-offer", async (req, res) => {
