@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EmployerSettings from "../SettingsPage/EmployerSettings";
+import CandidateSettings from "../SettingsPage/CandidateSettings";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let account = useRef(null);
@@ -18,8 +19,8 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
     <>
       {userData?.role == "employer" ? (
         <EmployerSettings />
-      ) : userData?.role === "Candidate" ? (
-        " "
+      ) : userData?.role === "candidate" ? (
+        <CandidateSettings />
       ) : (
         ""
       )}

@@ -5,7 +5,7 @@ import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
-  const [userData, setUserData] = useState(
+  const [userData, ] = useState(
     JSON.parse(sessionStorage.getItem("user-data"))
   );
   const [company, setCompany] = useState({});
