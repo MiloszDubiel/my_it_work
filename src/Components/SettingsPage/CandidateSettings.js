@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [profile, setProfile] = useState([]);
+  const [info, setInfo] = useState("");
+  const [error, setErorr] = useState("");
 
   const [DataToChange, setDataToChange] = useState({
     ...userData,
@@ -16,12 +19,47 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
     repo: "",
   });
 
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  const [candidateProfile, setCandidateProfile] = useState({
+    location: "",
+    phone_number: "",
+    current_position: "",
+    desired_position: "",
+    career_level: "Junior",
+    years_of_experience: "",
+    skills: [],
+    languages: [],
+    education: [],
+    cv_link: "",
+    portfolio_link: "",
+    linkedin: "",
+    github: "",
+    availability: "",
+    remote_preference: "Remote",
+  });
 
-  const [cvName, setCvName] = useState("");
-  const [coverName, setCoverName] = useState("");
-  const [info, setInfo] = useState("");
-  const [error, setErorr] = useState("");
+  const [cvFile, setCvFile] = useState(null);
+  const [coverLetterFile, setCoverLetterFile] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const cvInputRef = useRef();
+  const coverInputRef = useRef();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCandidateProfile({ ...candidateProfile, [name]: value });
+  };
+
+  useEffect(() => {
+    axios.post("http://localhost:5000/user/get-candiate-info", {
+      id: userData.id,
+    });
+
+    axios
+      .post("http://localhost:5000/user/has-candiate-profile", {
+        id: userData.id,
+      })
+      .then((res) => setProfile(res.data.info));
+  }, []);
 
   const handleSubmitUserInfo = async (e) => {
     e.preventDefault();
@@ -80,7 +118,77 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
     } catch (err) {}
   };
 
-  const handleSaveCandiateProfile = (e) => {};
+  const handleSavecandidateProfile = (e) => {};
+
+  const addSkillorLanguage = (e, type) => {
+    if (type === "skill") {
+      setCandidateProfile({
+        ...candidateProfile,
+        skills: [...new Set([...candidateProfile.skills, e.target.value])],
+      });
+    } else {
+      setCandidateProfile({
+        ...candidateProfile,
+        languages: [
+          ...new Set([...candidateProfile.languages, e.target.value]),
+        ],
+      });
+    }
+  };
+
+  const deleteSkillorLanguage = (e, type) => {
+    if (type === "skill") {
+      const skills = new Set([...candidateProfile.skills]);
+      skills.delete(e.target.textContent);
+
+      setCandidateProfile({
+        ...candidateProfile,
+        skills: [...skills],
+      });
+    } else if (type === "lang") {
+      const languages = new Set([...candidateProfile.languages]);
+      languages.delete(e.target.textContent);
+
+      setCandidateProfile({
+        ...candidateProfile,
+        languages: [...languages],
+      });
+    } else {
+      const education = new Set([...candidateProfile.education]);
+      education.delete(e.target.textContent);
+
+      setCandidateProfile({
+        ...candidateProfile,
+        education: [...education],
+      });
+    }
+  };
+
+  const addSkillLanguageorSchoolFromInput = (e, type) => {
+    if (type === "skill") {
+      let input = e.target.parentElement.querySelector("input");
+      if (input.value.length === 0) return;
+
+      setCandidateProfile({
+        ...candidateProfile,
+        skills: [...new Set([...candidateProfile.skills, input.value])],
+      });
+    } else if (type === "lang") {
+      let input = e.target.parentElement.querySelector("input");
+      if (input.value.length === 0) return;
+      setCandidateProfile({
+        ...candidateProfile,
+        languages: [...new Set([...candidateProfile.languages, input.value])],
+      });
+    } else {
+      let input = e.target.parentElement.querySelector("input");
+      if (input.value.length === 0) return;
+      setCandidateProfile({
+        ...candidateProfile,
+        education: [...new Set([...candidateProfile.education, input.value])],
+      });
+    }
+  };
 
   return (
     <div className={styles.container1} id="settings">
@@ -197,47 +305,273 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
           )}
 
           {activeTab === "candidate-profile" && (
-            <form className={styles.form} onSubmit={handleSaveCandiateProfile}>
+            <form className={styles.form} onSubmit={handleSavecandidateProfile}>
               <h2>Ustawienia profilu kandydata</h2>
+              {/* {candidateProfile.length === 0 && (
+                <p>Brak profilu kandydata...</p>
+              )} */}
+              {candidateProfile.length ? (
+                <button className={styles.saveBtn}>Utwórz profil</button>
+              ) : (
+                <>
+                  <label>Lokalizacja</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={candidateProfile.location}
+                    onChange={handleChange}
+                    placeholder="np. Warszawa"
+                    required
+                  />
 
-              {/* CV */}
-              <label>CV</label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  setDataToChange({ ...DataToChange, cv: file });
-                  setCvName(file?.name || "");
-                }}
-              />
-              {cvName && <p className={styles.cvInfo}>📄 {cvName}</p>}
+                  <label>Numer telefonu</label>
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    value={candidateProfile.phone_number}
+                    onChange={handleChange}
+                    placeholder="123456789"
+                    pattern="[0-9]{9}"
+                    required
+                  />
 
-              {/* List motywacyjny */}
-              <label>List motywacyjny</label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  setDataToChange({ ...DataToChange, coverLetter: file });
-                  setCoverName(file?.name || "");
-                }}
-              />
+                  <label>Aktualne stanowisko</label>
+                  <input
+                    type="text"
+                    name="current_position"
+                    value={candidateProfile.current_position}
+                    onChange={handleChange}
+                    placeholder="Frontend Developer"
+                  />
+                  <label>Stanowisko docelowe</label>
+                  <input
+                    type="text"
+                    name="desired_position"
+                    value={candidateProfile.desired_position}
+                    onChange={handleChange}
+                    placeholder="Senior Frontend Developer"
+                  />
 
-              {/* Link do repozytrium */}
-              <label>Link do repozytrium</label>
-              <input
-                type="link"
-                value={DataToChange.link}
-                onChange={(e) =>
-                  setDataToChange({ ...DataToChange, repo: e.target.value })
-                }
-              />
+                  <label>Poziom doświadczenia</label>
+                  <select
+                    name="career_level"
+                    value={candidateProfile.career_level}
+                    onChange={handleChange}
+                  >
+                    <option>Intern</option>
+                    <option>Junior</option>
+                    <option>Mid</option>
+                    <option>Senior</option>
+                    <option>Lead</option>
+                  </select>
 
-              <button type="submit" className={styles.saveBtn}>
-                Zapisz zmiany
-              </button>
+                  <label>Lata doświadczenia</label>
+                  <select
+                    name="experience_years"
+                    value={candidateProfile.career_level}
+                    onChange={handleChange}
+                  >
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4+</option>
+                  </select>
+
+                  <label>
+                    Umiejętności{" "}
+                    <span className={styles.span}>
+                      Kliknij podwójnie aby usunąć
+                    </span>{" "}
+                  </label>
+                  <div className={styles.skill}>
+                    <div className={styles.skillsList}>
+                      {candidateProfile.skills?.map((el) => {
+                        return (
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onDoubleClick={(e) =>
+                              deleteSkillorLanguage(e, "skill")
+                            }
+                          >
+                            {el}
+                          </span>
+                        );
+                      })}
+                    </div>
+
+                    <select
+                      name="skills"
+                      onChange={(e) => addSkillorLanguage(e, "skill")}
+                    >
+                      <option>JavaScript</option>
+                      <option>TypeScript</option>
+                      <option>Java</option>
+                      <option>C</option>
+                      <option>C++</option>
+                      <option>C#</option>
+                      <option>Python</option>
+                      <option>Kotlin</option>
+                      <option>Rust</option>
+                      <option>Node.js</option>
+                      <option>React.js</option>
+                      <option>Angular.js</option>
+                      <option>Vue.js</option>
+                      <option>Inna...</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="add_skill"
+                      placeholder="Inna umiejętność..."
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        addSkillLanguageorSchoolFromInput(e, "skill")
+                      }
+                      className={styles.saveBtn}
+                    >
+                      Dodaj
+                    </button>
+                  </div>
+
+                  <label>
+                    Języki
+                    <span className={styles.span}>
+                      Kliknij podwójnie aby usunąć
+                    </span>
+                  </label>
+                  <div className={styles.skill}>
+                    <div className={styles.skillsList}>
+                      {candidateProfile.languages?.map((el) => {
+                        return (
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onDoubleClick={(e) =>
+                              deleteSkillorLanguage(e, "lang")
+                            }
+                          >
+                            {el}
+                          </span>
+                        );
+                      })}
+                    </div>
+
+                    <select
+                      name="languages"
+                      onChange={(e) => addSkillorLanguage(e, "lang")}
+                    >
+                      <option>Angielski podstawowy</option>
+                      <option>Angielski sredniozaawansowany</option>
+                      <option>Angielski zaawansowany</option>
+                      <option>Niemieck podstawowy</option>
+                      <option>Niemiecki średniozaawansowany</option>
+                      <option>Niemiecki zaawansowany</option>
+                      <option>Inny</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="add_language"
+                      placeholder="Inny język..."
+                    />
+
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        addSkillLanguageorSchoolFromInput(e, "lang")
+                      }
+                      className={styles.saveBtn}
+                    >
+                      Dodaj
+                    </button>
+                  </div>
+
+                  <label>
+                    Edukacja
+                    <span className={styles.span}>
+                      Kliknij podwójnie aby usunąć
+                    </span>{" "}
+                  </label>
+                  <div className={styles.skill}>
+                    <div className={styles.skillsList}>
+                      {candidateProfile.education?.map((el) => {
+                        return (
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onDoubleClick={(e) =>
+                              deleteSkillorLanguage(e, "sch")
+                            }
+                          >
+                            {el}
+                          </span>
+                        );
+                      })}
+                    </div>
+
+                    <input
+                      type="text"
+                      name="add_language"
+                      placeholder="Szkoła..."
+                    />
+
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        addSkillLanguageorSchoolFromInput(e, "sch")
+                      }
+                      className={styles.saveBtn}
+                    >
+                      Dodaj
+                    </button>
+                  </div>
+
+                  <label>📎 CV</label>
+                  <input
+                    type="file"
+                    ref={cvInputRef}
+                    accept=".pdf"
+                    onChange={(e) => setCvFile(e.target.files[0])}
+                  />
+
+                  <label>List motywacyjny</label>
+                  <input
+                    type="file"
+                    ref={coverInputRef}
+                    accept=".pdf"
+                    onChange={(e) => setCoverLetterFile(e.target.files[0])}
+                  />
+
+                  <label>GitHub</label>
+                  <input
+                    type="url"
+                    name="github"
+                    value={candidateProfile.github}
+                    onChange={handleChange}
+                    placeholder="https://github.com/..."
+                  />
+
+                  <label>Dostępność</label>
+                  <select name="access">
+                    <option>Od zaraz</option>
+                    <option>Za tydzień</option>
+                    <option>W przyszłym miesiącu</option>
+                  </select>
+
+                  <label>Tryb pracy</label>
+                  <select
+                    name="remote_preference"
+                    value={candidateProfile.remote_preference}
+                    onChange={handleChange}
+                  >
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                    <option>On-site</option>
+                  </select>
+
+                  <button type="submit" className={styles.saveBtn}>
+                    Zapisz zmiany
+                  </button>
+                </>
+              )}
             </form>
           )}
 

@@ -1,7 +1,7 @@
-import express from "express";
+import express, { json } from "express";
 import multer from "multer";
 import { connection } from "../config/db.js";
-import { editUser } from "../services/settingService.js";
+import { editUser, getCandiatInfo } from "../services/settingService.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -39,6 +39,35 @@ router.post("/upload-avatar", upload.single("avatar"), async (req, res) => {
     console.error("Błąd przy zapisie avatara:", error);
     res.status(500).json({ error: "Błąd serwera przy zapisie avatara" });
   }
+});
+
+router.post("/get-candiate-info", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "Niepoprawne dane" });
+  }
+
+  const candiat = await getCandiatInfo(id);
+  return res.json({ candiate: candiat });
+});
+
+router.post("/has-candiate-profile", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "Niepoprawne dane" });
+  }
+
+  const [row] = await connection.query(
+    "SELECT * FROM candidate_info WHERE user_id = ?",
+    [id]
+  );
+
+  return res.json({ info: row });
+
+
+  
 });
 
 export default router;

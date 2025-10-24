@@ -47,3 +47,17 @@ export async function editUser({
 
   return { info: "Zapisano zmiany", userData: userData[0] };
 }
+
+export async function getCandiatInfo(id) {
+  const [row] = await connection.query(
+    "SELECT * FROM applications WHERE user_id = ?",
+    [id]
+  );
+
+  if (row.length === 0) {
+    return false;
+  }
+
+  return row;
+  
+}
