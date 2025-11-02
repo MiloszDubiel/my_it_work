@@ -360,7 +360,7 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
                   >
                     <option>Intern</option>
                     <option>Junior</option>
-                    <option>Mid</option>
+                    <option>Mid / Regular</option>
                     <option>Senior</option>
                     <option>Lead</option>
                   </select>

@@ -248,7 +248,7 @@ const EmployerSettings = () => {
               <button
                 className={styles.addBtn}
                 onClick={() => {
-                  document.querySelector("#add-offer").style.display = "flex";
+                  document.querySelector("#add-job-offer").style.display = "flex";
                 }}
               >
                 ➕ Dodaj nową ofertę
@@ -262,6 +262,13 @@ const EmployerSettings = () => {
                   <span>Akcje</span>
                 </div>
                 <div className={styles.row}>
+
+
+
+
+
+
+                  
                   <span>Frontend Developer</span>
                   <span>Aktywna</span>
                   <span>12.10.2025</span>
