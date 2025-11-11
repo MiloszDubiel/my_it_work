@@ -271,6 +271,17 @@
   font-size: 14px;
   color: #374151;
 }
+.starFilled {
+  color: #ffb800;
+  width: 28px;
+  height: 28px;
+}
+
+.starEmpty {
+  color: #ccc;
+  width: 28px;
+  height: 28px;
+}
 
 /* small screens */
 @media (max-width: 900px) {

@@ -60,7 +60,7 @@ const Offer = ({ offer, index }) => {
           className={styles.actions}
           onClick={() => {
             document.querySelector(
-              `.offer-details-container${index}`
+              `.offer-details-container${offer.id}`
             ).style.display = "flex";
 
             document.querySelector("#root").style.overflow = "hidden";

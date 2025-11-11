@@ -109,6 +109,16 @@ const CandidateSettings = ({ applications = [] }) => {
       });
   }, []);
 
+  useEffect(() => {
+    document.addEventListener("setIsFavorite", () => {
+      axios
+        .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+        .then((res) => {
+          setFavorites(res.data);
+        });
+    });
+  });
+
   const handleSubmitUserInfo = async (e) => {
     e.preventDefault();
 
@@ -782,7 +792,15 @@ const CandidateSettings = ({ applications = [] }) => {
                 <p>Brak zapisanych ofert.</p>
               ) : (
                 favorites.map((offer) => (
-                  <div key={offer.id} className={styles.offerCard}>
+                  <div
+                    key={offer.id}
+                    className={styles.offerCard}
+                    onClick={() => {
+                      document.querySelector(
+                        `.offer-details-container${offer.id}`
+                      ).style.display = "flex";
+                    }}
+                  >
                     <img src={offer.img} alt={offer.title} />
                     <div>
                       <h4>{offer.title}</h4>

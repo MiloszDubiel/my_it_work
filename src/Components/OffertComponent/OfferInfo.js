@@ -4,6 +4,7 @@ import styles from "./ofertinfo.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import { CiStar } from "react-icons/ci";
 
 async function fetchDetails(link, type) {
   const response = await axios.post(
@@ -20,6 +21,11 @@ async function fetchDetails(link, type) {
 const OfferInfo = ({ offer, id }) => {
   const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+
+  console.log(offer.id);
 
   useEffect(() => {
     setIsLoading(true);
@@ -35,10 +41,49 @@ const OfferInfo = ({ offer, id }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const checkFavorite = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`
+        );
+        setIsFavorite(res.data.isFavorite);
+      } catch (err) {
+        console.error("Błąd przy sprawdzaniu ulubionych:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (offer?.id && userData?.id) checkFavorite();
+  }, [offer?.id, userData?.id]);
+
+  const toggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await axios.delete(
+          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`
+        );
+        setIsFavorite(false);
+        sessionStorage.setItem("setIsFavorite", false);
+        window.dispatchEvent(new Event("setIsFavorite"));
+      } else {
+        await axios.post("http://localhost:5000/api/job-offerts/favorites", {
+          user_id: userData.id,
+          offer_id: offer.id,
+        });
+        setIsFavorite(true);
+        sessionStorage.setItem("setIsFavorite", true);
+        window.dispatchEvent(new Event("setIsFavorite"));
+      }
+    } catch (err) {
+      console.error("Błąd przy aktualizacji ulubionych:", err);
+    }
+  };
   return (
     <div
       id="offer-details-container"
-      className={styles.container + " " + `offer-details-container${id}`}
+      className={styles.container + " " + `offer-details-container${offer.id}`}
     >
       <main className={styles.wrapper} aria-labelledby="job-title">
         <nav
@@ -48,7 +93,13 @@ const OfferInfo = ({ offer, id }) => {
         >
           <div style={{ display: "flex", gap: " 10px" }}>
             <button className={styles.iconBtn}>Udostępnij</button>
-            <button className={styles.iconBtn}>Dodaj do ulubionych</button>
+            <button onClick={toggleFavorite} className={styles.iconBtn}>
+              {isFavorite ? (
+                <CiStar className={styles.starFilled} />
+              ) : (
+                <CiStar className={styles.starEmpty} />
+              )}
+            </button>
           </div>
 
           <div className={styles.rightActions}>
@@ -56,7 +107,7 @@ const OfferInfo = ({ offer, id }) => {
               <IoMdClose
                 onClick={() => {
                   document.querySelector(
-                    `.offer-details-container${id}`
+                    `.offer-details-container${offer.id}`
                   ).style.display = "none";
 
                   document.querySelector("#root").style.overflow = "auto";
