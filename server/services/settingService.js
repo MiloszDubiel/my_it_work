@@ -50,7 +50,7 @@ export async function editUser({
 
 export async function getCandiatInfo(id) {
   const [row] = await connection.query(
-    "SELECT * FROM applications WHERE user_id = ?",
+    "SELECT * FROM candidate_info WHERE user_id = ?",
     [id]
   );
 
@@ -59,5 +59,4 @@ export async function getCandiatInfo(id) {
   }
 
   return row;
-  
 }

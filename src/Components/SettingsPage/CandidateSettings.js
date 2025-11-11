@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
-const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
+const CandidateSettings = ({ applications = [] }) => {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
-  const [profile, setProfile] = useState([]);
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
-
   const [DataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -18,7 +16,7 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
     avatar: null,
     repo: "",
   });
-
+  const [favorites, setFavorites] = useState([]);
   const [candidateProfile, setCandidateProfile] = useState({
     location: "",
     phone_number: "",
@@ -36,10 +34,11 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
     availability: "",
     remote_preference: "Remote",
   });
-
   const [cvFile, setCvFile] = useState(null);
   const [coverLetterFile, setCoverLetterFile] = useState(null);
-  const [message, setMessage] = useState("");
+  const [isCreated, setIsCreate] = useState(false);
+  const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
 
   const cvInputRef = useRef();
   const coverInputRef = useRef();
@@ -50,15 +49,64 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
   };
 
   useEffect(() => {
-    axios.post("http://localhost:5000/user/get-candiate-info", {
-      id: userData.id,
-    });
-
     axios
       .post("http://localhost:5000/user/has-candiate-profile", {
         id: userData.id,
       })
-      .then((res) => setProfile(res.data.info));
+      .then((res) => {
+        return res.data.info?.length > 0 ? setIsCreate(true) : "";
+      });
+    axios
+      .post(
+        "http://localhost:5000/user/get-candiate-info",
+        {
+          id: userData.id,
+        },
+        {}
+      )
+      .then((res) => {
+        console.log(res.data);
+        setCandidateProfile({
+          ...candidateProfile,
+          career_level: res.data.candiate[0]?.exp,
+          languages: JSON.parse(res.data.candiate[0]?.lang),
+          education: JSON.parse(res.data.candiate[0]?.edu),
+          location: res.data.candiate[0]?.locations,
+          desired_position: res.data.candiate[0]?.target_job,
+          current_position: res.data.candiate[0]?.present_job,
+          phone_number: res.data.candiate[0].phone_number,
+          availability: res.data.candiate[0].access,
+          remote_preference: res.data.candiate[0].working_mode,
+          skills: JSON.parse(res.data.candiate[0]?.skills),
+          github: res.data.candiate[0].link_git,
+        });
+      });
+
+    axios
+      .get(`http://localhost:5000/user/candidate-cv/${userData.id}`, {
+        responseType: "arraybuffer",
+      })
+      .then((res) => {
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        setCvPreviewUrl(url);
+      });
+
+    axios
+      .get(`http://localhost:5000/user/candidate-cover/${userData.id}`, {
+        responseType: "arraybuffer",
+      })
+      .then((res) => {
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        setCoverPreviewUrl(url);
+      });
+
+    axios
+      .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+      .then((res) => {
+        setFavorites(res.data);
+      });
   }, []);
 
   const handleSubmitUserInfo = async (e) => {
@@ -118,7 +166,65 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
     } catch (err) {}
   };
 
-  const handleSavecandidateProfile = (e) => {};
+  const handleSavecandidateProfile = async (e) => {
+    e.preventDefault();
+
+    setInfo("");
+    setErorr("");
+    if (!candidateProfile.location.trim()) {
+      setErorr("Lokalizacja nie może być pusta.");
+      return;
+    }
+    if (!candidateProfile.current_position.trim()) {
+      setErorr("Aktualne stanowisko nie może być puste.");
+    }
+    if (!candidateProfile.desired_position.trim()) {
+      setErorr("Stanowisko docelowe nie może być puste.");
+      return;
+    }
+    const phoneRegex = /^[0-9]{9}$/;
+    if (!phoneRegex.test(candidateProfile.phone_number)) {
+      setErorr("Numer telefonu musi składać się z 9 cyfr.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("locations", candidateProfile.location || "");
+    formData.append("skills", JSON.stringify(candidateProfile.skills || []));
+    formData.append("lang", JSON.stringify(candidateProfile.languages || []));
+    formData.append("edu", JSON.stringify(candidateProfile.education || []));
+    formData.append("link_git", candidateProfile.github || "");
+    formData.append("working_mode", candidateProfile.remote_preference || "");
+    formData.append("present_job", candidateProfile.current_position || "");
+    formData.append("target_job", candidateProfile.desired_position || "");
+    formData.append("phone_number", candidateProfile.phone_number || "");
+    formData.append("user_id", userData.id);
+    formData.append("exp", candidateProfile.career_level);
+    formData.append("access", candidateProfile.availability);
+    formData.append("career_level", candidateProfile.career_level);
+
+    if (cvFile) formData.append("cv", cvFile);
+    if (coverLetterFile) formData.append("cover_letter", coverLetterFile);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/user/set-candidate-info",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      e.target.parentElement.scrollTo(0, 0);
+
+      setInfo("Profil kandydata zapisany pomyślnie!");
+    } catch (err) {
+      console.error(err);
+      e.target.parentElement.scrollTo(0, 0);
+      setErorr("Profil kandydata zapisany pomyślnie!");
+    }
+  };
 
   const addSkillorLanguage = (e, type) => {
     if (type === "skill") {
@@ -196,25 +302,41 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
         <div className={styles.sidebar}>
           <button
             className={activeTab === "profile" ? styles.active : ""}
-            onClick={() => setActiveTab("profile")}
+            onClick={() => {
+              setInfo("");
+              setErorr("");
+              setActiveTab("profile");
+            }}
           >
             Ustawienia konta
           </button>
           <button
             className={activeTab === "candidate-profile" ? styles.active : ""}
-            onClick={() => setActiveTab("candidate-profile")}
+            onClick={() => {
+              setInfo("");
+              setErorr("");
+              setActiveTab("candidate-profile");
+            }}
           >
             Moje profil kandydata
           </button>
           <button
             className={activeTab === "applications" ? styles.active : ""}
-            onClick={() => setActiveTab("applications")}
+            onClick={() => {
+              setInfo("");
+              setErorr("");
+              setActiveTab("applications");
+            }}
           >
             Złożone CV
           </button>
           <button
             className={activeTab === "favorites" ? styles.active : ""}
-            onClick={() => setActiveTab("favorites")}
+            onClick={() => {
+              setInfo("");
+              setErorr("");
+              setActiveTab("favorites");
+            }}
           >
             Ulubione oferty
           </button>
@@ -307,11 +429,18 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
           {activeTab === "candidate-profile" && (
             <form className={styles.form} onSubmit={handleSavecandidateProfile}>
               <h2>Ustawienia profilu kandydata</h2>
-              {/* {candidateProfile.length === 0 && (
-                <p>Brak profilu kandydata...</p>
-              )} */}
-              {candidateProfile.length ? (
-                <button className={styles.saveBtn}>Utwórz profil</button>
+              {!isCreated ? (
+                <>
+                  <p>Brak profilu kandydata</p>
+                  <button
+                    className={styles.saveBtn}
+                    onClick={() => {
+                      setIsCreate(true);
+                    }}
+                  >
+                    Utwórz profil
+                  </button>
+                </>
               ) : (
                 <>
                   <label>Lokalizacja</label>
@@ -331,6 +460,7 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
                     value={candidateProfile.phone_number}
                     onChange={handleChange}
                     placeholder="123456789"
+                    max={9}
                     pattern="[0-9]{9}"
                     required
                   />
@@ -367,10 +497,11 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
 
                   <label>Lata doświadczenia</label>
                   <select
-                    name="experience_years"
+                    name="career_level"
                     value={candidateProfile.career_level}
                     onChange={handleChange}
                   >
+                    <option>Brak doświadczenia</option>
                     <option>1</option>
                     <option>2</option>
                     <option>3</option>
@@ -524,7 +655,20 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
                     </button>
                   </div>
 
-                  <label>📎 CV</label>
+                  <label>CV</label>
+                  {cvPreviewUrl ? (
+                    <div className={styles.cvPreview}>
+                      <a
+                        href={cvPreviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Zobacz aktualne CV
+                      </a>
+                    </div>
+                  ) : (
+                    <p>Brak przesłanego CV</p>
+                  )}
                   <input
                     type="file"
                     ref={cvInputRef}
@@ -533,6 +677,19 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
                   />
 
                   <label>List motywacyjny</label>
+                  {coverPreviewUrl ? (
+                    <div className={styles.cvPreview}>
+                      <a
+                        href={coverPreviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Zobacz aktualny list motywacyjny
+                      </a>
+                    </div>
+                  ) : (
+                    <p>Brak przesłanego listu motywacyjnego</p>
+                  )}
                   <input
                     type="file"
                     ref={coverInputRef}
@@ -550,7 +707,11 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
                   />
 
                   <label>Dostępność</label>
-                  <select name="access">
+                  <select
+                    name="availability"
+                    value={candidateProfile.availability}
+                    onChange={handleChange}
+                  >
                     <option>Od zaraz</option>
                     <option>Za tydzień</option>
                     <option>W przyszłym miesiącu</option>
@@ -569,6 +730,15 @@ const CandidateSettings = ({ user, favorites = [], applications = [] }) => {
 
                   <button type="submit" className={styles.saveBtn}>
                     Zapisz zmiany
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.saveBtn}
+                    onClick={() => {
+                      setIsCreate(false);
+                    }}
+                  >
+                    Anuluj
                   </button>
                 </>
               )}

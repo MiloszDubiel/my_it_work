@@ -17,4 +17,5 @@ app.use("/api/employers", employersRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
 
+
 app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));
