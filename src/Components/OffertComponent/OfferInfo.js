@@ -128,11 +128,9 @@ const OfferInfo = ({ offer, id }) => {
             </div>
           </div>
           <div className={styles.headerRight}>
-            <button className={styles.applyBtn}>
-              <a href={offer.link} target="_blank" style={{ all: "unset" }}>
-                Szczegóły aplikacji
-              </a>
-            </button>
+            <a href={offer.link} target="_blank" style={{ all: "unset" }}>
+              <button className={styles.applyBtn}>Szczegóły aplikacji</button>
+            </a>
           </div>{" "}
         </section>
 
