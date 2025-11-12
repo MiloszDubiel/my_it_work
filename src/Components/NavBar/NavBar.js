@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EmployerSettings from "../SettingsPage/EmployerSettings";
 import CandidateSettings from "../SettingsPage/CandidateSettings";
+import { FiMessageSquare } from "react-icons/fi";
+import { IoIosNotificationsOutline } from "react-icons/io";
+import ChatPage from "../Chat/ChatPage";
 
 const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   let account = useRef(null);
@@ -18,9 +21,15 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
   return (
     <>
       {userData?.role == "employer" ? (
-        <EmployerSettings />
+        <>
+          <EmployerSettings />
+          <ChatPage />
+        </>
       ) : userData?.role === "candidate" ? (
-        <CandidateSettings />
+        <>
+          <CandidateSettings />
+          <ChatPage />
+        </>
       ) : (
         ""
       )}
@@ -80,7 +89,25 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                     backgroundSize: "cover",
                   }}
                 >
-                  {!avatar ? <IoPersonOutline className={styles.icon} /> : ""}
+                  <IoPersonOutline className={styles.icon} />
+                </button>
+                <button
+                  onClick={() => {
+                    let dis =
+                      document.querySelector("#chatContainer").style.display;
+
+                    if (dis === "none")
+                      document.querySelector("#chatContainer").style.display =
+                        "flex";
+                    else
+                      document.querySelector("#chatContainer").style.display =
+                        "none";
+                  }}
+                >
+                  <FiMessageSquare className={styles.icon} />
+                </button>
+                <button>
+                  <IoIosNotificationsOutline className={styles.icon} />
                 </button>
               </>
             ) : (

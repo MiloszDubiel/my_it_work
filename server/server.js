@@ -4,7 +4,9 @@ import jobOffertsRoutes from "./routes//jobOffertsRoutes.js";
 import employersRoutes from "./routes/employersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoutes.js";
-
+import chatRoutes from "./routes/chatRoutes.js";
+import http from "http";
+import { Server } from "socket.io";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,6 +18,54 @@ app.use("/api/job-offerts", jobOffertsRoutes);
 app.use("/api/employers", employersRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
+app.use("/messager", chatRoutes);
 
+const server = http.createServer(app);
 
+// ✅ Konfiguracja Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Twój frontend
+    methods: ["GET", "POST"],
+  },
+});
+
+// ====== SOCKET.IO REAL-TIME ======
+io.on("connection", (socket) => {
+  console.log("🟢 Użytkownik połączony:", socket.id);
+
+  // Dołączanie do pokoju konwersacji
+  socket.on("join_conversation", (conversationId) => {
+    socket.join(conversationId);
+    console.log(`👥 Użytkownik dołączył do konwersacji ${conversationId}`);
+  });
+
+  // Odbiór nowej wiadomości
+  socket.on("send_message", async (data) => {
+    const { conversation_id, sender_id, content } = data;
+
+    // Zapis do bazy danych
+    const [result] = await connection.query(
+      "INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)",
+      [conversation_id, sender_id, content]
+    );
+
+    const message = {
+      id: result.insertId,
+      conversation_id,
+      sender_id,
+      content,
+      created_at: new Date(),
+    };
+
+    // Wysłanie wiadomości do uczestników pokoju
+    io.to(conversation_id).emit("receive_message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("🔴 Użytkownik odłączony:", socket.id);
+  });
+});
+
+server.listen(5001, () => console.log("Server działa na porcie 5001"));
 app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));

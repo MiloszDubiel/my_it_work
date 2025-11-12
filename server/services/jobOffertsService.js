@@ -28,13 +28,14 @@ export function saveOffertsToDb(offers) {
 }
 
 export function getAllOfferts() {
-  return connection.query("SELECT * FROM job_offers");
+  return connection.query(
+    "SELECT job_offers.id ,job_offers.title, job_offers.companyName, job_offers.workingMode, job_offers.contractType, job_offers.experience, job_offers.technologies, job_offers.salary, job_offers.is_active, job_offers.link, job_offers.img, job_details.description, job_details.requirements  FROM job_offers INNER JOIN job_details ON job_offers.id = job_details.job_offer_id "
+  );
 }
 
 export async function getFillteredOfferts({ title, experience, location }) {
   let sql = "SELECT * FROM job_offers WHERE 1=1";
   const params = [];
-
 
   if (title && title.trim() !== "") {
     sql += " AND title LIKE ?";
@@ -42,8 +43,7 @@ export async function getFillteredOfferts({ title, experience, location }) {
   }
 
   if (experience && experience.trim() !== "") {
-
-    if (experience === '') {
+    if (experience === "") {
       sql += " AND experience LIKE ?";
       params.push(`%`);
     } else {

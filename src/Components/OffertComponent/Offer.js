@@ -25,7 +25,8 @@ const Offer = ({ offer, index }) => {
           <div className={styles.tags}>
             <div className={styles.technologies}>
               <span className={styles.item}>Technologie:</span>{" "}
-              {JSON.parse(offer.technologies).length > 0 &&
+              {JSON.parse(offer.technologies)
+                .length > 0 &&
                 JSON.parse(offer.technologies)
                   .slice(0, 2)
                   .map((el) => {
@@ -40,6 +41,7 @@ const Offer = ({ offer, index }) => {
               {JSON.parse(offer.technologies).length === 0 && (
                 <span className={styles.item}>Nie podano</span>
               )}
+              {}
             </div>
 
             <div className={styles.locations}>

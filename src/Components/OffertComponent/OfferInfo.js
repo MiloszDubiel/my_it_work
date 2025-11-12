@@ -25,22 +25,6 @@ const OfferInfo = ({ offer, id }) => {
   const [loading, setLoading] = useState(true);
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
 
-  console.log(offer.id);
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    try {
-      fetchDetails(offer.link, offer.type).then((res) => {
-        setDetails(res.details);
-        setIsLoading(false);
-      });
-    } catch (err) {
-      setIsLoading(true);
-      console.log(err);
-    }
-  }, []);
-
   useEffect(() => {
     const checkFavorite = async () => {
       try {
@@ -80,6 +64,7 @@ const OfferInfo = ({ offer, id }) => {
       console.error("Błąd przy aktualizacji ulubionych:", err);
     }
   };
+
   return (
     <div
       id="offer-details-container"
@@ -93,13 +78,18 @@ const OfferInfo = ({ offer, id }) => {
         >
           <div style={{ display: "flex", gap: " 10px" }}>
             <button className={styles.iconBtn}>Udostępnij</button>
-            <button onClick={toggleFavorite} className={styles.iconBtn}>
-              {isFavorite ? (
-                <CiStar className={styles.starFilled} />
-              ) : (
-                <CiStar className={styles.starEmpty} />
-              )}
-            </button>
+
+            {userData?.email && userData?.role === "candidate" ? (
+              <button onClick={toggleFavorite} className={styles.iconBtn}>
+                {isFavorite ? (
+                  <CiStar className={styles.starFilled} />
+                ) : (
+                  <CiStar className={styles.starEmpty} />
+                )}
+              </button>
+            ) : (
+              ""
+            )}
           </div>
 
           <div className={styles.rightActions}>
@@ -162,11 +152,11 @@ const OfferInfo = ({ offer, id }) => {
               <>
                 <div
                   className={styles.description}
-                  dangerouslySetInnerHTML={{ __html: details.willDo }}
+                  dangerouslySetInnerHTML={{ __html: offer.description }}
                 ></div>
                 <div
                   className={styles.description}
-                  dangerouslySetInnerHTML={{ __html: details.offer }}
+                  dangerouslySetInnerHTML={{ __html: offer.description }}
                 ></div>
               </>
             )}

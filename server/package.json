@@ -18,11 +18,12 @@
     "json2csv": "^6.0.0-alpha.2",
     "multer": "^2.0.2",
     "mysql2": "^3.14.3",
-    "puppeteer": "^24.23.0",
+    "puppeteer": "^24.29.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "react-redux": "^9.2.0",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

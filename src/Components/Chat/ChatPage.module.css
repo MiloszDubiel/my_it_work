@@ -1,0 +1,95 @@
+.container {
+  width: 100%;
+  position: fixed;
+  height: 100%;
+  background: #0000003d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 111111;
+  display: none;
+}
+
+.rightActions {
+  width: calc(100% - 30px);
+  display: flex;
+  justify-content: end;
+  position: absolute;
+  top: 10px;
+  right: 30px;
+}
+
+.chatPage {
+  display: flex;
+  height: 80%;
+  width: 1000px;
+  background: #f9fafc;
+  border-radius: 1rem;
+  overflow: hidden;
+  z-index: 11111;
+}
+
+.inbox {
+  width: 30%;
+  border-right: 1px solid #ddd;
+  background: #fff;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.inbox h2 {
+  margin-bottom: 1rem;
+}
+
+.conversation {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.conversation:hover {
+  background: #f0f0f0;
+}
+
+.active {
+  background: #e1e9ff;
+}
+
+.avatarPlaceholder {
+  background: #007bff;
+  color: #fff;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  font-weight: bold;
+}
+
+.chatArea {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fc;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #888;
+}
+
+.empty {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin-top: 2rem;
+}

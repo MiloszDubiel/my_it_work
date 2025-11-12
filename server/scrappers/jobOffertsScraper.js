@@ -1,42 +1,77 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import { connection } from "../config/db.js";
 
 puppeteer.use(StealthPlugin());
 
-export async function getJobOfferts() {
+export async function insertOffer(db, job, details) {
+  try {
+    const [result] = await db.execute(
+      `INSERT IGNORE INTO job_offers 
+      (title, companyName, workingMode, contractType, experience, technologies, description, salary, is_active, link, img, type, source, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [
+        job.title,
+        job.companyName || null,
+        JSON.stringify(job.workingMode || []),
+        JSON.stringify(job.contractType || []),
+        JSON.stringify(job.experience || []),
+        JSON.stringify(job.technologies || []),
+        details?.description || "",
+        job.salary || "",
+        1,
+        job.link || "",
+        job.img || "",
+        job.type || "",
+        "scraped",
+      ]
+    );
+
+    const jobOfferId = result.insertId;
+
+    await db.execute(
+      `INSERT IGNORE job_details 
+      (job_offer_id, description, requirements, responsibilities, benefits, extra_info, technologies, locations)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        jobOfferId,
+        details?.description || "",
+        details?.requirements || "",
+        details?.responsibilities || "",
+        details?.benefits || "",
+        details?.extra_info || "",
+        details?.technologies || "",
+        details?.locations || "",
+      ]
+    );
+
+    console.log(`✅ Zapisano ofertę ID ${jobOfferId}: ${job.title}`);
+  } catch (err) {
+    console.error("❌ Błąd przy zapisie oferty:", err.message);
+  }
+}
+
+export async function scrapeAll() {
   const browser = await puppeteer.launch({
     headless: "new",
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
-    args: [
-      "--window-size=1920,1080",
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-    ],
-
-    ignoreDefaultArgs: ["--enable-automation"],
+    defaultViewport: { width: 1920, height: 1080 },
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+
   const page = await browser.newPage();
 
-  const allJobs = [];
-
-  for (let i = 1; i <= 120; i++) {
-    console.log(`Scraping bulldogjob.pl ${i}...`);
+  // ================================
+  // BULLDOGJOB.PL
+  // ================================
+  for (let i = 1; i <= 10; i++) {
+    // dla testów ogranicz
+    console.log(`Scraping BulldogJob.pl — strona ${i}`);
     await page.goto(
       `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
       {
         waitUntil: "networkidle2",
       }
     );
-
-    try {
-      await page.waitForSelector(".JobListItem_item__fYh8y");
-    } catch (err) {
-      console.log(err);
-      break;
-    }
 
     const jobs = await page.evaluate(() => {
       return Array.from(
@@ -46,64 +81,73 @@ export async function getJobOfferts() {
           el
             .querySelector(".JobListItem_item__title__278xz h3")
             ?.textContent?.trim() || "",
-        companyName: el
-          .querySelector(".JobListItem_item__title__278xz div")
-          ?.textContent?.trim(),
+        companyName:
+          el
+            .querySelector(".JobListItem_item__title__278xz div")
+            ?.textContent?.trim() || "",
         workingMode: [
           el
             .querySelector(".JobListItem_item__details__sg4tk .relative span")
-            ?.textContent?.trim(),
+            ?.textContent?.trim() || "",
           Array.from(
-            [
-              ...el.querySelectorAll(
-                ".JobListItem_item__details__sg4tk .shadow-dropdown span"
-              ),
-            ].map((tag) => {
-              return tag.textContent;
-            })
-          ),
+            el.querySelectorAll(
+              ".JobListItem_item__details__sg4tk .shadow-dropdown span"
+            )
+          ).map((t) => t.textContent),
         ],
         contractType: [
           el
             .querySelectorAll(
               ".JobListItem_item__details__sg4tk .items-start "
             )[0]
-            ?.textContent?.trim(),
-        ] || ["Umowa o pracę", "Kontrakt B2B", "Inna forma zatrudnienia"],
+            ?.textContent?.trim() || "",
+        ],
         experience: [
           el
             .querySelectorAll(
               ".JobListItem_item__details__sg4tk .items-start "
             )[1]
-            ?.textContent?.trim(),
-        ] || ["Intern", "Junior", "Mid/Regular", "Senior"],
+            ?.textContent?.trim() || "",
+        ],
         technologies: Array.from(
           el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
         ).map((tag) => tag.textContent.trim()),
         salary:
           el
-            .querySelector(".JobListItem_item__salary__OIin6 ")
+            .querySelector(".JobListItem_item__salary__OIin6")
             ?.textContent?.trim() || "not available",
         img: el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
-        link: el?.href,
+        link: el.href,
         type: "bulldogjob.pl",
       }));
     });
-    allJobs.push(...jobs);
+
+    for (let job of jobs) {
+      console.log(`→ Szczegóły ${job.title}`);
+      const jobPage = await browser.newPage();
+      await jobPage.goto(job.link, { waitUntil: "networkidle2" });
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const details = await jobPage.evaluate(() => {
+        return {
+          description:
+            document.querySelector("#accordionGroup ")?.innerHTML || "",
+        };
+      });
+      await insertOffer(connection, job, details);
+      await jobPage.close();
+      await new Promise((r) => setTimeout(r, 1000));
+    }
   }
 
-  for (let i = 1; i <= 80; i++) {
-    console.log(`Scraping theprotocol.it ${i}...`);
+  // ================================
+  // THEPROTOCOL.IT
+  // ================================
+  for (let i = 1; i <= 10; i++) {
+    console.log(`Scraping TheProtocol.it — strona ${i}`);
     await page.goto(`https://theprotocol.it/filtry/;c?pageNumber=${i}`, {
       waitUntil: "networkidle2",
     });
-
-    try {
-      await page.waitForSelector("div.o1onjy6t");
-    } catch (err) {
-      console.log(err);
-      break;
-    }
 
     const jobs = await page.evaluate(() => {
       return Array.from(document.querySelectorAll("a.a4pzt2q"))
@@ -112,159 +156,107 @@ export async function getJobOfferts() {
           companyName: el
             .querySelectorAll("div.l1c07yeh")[0]
             ?.textContent?.trim(),
-          workingMode: [
-            el.querySelectorAll("div.l1c07yeh")[2]?.textContent?.trim() ||
-              "not available",
-            [...el.querySelectorAll("div.p7zsgaa div.m13o6ws7 div")].map(
-              (tag) => tag.textContent
-            ),
-          ],
-          experience: ["Intern", "Junior", "Mid/Regular", "Senior"],
-          contractType: [
-            "Umowa o pracę",
-            "Kontrakt B2B",
-            "Inna forma zatrudnienia",
-          ],
+          workingMode: el
+            .querySelectorAll("div.l1c07yeh")[2]
+            ?.textContent?.trim(),
+          experience: ["Junior", "Mid", "Senior"],
+          contractType: ["B2B", "UoP"],
           technologies: [...el.querySelectorAll("div.c13r9id2 div")].map(
-            (tag) => tag.textContent
+            (t) => t.textContent
           ),
           salary: "not available",
           img: el.querySelector("img")?.src,
-          link: el?.href,
+          link: el.href,
           type: "theprotocol.it",
         }))
-        .filter((el) => el.title != "");
+        .filter((el) => el.title);
     });
-    allJobs.push(...jobs);
+
+    for (let job of jobs) {
+      console.log(`→ Szczegóły ${job.title}`);
+      const jobPage = await browser.newPage();
+      await jobPage.goto(job.link, { waitUntil: "networkidle2" });
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const details = await jobPage.evaluate(() => {
+        return {
+          description: document.querySelector(".o1r47x2m .bptj5gp .p1eexex0")
+            ?.innerHTML,
+          requirements: document.querySelector(".o1r47x2m .bptj5gp ul")
+            ?.innerHTML,
+        };
+      });
+
+      await insertOffer(connection, job, details);
+      await jobPage.close();
+      await new Promise((r) => setTimeout(r, 1000));
+    }
   }
 
+  // ================================
+  // NOFLUFFJOBS.COM
+  // ================================
   await page.goto(
     "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Dsys-administrator,business-analyst,architecture,backend,data,ux,devops,erp,embedded,frontend,fullstack,game-dev,mobile,project-manager,security,support,testing,other",
-    {
-      waitUntil: "networkidle2",
-    }
+    { waitUntil: "networkidle2" }
   );
 
-  let loadMore = 1;
-
-  while (loadMore <= 80) {
+  for (let i = 0; i < 10; i++) {
     try {
       await page.evaluate(() => {
         const btn = document.querySelectorAll("div.tw-flex button.tw-btn")[6];
-        btn.click();
+        btn?.click();
       });
-      loadMore++;
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } catch (err) {
-      console.log(err);
-      loadMore = 101;
-    }
+      await new Promise((r) => setTimeout(r, 1500));
+    } catch {}
   }
 
-  const jobsIT = await page.evaluate(() => {
-    return Array.from(
-      document.querySelectorAll("div.list-container a.posting-list-item")
-    ).map((el) => ({
-      title: el.querySelector("h3")?.textContent?.trim().includes("NOWA")
-        ? String(el.querySelector("h3")?.textContent?.trim())
-            .substring(
-              0,
-              el.querySelector("h3").textContent.indexOf("NOWA") - 1
-            )
-            .trim()
-        : el.querySelector("h3")?.textContent?.trim(),
-      companyName: el.querySelector("h4.company-name")?.textContent?.trim(),
-      workingMode: [
-        el.querySelector("footer div.tw-text-gray")?.textContent?.trim() ||
-          "not available",
-      ],
-      experience: ["Junior", "Mid/Regular", "Senior"],
-      technologies: [...el.querySelectorAll("nfj-posting-item-tiles span")].map(
-        (tag) => tag.textContent
-      ),
-      contractType: [
-        "Umowa o pracę",
-        "Kontrakt B2B",
-        "Inna forma zatrudnienia",
-      ],
-      salary: el.querySelector("nfj-posting-item-salary").textContent,
-
-      img: el.querySelector("img")?.src,
-      link: el.href,
-      type: "nofluffjobs.com",
-    }));
+  const jobs = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll("a.posting-list-item")).map(
+      (el) => ({
+        title: el.querySelector("h3")?.textContent?.trim() || "",
+        companyName:
+          el.querySelector("h4.company-name")?.textContent?.trim() || "",
+        workingMode: [
+          el.querySelector("footer div.tw-text-gray")?.textContent?.trim() ||
+            "",
+        ],
+        experience: ["Junior", "Mid", "Senior"],
+        technologies: Array.from(
+          el.querySelectorAll("nfj-posting-item-tiles span")
+        ).map((t) => t.textContent),
+        contractType: ["B2B", "UoP"],
+        salary:
+          el.querySelector("nfj-posting-item-salary")?.textContent?.trim() ||
+          "",
+        img: el.querySelector("img")?.src || "",
+        link: el.href,
+        type: "nofluffjobs.com",
+      })
+    );
   });
 
-  allJobs.push(...jobsIT);
+  for (let job of jobs) {
+    console.log(`→ Szczegóły ${job.title}`);
+    const jobPage = await browser.newPage();
+    await jobPage.goto(job.link, { waitUntil: "networkidle2" });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  await browser.close();
-  return allJobs;
-}
-
-export async function getJobOffertDetail(link, type) {
-  const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
-    args: ["--window-size=1920,1080"],
-  });
-  const page = await browser.newPage();
-
-  await page.goto(link, {
-    waitUntil: "networkidle2",
-  });
-
-  if (type === "bulldogjob.pl") {
-    try {
-      await page.waitForSelector(".JobListItem_item__fYh8y");
-    } catch (err) {
-      console.log(err);
-      return "Błąd";
-    }
-
-    const details = await page.evaluate(() => {
+    const details = await jobPage.evaluate(() => {
       return {
-        willDo: document.querySelectorAll("#accordionGroup")[0].innerHTML,
-        offer: document.querySelectorAll("#accordionGroup")[1].innerHTML,
-        expect: document.querySelectorAll("#accordionGroup")[2].innerHTML,
+        description: document.querySelector("#posting-description").innerHTML,
+        requirements: document.querySelector(
+          "nfj-read-more .tw-overflow-hidden ul"
+        ).innerHTML,
       };
     });
 
-    browser.close();
-    return details;
-  } else if (type === "theprotocol.it") {
-    try {
-      await page.waitForSelector(".JobListItem_item__fYh8y");
-    } catch (err) {
-      console.log(err);
-      return "Błąd";
-    }
-
-    const details = await page.evaluate(() => {
-      return Array.from(
-        document.querySelectorAll(".JobListItem_item__fYh8y")
-      ).map((el) => ({}));
-    });
-
-    browser.close();
-    return details;
-  } else {
-    try {
-      await page.waitForSelector(".JobListItem_item__fYh8y");
-    } catch (err) {
-      console.log(err);
-      return "Błąd";
-    }
-
-    const details = await page.evaluate(() => {
-      return Array.from(
-        document.querySelectorAll(".JobListItem_item__fYh8y")
-      ).map((el) => ({}));
-    });
-
-    browser.close();
-    return details;
+    await insertOffer(connection, job, details);
+    await jobPage.close();
+    await new Promise((r) => setTimeout(r, 1000));
   }
+
+  await browser.close();
+
+  console.log("✅ Wszystkie oferty zostały zapisane!");
 }
