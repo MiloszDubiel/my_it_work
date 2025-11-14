@@ -5,9 +5,9 @@ import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
-  const [userData, ] = useState(
-    JSON.parse(sessionStorage.getItem("user-data"))
-  );
+  const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState(null);
   const [company, setCompany] = useState({});
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
@@ -22,7 +22,21 @@ const EmployerSettings = () => {
       .post(`http://localhost:5000/api/employers/get-company-info`, {
         id: userData.id,
       })
-      .then((res) => setCompany(res.data.companyInfo[0]))
+      .then((res) => {
+        setCompany(res.data.companyInfo[0]);
+
+        if (res.data.companyInfo[0]?.uploaded_image) {
+          axios
+            .get(
+              `http://localhost:5000/api/employers/get-company-logo/${userData.id}`,
+              { responseType: "arraybuffer" }
+            )
+            .then((img) => {
+              const blob = new Blob([img.data], { type: "image/png" });
+              setLogoPreviewUrl(URL.createObjectURL(blob));
+            });
+        }
+      })
       .catch((err) => console.log(err));
   }, []);
 
@@ -66,17 +80,27 @@ const EmployerSettings = () => {
       return setErorr("Telefon musi zawierać dokładnie 9 cyfr.");
     }
 
-    try {
-      let res = await axios.post(
-        "http://localhost:5000/api/employers/set-company-info",
-        {
-          company: { ...company, owner_id: userData.id },
-        }
-      );
-      setInfo(res.data.info);
-    } catch (err) {
-      setErorr(err);
+    const formData = new FormData();
+    formData.append("owner_id", userData.id);
+    formData.append("companyName", company.companyName);
+    formData.append("description", company.description);
+    formData.append("link", company.link || "");
+    formData.append("email", company.email);
+    formData.append("phone_number", company.phone_number);
+
+    if (logoFile) {
+      formData.append("logo", logoFile);
     }
+
+    let res = await axios.post(
+      "http://localhost:5000/api/employers/set-company-info",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    console.log(res);
   };
 
   const handleSubmitUserInfo = async (e) => {
@@ -232,7 +256,23 @@ const EmployerSettings = () => {
                 />
 
                 <label>Logo firmy</label>
-                <input type="file" accept="image/*" />
+
+                {logoPreviewUrl ? (
+                  <div className={styles.logoPreview}>
+                    <img src={logoPreviewUrl} alt="Logo firmy" />
+                  </div>
+                ) : (
+                  <p>Brak ustawionego logo</p>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  onChange={(e) => {
+                    setLogoFile(e.target.files[0]);
+                    setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
+                  }}
+                />
 
                 <button type="submit" className={styles.saveBtn}>
                   Zapisz
@@ -248,7 +288,8 @@ const EmployerSettings = () => {
               <button
                 className={styles.addBtn}
                 onClick={() => {
-                  document.querySelector("#add-job-offer").style.display = "flex";
+                  document.querySelector("#add-job-offer").style.display =
+                    "flex";
                 }}
               >
                 ➕ Dodaj nową ofertę
@@ -262,13 +303,6 @@ const EmployerSettings = () => {
                   <span>Akcje</span>
                 </div>
                 <div className={styles.row}>
-
-
-
-
-
-
-                  
                   <span>Frontend Developer</span>
                   <span>Aktywna</span>
                   <span>12.10.2025</span>

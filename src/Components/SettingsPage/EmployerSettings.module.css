@@ -151,6 +151,16 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+.logoPreview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-bottom: 10px;
+  background: white;
+}
 
 .userCard {
   background: #f3f4f6;
@@ -169,6 +179,6 @@
 .info {
   color: #28a745;
   padding: 10px 0px;
-   font-size: 13px;
+  font-size: 13px;
   margin-top: -6px;
 }

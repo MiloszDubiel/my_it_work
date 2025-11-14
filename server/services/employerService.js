@@ -56,28 +56,3 @@ export async function getCompanyInfo(id) {
 
   return rows;
 }
-
-export async function setCompanyInfo({
-  owner_id,
-  companyName,
-  description,
-  link,
-  email,
-  phone_number,
-}) {
-  const owner = await getCompanyInfo(owner_id);
-
-  if (owner.length === 0) {
-    await connection.query(
-      "INSERT INTO companies(companyName, description, link, email, phone_number, owner_id) VALUES (?,?,?,?,?,?)  ",
-      [companyName, description, link, email, phone, owner_id]
-    );
-    return { info: "Zapisano firme" };
-  }
-
-  await connection.query(
-    "UPDATE companies SET  companyName = ?, description = ? , link = ?, email = ?, phone_number = ? WHERE owner_id = ? ",
-    [companyName, description, link, email, phone_number, owner_id]
-  );
-  return { info: "Zapisano zmiany" };
-}

@@ -39,6 +39,7 @@ const CandidateSettings = ({ applications = [] }) => {
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
+  
 
   const cvInputRef = useRef();
   const coverInputRef = useRef();

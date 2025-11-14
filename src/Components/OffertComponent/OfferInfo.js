@@ -28,7 +28,6 @@ const OfferInfo = ({ offer, id }) => {
 
     if (offer?.id && userData?.id) checkFavorite();
   }, [offer?.id, userData?.id]);
-  console.log(offer);
   const toggleFavorite = async () => {
     try {
       if (isFavorite) {
