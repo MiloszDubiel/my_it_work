@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
+import { useEffect } from "react";
 
 const AddJobOffer = () => {
+  const [userData, setUserData] = useState(
+    JSON.parse(sessionStorage.getItem("user-data"))
+  );
+
   const [offer, setOffer] = useState({
     title: "",
-    company_name: "",
+    company: "",
     location: "",
     salary_min: "",
     salary_max: "",
@@ -17,8 +22,28 @@ const AddJobOffer = () => {
     requirements: "",
     responsibilities: "",
     benefits: "",
-    link: "",
+    company_id: "",
+    employer_id: userData.id,
   });
+
+  useEffect(() => {
+    const getCompanyInfo = async () => {
+      let res = await axios.post(
+        "http://localhost:5000/api/employers/get-company-info",
+        {
+          id: userData.id,
+        }
+      );
+
+      setOffer({
+        ...offer,
+        company: res.data.companyInfo[0].companyName,
+        company_id: res.data.companyInfo[0].id,
+      });
+    };
+
+    getCompanyInfo();
+  }, []);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +51,6 @@ const AddJobOffer = () => {
   const validate = () => {
     if (!offer.title?.trim()) return "Tytuł oferty jest wymagany";
     if (!offer.location?.trim()) return "Lokalizacja jest wymagana";
-    if (!offer.company_name?.trim()) return "Nazwa firmy jest wymagana";
     if (!offer.description?.trim()) return "Opis oferty nie może być pusty";
     if (
       offer.salary_min &&
@@ -44,34 +68,26 @@ const AddJobOffer = () => {
 
     const validationError = validate();
     if (validationError) {
+      e.target.parentElement.parentElement.scrollTo(0, 0);
       setError(validationError);
       return;
     }
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/offers/add",
+        "http://localhost:5000/api/job-offerts/add",
         offer
       );
       if (res.status === 200) {
-        setMessage("Oferta została pomyślnie dodana!");
-        setOffer({
-          title: "",
-          company_name: "",
-          location: "",
-          salary_min: "",
-          salary_max: "",
-          experience: "",
-          technologies: [],
-          contract_type: "",
-          description: "",
-          requirements: "",
-          responsibilities: "",
-          benefits: "",
-        });
+        e.target.parentElement.parentElement.scrollTo(0, 0);
+        setMessage("Oferta została pomyślnie dodana! Trwa odswieżanie strony");
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       }
     } catch (err) {
       console.error(err);
+      e.target.parentElement.parentElement.scrollTo(0, 0);
       setError("Błąd podczas dodawania oferty. Spróbuj ponownie później.");
     }
   };
@@ -116,7 +132,7 @@ const AddJobOffer = () => {
         {error && <p className={styles.error}>{error}</p>}
         {message && <p className={styles.success}>{message}</p>}
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form className={styles.form}>
           <label>Tytuł oferty*</label>
           <input
             type="text"
@@ -269,7 +285,11 @@ const AddJobOffer = () => {
             placeholder="Co oferuje firma..."
           />
 
-          <button type="submit" className={styles.submitBtn}>
+          <button
+            type="submit"
+            className={styles.submitBtn}
+            onClick={handleSubmit}
+          >
             Dodaj ofertę
           </button>
         </form>

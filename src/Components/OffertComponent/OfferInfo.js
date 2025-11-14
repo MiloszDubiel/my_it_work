@@ -6,20 +6,7 @@ import axios from "axios";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import { CiStar } from "react-icons/ci";
 
-async function fetchDetails(link, type) {
-  const response = await axios.post(
-    "http://localhost:5000/api/job-offerts/scrape/details",
-    {
-      link,
-      type,
-    }
-  );
-
-  return response.data;
-}
-
 const OfferInfo = ({ offer, id }) => {
-  const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -41,7 +28,7 @@ const OfferInfo = ({ offer, id }) => {
 
     if (offer?.id && userData?.id) checkFavorite();
   }, [offer?.id, userData?.id]);
-
+  console.log(offer);
   const toggleFavorite = async () => {
     try {
       if (isFavorite) {
@@ -215,21 +202,15 @@ const OfferInfo = ({ offer, id }) => {
                 <li>
                   Lokalizacja:{" "}
                   <ul>
-                    {JSON.parse(offer?.workingMode || "[]")[1]?.length === 0 ? (
-                      <li>
-                        <strong>
-                          {JSON.parse(offer?.workingMode || "[]")[0]}
-                        </strong>
-                      </li>
-                    ) : (
-                      JSON.parse(offer?.workingMode || "[]")[1]?.map((el) => {
-                        return (
-                          <li>
-                            <strong>{el}</strong>
-                          </li>
-                        );
-                      })
-                    )}
+                    {String(offer.workingMode)
+                      .replaceAll("[", "")
+                      .replaceAll("]", "")
+                      .replaceAll('"', "")
+                      .trim()
+                      .split(",")
+                      .map((el) => {
+                        return <li>{el}</li>;
+                      })}
                   </ul>
                 </li>
               </ul>

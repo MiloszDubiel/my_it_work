@@ -25,8 +25,7 @@ const Offer = ({ offer, index }) => {
           <div className={styles.tags}>
             <div className={styles.technologies}>
               <span className={styles.item}>Technologie:</span>{" "}
-              {JSON.parse(offer.technologies)
-                .length > 0 &&
+              {JSON.parse(offer.technologies).length > 0 &&
                 JSON.parse(offer.technologies)
                   .slice(0, 2)
                   .map((el) => {
@@ -46,14 +45,16 @@ const Offer = ({ offer, index }) => {
 
             <div className={styles.locations}>
               <span className={styles.item}>Lokalizacja:</span>{" "}
-              {JSON.parse(offer.workingMode)?.length > 0 && (
-                <span className={styles.tag}>
-                  {JSON.parse(offer.workingMode)[0]}
-                </span>
-              )}
-              {JSON.parse(offer.workingMode)[1]?.length > 1 && (
-                <span className={styles.item}>i więcej</span>
-              )}
+              <span className={styles.tag}>
+                {
+                  String(offer.workingMode)
+                    .replaceAll("[", "")
+                    .replaceAll("]", "")
+                    .replaceAll('"', "")
+                    .trim()
+                    .split(",")[0]
+                }
+              </span>
             </div>
           </div>
         </div>

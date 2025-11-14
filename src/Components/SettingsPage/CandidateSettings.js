@@ -741,15 +741,7 @@ const CandidateSettings = ({ applications = [] }) => {
                   <button type="submit" className={styles.saveBtn}>
                     Zapisz zmiany
                   </button>
-                  <button
-                    type="button"
-                    className={styles.saveBtn}
-                    onClick={() => {
-                      setIsCreate(false);
-                    }}
-                  >
-                    Anuluj
-                  </button>
+                  
                 </>
               )}
             </form>
