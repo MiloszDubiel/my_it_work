@@ -91,13 +91,17 @@ router.post(
         req.body;
 
       const logo = req.file ? req.file.filename : null;
+      const logoLink = logo
+        ? `http://localhost:5000/api/employers/get-company-logo/${owner_id}`
+        : null;
 
-      // Sprawdź, czy firma już istnieje
+      // Pobieramy istniejącą firmę
       const owner = await getCompanyInfo(owner_id);
 
       if (owner.length === 0) {
+        // INSERT nowej firmy
         const query = logo
-          ? "INSERT INTO companies (companyName, description, link, email, phone_number, owner_id, uploaded_image) VALUES (?,?,?,?,?,?,?)"
+          ? "INSERT INTO companies (companyName, description, link, email, phone_number, owner_id, uploaded_image, img) VALUES (?,?,?,?,?,?,?,?)"
           : "INSERT INTO companies (companyName, description, link, email, phone_number, owner_id) VALUES (?,?,?,?,?,?)";
 
         const params = logo
@@ -109,25 +113,44 @@ router.post(
               phone_number,
               owner_id,
               logo,
+              logoLink,
             ]
           : [companyName, description, link, email, phone_number, owner_id];
 
         await connection.query(query, params);
 
-        return res.json({ info: "Zapisano firmę" });
+        return res.status(200).json({ info: "Zapisano firmę" });
       }
 
+      // UPDATE istniejącej firmy
       const updateQuery = logo
-        ? "UPDATE companies SET companyName=?, description=?, link=?, email=?, phone_number=?, uploaded_image=? WHERE owner_id=?"
+        ? "UPDATE companies SET companyName=?, description=?, link=?, email=?, phone_number=?, uploaded_image=?, img=? WHERE owner_id=?"
         : "UPDATE companies SET companyName=?, description=?, link=?, email=?, phone_number=? WHERE owner_id=?";
 
       const updateParams = logo
-        ? [companyName, description, link, email, phone_number, logo, owner_id]
+        ? [
+            companyName,
+            description,
+            link,
+            email,
+            phone_number,
+            logo,
+            logoLink,
+            owner_id,
+          ]
         : [companyName, description, link, email, phone_number, owner_id];
 
       await connection.query(updateQuery, updateParams);
 
-      return res.json({ info: "Zapisano zmiany" });
+      // Jeśli logo się zmieniło, aktualizujemy kolumnę img w job_offers
+      if (logo) {
+        await connection.query(
+          "UPDATE job_offers SET img=? WHERE company_id=?",
+          [logoLink, owner[0].id]
+        );
+      }
+
+      return res.status(200).json({ info: "Zapisano zmiany" });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ error: "Błąd serwera" });
@@ -137,24 +160,57 @@ router.post(
 
 router.get("/get-company-logo/:id", async (req, res) => {
   const owner_id = req.params.id;
+
   const [results] = await connection.query(
     "SELECT uploaded_image FROM companies WHERE owner_id = ?",
     [owner_id]
   );
 
-  if (results.length === 0) {
+  if (results.length === 0 || !results[0].uploaded_image) {
     return res.status(404).json({ error: "Brak logo" });
   }
+
   const filename = results[0].uploaded_image;
+  const filepath = `uploads/company_logos/${filename}`;
 
-  if (!filename) return res.status(404).json({ error: "Brak logo" });
-
-  const path = `uploads/company_logos/${filename}`;
-
-  if (!fs.existsSync(path))
+  if (!fs.existsSync(filepath)) {
     return res.status(404).json({ error: "Logo nie istnieje" });
+  }
+  res.sendFile(path.resolve(filepath));
+});
 
-  res.sendFile(path, { root: "." });
+router.post("/get-my-offers", async (req, res) => {
+  try {
+    const { owner_id } = req.body;
+
+    if (!owner_id) {
+      return res.status(400).json({ error: "Brak owner_id w zapytaniu" });
+    }
+    
+    const [companyResult] = await connection.query(
+      "SELECT id FROM companies WHERE owner_id = ?",
+      [owner_id]
+    );
+
+    if (companyResult.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Nie znaleziono firmy dla tego właściciela" });
+    }
+
+    const company_id = companyResult[0].id;
+
+    // Pobieramy wszystkie oferty pracy powiązane z firmą
+    const [offers] = await connection.query(
+      "SELECT * FROM job_offers WHERE company_id = ?",
+      [company_id]
+    );
+
+    return res.status(200).json({ offers });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Błąd serwera" });
+  }
 });
 
 export default router;

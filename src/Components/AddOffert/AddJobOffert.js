@@ -4,7 +4,7 @@ import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
 import { useEffect } from "react";
 
-const AddJobOffer = () => {
+const AddJobOffer = ({ onOfferAdded }) => {
   const [userData, setUserData] = useState(
     JSON.parse(sessionStorage.getItem("user-data"))
   );
@@ -80,10 +80,24 @@ const AddJobOffer = () => {
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
-        setMessage("Oferta została pomyślnie dodana! Trwa odswieżanie strony");
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        setMessage("Oferta została pomyślnie dodana!");
+        onOfferAdded();
+        setOffer({
+          title: "",
+          company: "",
+          location: "",
+          salary_min: "",
+          salary_max: "",
+          experience: "",
+          technologies: [],
+          contract_type: "",
+          description: "",
+          requirements: "",
+          responsibilities: "",
+          benefits: "",
+          company_id: "",
+          employer_id: userData.id,
+        });
       }
     } catch (err) {
       console.error(err);

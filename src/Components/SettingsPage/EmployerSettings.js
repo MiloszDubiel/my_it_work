@@ -11,6 +11,7 @@ const EmployerSettings = () => {
   const [company, setCompany] = useState({});
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
+  const [offers, setOffers] = useState([]);
   const [dataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -24,22 +25,28 @@ const EmployerSettings = () => {
       })
       .then((res) => {
         setCompany(res.data.companyInfo[0]);
-
-        if (res.data.companyInfo[0]?.uploaded_image) {
-          axios
-            .get(
-              `http://localhost:5000/api/employers/get-company-logo/${userData.id}`,
-              { responseType: "arraybuffer" }
-            )
-            .then((img) => {
-              const blob = new Blob([img.data], { type: "image/png" });
-              setLogoPreviewUrl(URL.createObjectURL(blob));
-            });
-        }
       })
       .catch((err) => console.log(err));
   }, []);
 
+  const fetchOffers = () => {
+    axios
+      .post("http://localhost:5000/api/employers/get-my-offers", {
+        owner_id: userData.id,
+      })
+      .then((res) => setOffers(res.data.offers))
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    if (activeTab === "offers") {
+      fetchOffers();
+    }
+  }, [activeTab]);
+
+  const handleOfferAdded = () => {
+    fetchOffers();
+  };
   useEffect(() => {
     window.addEventListener("setting-changed", () => {
       setActiveTab(sessionStorage.getItem("tab"));
@@ -100,7 +107,12 @@ const EmployerSettings = () => {
       }
     );
 
-    console.log(res);
+    if (res.status === 200) {
+      setInfo("Zapisano. Trwa odświeżanie storny...");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
   };
 
   const handleSubmitUserInfo = async (e) => {
@@ -203,7 +215,6 @@ const EmployerSettings = () => {
           {activeTab === "company" && (
             <section className={styles.section}>
               <h3>Informacje o firmie</h3>
-              <p>{info}</p>
               <form onSubmit={handleSubmit}>
                 <label>Nazwa firmy</label>
                 <input
@@ -257,17 +268,19 @@ const EmployerSettings = () => {
 
                 <label>Logo firmy</label>
 
-                {logoPreviewUrl ? (
-                  <div className={styles.logoPreview}>
-                    <img src={logoPreviewUrl} alt="Logo firmy" />
-                  </div>
-                ) : (
-                  <p>Brak ustawionego logo</p>
-                )}
+                <div className={styles.logoPreview}>
+                  <img
+                    src={
+                      logoPreviewUrl ||
+                      `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
+                    }
+                    alt="Logo firmy"
+                  />
+                </div>
 
                 <input
                   type="file"
-                  accept="image/png, image/jpeg"
+                  accept="image/png"
                   onChange={(e) => {
                     setLogoFile(e.target.files[0]);
                     setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
@@ -282,7 +295,7 @@ const EmployerSettings = () => {
           )}
           {activeTab === "offers" && (
             <section className={styles.section}>
-              <AddJobOffer />
+              <AddJobOffer onOfferAdded={handleOfferAdded} />
               <h3>Oferty pracy</h3>
               <p>Tutaj możesz zarządzać swoimi ofertami pracy.</p>
               <button
@@ -302,15 +315,26 @@ const EmployerSettings = () => {
                   <span>Data dodania</span>
                   <span>Akcje</span>
                 </div>
-                <div className={styles.row}>
-                  <span>Frontend Developer</span>
-                  <span>Aktywna</span>
-                  <span>12.10.2025</span>
-                  <span className={styles.actions}>
-                    <button>✏️</button>
-                    <button>🗑️</button>
-                  </span>
-                </div>
+
+                {offers.length > 0 ? (
+                  offers.map((offer) => (
+                    <div key={offer.id} className={styles.row}>
+                      <span>{offer.title}</span>
+                      <span>{offer.status}</span>
+                      <span>
+                        {new Date(offer.created_at).toLocaleDateString()}
+                      </span>
+                      <span className={styles.actions}>
+                        <button>✏️</button>
+                        <button>🗑️</button>
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className={styles.row}>
+                    <span colSpan={4}>Brak ofert pracy</span>
+                  </div>
+                )}
               </div>
             </section>
           )}
