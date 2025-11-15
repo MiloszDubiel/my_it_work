@@ -84,6 +84,7 @@ router.get("/favorites/:user_id/:offer_id", async (req, res) => {
     res.status(500).json({ error: "Błąd przy sprawdzaniu ulubionych" });
   }
 });
+
 router.post("/add", async (req, res) => {
   const {
     employer_id,
@@ -151,6 +152,39 @@ router.post("/add", async (req, res) => {
   } catch (err) {
     await conn.rollback();
     console.error("Błąd podczas dodawania oferty:", err);
+    res.status(500).json({ error: "Błąd serwera" });
+  } finally {
+    conn.release();
+  }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: "Brak wymaganych pól!" });
+  }
+
+  const conn = await connection.getConnection();
+  await conn.beginTransaction();
+
+  try {
+    const [jobOfferResult] = await conn.query(
+      `
+      DELETE FROM job_offers WHERE id = ?
+      `,
+      [id]
+    );
+
+    await conn.commit();
+
+    res.json({
+      success: true,
+      message: "Oferta została usunięta",
+    });
+  } catch (err) {
+    await conn.rollback();
+    console.error("Błąd podczas usuwania oferty:", err);
     res.status(500).json({ error: "Błąd serwera" });
   } finally {
     conn.release();

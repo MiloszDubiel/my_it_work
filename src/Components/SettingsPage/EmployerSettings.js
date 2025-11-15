@@ -12,6 +12,7 @@ const EmployerSettings = () => {
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
   const [offers, setOffers] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const [dataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -42,7 +43,7 @@ const EmployerSettings = () => {
     if (activeTab === "offers") {
       fetchOffers();
     }
-  }, [activeTab]);
+  }, [activeTab, refresh]);
 
   const handleOfferAdded = () => {
     fetchOffers();
@@ -320,13 +321,34 @@ const EmployerSettings = () => {
                   offers.map((offer) => (
                     <div key={offer.id} className={styles.row}>
                       <span>{offer.title}</span>
-                      <span>{offer.status}</span>
+                      <span>
+                        {offer.is_active === 0
+                          ? "Czeka na weryfikacje"
+                          : "Aktywna"}
+                      </span>
                       <span>
                         {new Date(offer.created_at).toLocaleDateString()}
                       </span>
                       <span className={styles.actions}>
                         <button>✏️</button>
-                        <button>🗑️</button>
+                        <button
+                          onClick={async () => {
+                            if (
+                              window.confirm(
+                                `Czy napewno chcesz usunąc oferte ${offer.title} `
+                              )
+                            ) {
+                              let res = await axios.delete(
+                                `http://localhost:5000/api/job-offerts/delete/${offer.id}`
+                              );
+                              if (res.data.success) {
+                                setRefresh(!refresh);
+                              }
+                            }
+                          }}
+                        >
+                          🗑️
+                        </button>
                       </span>
                     </div>
                   ))

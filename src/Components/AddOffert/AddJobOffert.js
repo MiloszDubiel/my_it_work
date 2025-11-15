@@ -80,7 +80,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
-        setMessage("Oferta została pomyślnie dodana!");
+        setMessage(
+          "Oferta została przesłana do weryfikacji przez Administratora"
+        );
         onOfferAdded();
         setOffer({
           title: "",
