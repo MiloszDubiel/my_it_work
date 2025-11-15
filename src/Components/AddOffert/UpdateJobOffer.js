@@ -2,60 +2,36 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
-import { useEffect } from "react";
 
-const AddJobOffer = ({ onOfferAdded }) => {
-  const [userData, setUserData] = useState(
-    JSON.parse(sessionStorage.getItem("user-data"))
-  );
-
-  const [offer, setOffer] = useState({
-    title: "",
-    company: "",
-    location: "",
+const UpdateJobOffer = ({ offer, onOfferAdded }) => {
+  const [updateOffer, setUpdateOffer] = useState({
+    title: offer.title,
+    company: offer.companyName,
+    location: JSON.parse(offer.workingMode),
     salary_min: "",
     salary_max: "",
-    experience: "",
-    technologies: [],
-    contract_type: "",
-    description: "",
-    requirements: "",
-    responsibilities: "",
-    benefits: "",
-    company_id: "",
-    employer_id: userData.id,
+    experience: JSON.parse(offer.experience),
+    technologies: JSON.parse(offer.technologies),
+    contract_type: JSON.parse(offer.contractType),
+    description: offer.description,
+    requirements: offer.requirements,
+    responsibilities: offer.responsibilities,
+    benefits: offer.benefits,
+    offer_id: offer.id,
   });
-
-  useEffect(() => {
-    const getCompanyInfo = async () => {
-      let res = await axios.post(
-        "http://localhost:5000/api/employers/get-company-info",
-        {
-          id: userData.id,
-        }
-      );
-
-      setOffer({
-        ...offer,
-        company: res.data.companyInfo[0].companyName,
-        company_id: res.data.companyInfo[0].id,
-      });
-    };
-
-    getCompanyInfo();
-  }, []);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const validate = () => {
-    if (!offer.title?.trim()) return "Tytuł oferty jest wymagany";
-    if (!offer.location?.trim()) return "Lokalizacja jest wymagana";
-    if (!offer.description?.trim()) return "Opis oferty nie może być pusty";
+    if (!updateOffer.title?.trim()) return "Tytuł oferty jest wymagany";
+    if (!updateOffer.location) return "Lokalizacja jest wymagana";
+    if (!updateOffer.description?.trim())
+      return "Opis oferty nie może być pusty";
     if (
-      offer.salary_min &&
-      offer.salary_max &&
-      +offer.salary_min > +offer.salary_max
+      updateOffer.salary_min &&
+      updateOffer.salary_max &&
+      +updateOffer.salary_min > +offer.salary_max
     )
       return "Minimalne wynagrodzenie nie może być większe niż maksymalne";
     return null;
@@ -75,31 +51,15 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/job-offerts/add",
-        offer
+        "http://localhost:5000/api/job-offerts/update",
+        updateOffer
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
         setMessage(
           "Oferta została przesłana do weryfikacji przez Administratora"
         );
-        onOfferAdded();
-        setOffer({
-          title: "",
-          company: "",
-          location: "",
-          salary_min: "",
-          salary_max: "",
-          experience: "",
-          technologies: [],
-          contract_type: "",
-          description: "",
-          requirements: "",
-          responsibilities: "",
-          benefits: "",
-          company_id: "",
-          employer_id: userData.id,
-        });
+        window.dispatchEvent(new Event("updated-offer"));
       }
     } catch (err) {
       console.error(err);
@@ -111,16 +71,16 @@ const AddJobOffer = ({ onOfferAdded }) => {
     let input = e.target.parentElement.querySelector("input");
     if (input.value.length === 0) return;
 
-    setOffer({
-      ...offer,
-      technologies: [...new Set([...offer.technologies, input.value])],
+    setUpdateOffer({
+      ...updateOffer,
+      technologies: [...new Set([...updateOffer.technologies, input.value])],
     });
   };
 
   const addSkillorLanguage = (e) => {
-    setOffer({
-      ...offer,
-      technologies: [...new Set([...offer.technologies, e.target.value])],
+    setUpdateOffer({
+      ...updateOffer,
+      technologies: [...new Set([...updateOffer.technologies, e.target.value])],
     });
   };
 
@@ -128,24 +88,29 @@ const AddJobOffer = ({ onOfferAdded }) => {
     const skills = new Set([...offer.technologies]);
     skills.delete(e.target.textContent);
 
-    setOffer({
-      ...offer,
+    setUpdateOffer({
+      ...updateOffer,
       technologies: [...skills],
     });
   };
   return (
-    <div className={styles.container1} id="add-job-offer">
+    <div
+      className={styles.container1 + " " + `update-job-offer${offer.id}`}
+      id="update-job-offer"
+    >
       <div className={styles.container}>
         <IoMdClose
           style={{ cursor: "pointer" }}
           onClick={() => {
-            document.querySelector("#add-job-offer").style.display = "none";
+            document.querySelector(
+              `.update-job-offer${offer.id}`
+            ).style.display = "none";
             document.querySelector("#root").style.overflow = "auto";
             setError("");
             setMessage("");
           }}
         />
-        <h2>Dodaj nową ofertę pracy</h2>
+        <h2>Aktualizuj oferte pracy</h2>
 
         {error && <p className={styles.error}>{error}</p>}
         {message && <p className={styles.success}>{message}</p>}
@@ -154,24 +119,28 @@ const AddJobOffer = ({ onOfferAdded }) => {
           <label>Tytuł oferty*</label>
           <input
             type="text"
-            value={offer.title}
-            onChange={(e) => setOffer({ ...offer, title: e.target.value })}
+            value={updateOffer.title}
+            onChange={(e) =>
+              setUpdateOffer({ ...updateOffer, title: e.target.value })
+            }
             placeholder="Np. Frontend Developer"
           />
 
           <label>Lokalizacja*</label>
           <input
             type="text"
-            value={offer.location}
-            onChange={(e) => setOffer({ ...offer, location: e.target.value })}
+            value={updateOffer.location}
+            onChange={(e) =>
+              setUpdateOffer({ ...updateOffer, location: e.target.value })
+            }
             placeholder="Np. Warszawa / Zdalnie"
           />
 
           <label>Rodzaj umowy</label>
           <select
-            value={offer.contract_type}
+            value={updateOffer.contract_type}
             onChange={(e) =>
-              setOffer({ ...offer, contract_type: e.target.value })
+              setUpdateOffer({ ...updateOffer, contract_type: e.target.value })
             }
           >
             <option value="">Wybierz...</option>
@@ -186,9 +155,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
               <label>Wynagrodzenie min.</label>
               <input
                 type="number"
-                value={offer.salary_min}
+                value={updateOffer.salary_min}
                 onChange={(e) =>
-                  setOffer({ ...offer, salary_min: e.target.value })
+                  setUpdateOffer({ ...updateOffer, salary_min: e.target.value })
                 }
                 placeholder="np. 8000"
               />
@@ -198,9 +167,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
               <label>Wynagrodzenie max.</label>
               <input
                 type="number"
-                value={offer.salary_max}
+                value={updateOffer.salary_max}
                 onChange={(e) =>
-                  setOffer({ ...offer, salary_max: e.target.value })
+                  setUpdateOffer({ ...updateOffer, salary_max: e.target.value })
                 }
                 placeholder="np. 15000"
               />
@@ -211,8 +180,10 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
           <select
             name="career_level"
-            value={offer.experience}
-            onChange={(e) => setOffer({ ...offer, experience: e.target.value })}
+            value={updateOffer.experience}
+            onChange={(e) =>
+              setUpdateOffer({ ...updateOffer, experience: e.target.value })
+            }
           >
             <option value="Intern">Intern</option>
             <option value="Junior">Junior</option>
@@ -227,7 +198,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
           </label>
           <div className={styles.skill}>
             <div className={styles.skillsList}>
-              {offer.technologies?.map((el) => {
+              {updateOffer.technologies?.map((el) => {
                 return (
                   <span
                     style={{ cursor: "pointer" }}
@@ -271,35 +242,40 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
           <label>Opis stanowiska*</label>
           <textarea
-            value={offer.description}
+            value={updateOffer.description}
             onChange={(e) =>
-              setOffer({ ...offer, description: e.target.value })
+              setUpdateOffer({ ...updateOffer, description: e.target.value })
             }
             placeholder="Wprowadź pełny opis stanowiska..."
           />
 
           <label>Wymagania</label>
           <textarea
-            value={offer.requirements}
+            value={updateOffer.requirements}
             onChange={(e) =>
-              setOffer({ ...offer, requirements: e.target.value })
+              setUpdateOffer({ ...updateOffer, requirements: e.target.value })
             }
             placeholder="Wymagania dla kandydata..."
           />
 
           <label>Zakres obowiązków</label>
           <textarea
-            value={offer.responsibilities}
+            value={updateOffer.responsibilities}
             onChange={(e) =>
-              setOffer({ ...offer, responsibilities: e.target.value })
+              setUpdateOffer({
+                ...updateOffer,
+                responsibilities: e.target.value,
+              })
             }
             placeholder="Czym będziesz się zajmować..."
           />
 
           <label>Benefity</label>
           <textarea
-            value={offer.benefits}
-            onChange={(e) => setOffer({ ...offer, benefits: e.target.value })}
+            value={updateOffer.benefits}
+            onChange={(e) =>
+              setUpdateOffer({ ...updateOffer, benefits: e.target.value })
+            }
             placeholder="Co oferuje firma..."
           />
 
@@ -316,4 +292,4 @@ const AddJobOffer = ({ onOfferAdded }) => {
   );
 };
 
-export default AddJobOffer;
+export default UpdateJobOffer;

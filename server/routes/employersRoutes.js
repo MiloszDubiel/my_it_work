@@ -186,7 +186,7 @@ router.post("/get-my-offers", async (req, res) => {
     if (!owner_id) {
       return res.status(400).json({ error: "Brak owner_id w zapytaniu" });
     }
-    
+
     const [companyResult] = await connection.query(
       "SELECT id FROM companies WHERE owner_id = ?",
       [owner_id]
@@ -200,9 +200,8 @@ router.post("/get-my-offers", async (req, res) => {
 
     const company_id = companyResult[0].id;
 
-    // Pobieramy wszystkie oferty pracy powiązane z firmą
     const [offers] = await connection.query(
-      "SELECT * FROM job_offers WHERE company_id = ?",
+      "SELECT  job_offers.companyName, job_offers.contractType, job_offers.workingMode, job_offers.title, job_offers.id, job_offers.updated_at, job_offers.is_active,   job_offers.salary, job_offers.experience, job_offers.technologies, job_details.description, job_details.requirements, job_details.benefits, job_details.responsibilities FROM job_offers INNER JOIN job_details ON job_offers.id = job_details.job_offer_id WHERE company_id = ?",
       [company_id]
     );
 

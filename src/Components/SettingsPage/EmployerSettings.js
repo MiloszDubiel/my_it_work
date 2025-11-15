@@ -3,6 +3,7 @@ import styles from "./EmployerSettings.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
+import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
@@ -44,6 +45,12 @@ const EmployerSettings = () => {
       fetchOffers();
     }
   }, [activeTab, refresh]);
+
+  useEffect(() => {
+    window.addEventListener("updated-offer", () => {
+      setRefresh(!refresh);
+    });
+  });
 
   const handleOfferAdded = () => {
     fetchOffers();
@@ -319,38 +326,50 @@ const EmployerSettings = () => {
 
                 {offers.length > 0 ? (
                   offers.map((offer) => (
-                    <div key={offer.id} className={styles.row}>
-                      <span>{offer.title}</span>
-                      <span>
-                        {offer.is_active === 0
-                          ? "Czeka na weryfikacje"
-                          : "Aktywna"}
-                      </span>
-                      <span>
-                        {new Date(offer.created_at).toLocaleDateString()}
-                      </span>
-                      <span className={styles.actions}>
-                        <button>✏️</button>
-                        <button
-                          onClick={async () => {
-                            if (
-                              window.confirm(
-                                `Czy napewno chcesz usunąc oferte ${offer.title} `
-                              )
-                            ) {
-                              let res = await axios.delete(
-                                `http://localhost:5000/api/job-offerts/delete/${offer.id}`
-                              );
-                              if (res.data.success) {
-                                setRefresh(!refresh);
+                    <>
+                      <UpdateJobOffer offer={offer} />
+                      <div key={offer.id} className={styles.row}>
+                        <span>{offer.title}</span>
+                        <span>
+                          {offer.is_active === 0
+                            ? "W trakcie weryfikacje"
+                            : "Aktywna"}
+                        </span>
+                        <span>
+                          {new Date(offer.updated_at).toLocaleDateString()}
+                        </span>
+                        <span className={styles.actions}>
+                          <button
+                            onClick={() => {
+                              document.querySelector(
+                                `.update-job-offer${offer.id}`
+                              ).style.display = "flex";
+                            }}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (
+                                window.confirm(
+                                  `Czy napewno chcesz usunąc oferte ${offer.title} `
+                                )
+                              ) {
+                                let res = await axios.delete(
+                                  `http://localhost:5000/api/job-offerts/delete/${offer.id}`
+                                );
+                                console.log(res);
+                                if (res.data.success) {
+                                  setRefresh(!refresh);
+                                }
                               }
-                            }
-                          }}
-                        >
-                          🗑️
-                        </button>
-                      </span>
-                    </div>
+                            }}
+                          >
+                            🗑️
+                          </button>
+                        </span>
+                      </div>
+                    </>
                   ))
                 ) : (
                   <div className={styles.row}>

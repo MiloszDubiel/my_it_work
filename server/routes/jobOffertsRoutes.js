@@ -96,6 +96,7 @@ router.post("/add", async (req, res) => {
     contract_type,
     description,
     requirements,
+    responsibilities,
     benefits,
     company_id,
     technologies,
@@ -113,8 +114,8 @@ router.post("/add", async (req, res) => {
     const [jobOfferResult] = await conn.query(
       `
       INSERT INTO job_offers 
-      (title, company_id, companyName, workingMode, contractType, experience, technologies, description, salary, is_active, type, source)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)
+      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?)
       `,
       [
         title,
@@ -124,9 +125,8 @@ router.post("/add", async (req, res) => {
         JSON.stringify([contract_type ? contract_type : ""]),
         JSON.stringify([experience ? experience : ""]),
         JSON.stringify(technologies || []),
-        description,
         `${salary_min} - ${salary_max}`,
-        1,
+        0,
         "own",
         "user",
       ]
@@ -136,10 +136,10 @@ router.post("/add", async (req, res) => {
     await conn.query(
       `
       INSERT INTO job_details
-      (job_offer_id, requirements, benefits)
-      VALUES (?, ?, ?)
+      (job_offer_id, requirements, benefits, responsibilities)
+      VALUES (?, ?, ?, ?)
       `,
-      [offerId, requirements || "", benefits || ""]
+      [offerId, requirements || "", benefits || "", responsibilities || ""]
     );
 
     await conn.commit();
@@ -164,6 +164,7 @@ router.delete("/delete/:id", async (req, res) => {
   if (!id) {
     return res.status(400).json({ error: "Brak wymaganych pól!" });
   }
+  console.log(id);
 
   const conn = await connection.getConnection();
   await conn.beginTransaction();
@@ -185,6 +186,77 @@ router.delete("/delete/:id", async (req, res) => {
   } catch (err) {
     await conn.rollback();
     console.error("Błąd podczas usuwania oferty:", err);
+    res.status(500).json({ error: "Błąd serwera" });
+  } finally {
+    conn.release();
+  }
+});
+
+router.post("/update", async (req, res) => {
+  const {
+    offer_id,
+    title,
+    company,
+    location,
+    salary_min,
+    salary_max,
+    contract_type,
+    description,
+    requirements,
+    responsibilities,
+    benefits,
+    company_id,
+    technologies,
+    experience,
+  } = req.body;
+
+  if (!offer_id || !title) {
+    return res.status(400).json({ error: "Brak wymaganych pól!" });
+  }
+
+  const conn = await connection.getConnection();
+  await conn.beginTransaction();
+
+  try {
+    const [jobOfferResult] = await conn.query(
+      `
+      UPDATE job_offers SET title = ?, companyName = ?, workingMode = ?, contractType= ?, experience = ? , technologies = ?, salary = ? WHERE id = ? 
+      `,
+      [
+        title,
+        company,
+        JSON.stringify([location ? location : ""]),
+        JSON.stringify([contract_type ? contract_type : ""]),
+        JSON.stringify([experience ? experience : ""]),
+        JSON.stringify(technologies || []),
+        `${salary_min} - ${salary_max}`,
+        offer_id,
+      ]
+    );
+
+    await conn.query(
+      `
+      UPDATE job_details SET description = ? ,requirements = ?, benefits = ? , responsibilities = ? 
+      WHERE job_offer_id = ? 
+      `,
+      [
+        description,
+        requirements || "",
+        benefits || "",
+        responsibilities || "",
+        offer_id,
+      ]
+    );
+
+    await conn.commit();
+
+    res.status(200).json({
+      success: true,
+      message: "Oferta została zaaktualizowana",
+    });
+  } catch (err) {
+    await conn.rollback();
+    console.error("Błąd podczas dodawania oferty:", err);
     res.status(500).json({ error: "Błąd serwera" });
   } finally {
     conn.release();
