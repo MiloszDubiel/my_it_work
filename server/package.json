@@ -16,6 +16,7 @@
     "express": "^4.21.2",
     "file-type": "^21.0.0",
     "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "mysql2": "^3.14.3",
     "puppeteer": "^24.29.1",

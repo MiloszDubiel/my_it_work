@@ -8,45 +8,36 @@ import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
 import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
 import FilltredEmployers from "./Components/EmployersComponent/FiltredEmployerComponent";
+import AdminRoute from "./Components/AdminPanel/AdminRoute";
+
 const App = () => {
   return (
     <>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-        </Routes>
-        <Routes>
           <Route path="/login" element={<LoginPage />} />
-        </Routes>
-        <Routes>
           <Route path="/register" element={<RegisterPage />} />
-        </Routes>
-        <Routes>
           <Route path="/job-offers" element={<JobOffersPage />} />
-        </Routes>
-        <Routes>
           <Route path="/employers" element={<EmployersComponent />} />
-        </Routes>
-        <Routes>
           <Route path="/candidates" element={<CandidateComponent />} />
-        </Routes>
-        <Routes>
           <Route
             path="/job-offers/filltred"
             element={<FiltredJobOffersPage offersPage={true} />}
           />
-        </Routes>
-        <Routes>
           <Route
             path="/employers/filltred"
             element={<FilltredEmployers employerPage={true} />}
           />
-        </Routes>
-        <Routes>
           <Route path="/candidates/filltred" element={""} />
-        </Routes>
-        <Routes>
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </>

@@ -41,6 +41,7 @@ const LoginForm = () => {
 
       setInfo(res.data.info);
       sessionStorage.setItem("user-data", JSON.stringify(res.data.user));
+      sessionStorage.setItem("token", res.data.token);
       setTimeout(() => navigate("/", { replace: true }), 1000);
     } catch (err) {
       setError(JSON.parse(err.request.response).error);

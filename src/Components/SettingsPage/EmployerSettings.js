@@ -304,8 +304,7 @@ const EmployerSettings = () => {
           {activeTab === "offers" && (
             <section className={styles.section}>
               <AddJobOffer onOfferAdded={handleOfferAdded} />
-              <h3>Oferty pracy</h3>
-              <p>Tutaj możesz zarządzać swoimi ofertami pracy.</p>
+              <h3>Tutaj możesz zarządzać swoimi ofertami pracy</h3>
               <button
                 className={styles.addBtn}
                 onClick={() => {

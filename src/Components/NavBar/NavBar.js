@@ -127,17 +127,23 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
           >
             {userData?.email ? (
               <>
-                <Link
-                  onClick={() => {
-                    document.querySelector("#settings").style.display = "flex";
-                    document.querySelector("#root").style.overflow = "hidden";
+                {userData?.role !== "admin" ? (
+                  <Link
+                    onClick={() => {
+                      document.querySelector("#settings").style.display =
+                        "flex";
+                      document.querySelector("#root").style.overflow = "hidden";
 
-                    sessionStorage.setItem("tab", "company");
-                    window.dispatchEvent(new Event("setting-changed"));
-                  }}
-                >
-                  Ustawienia
-                </Link>
+                      sessionStorage.setItem("tab", "company");
+                      window.dispatchEvent(new Event("setting-changed"));
+                    }}
+                  >
+                    Ustawienia
+                  </Link>
+                ) : (
+                  ""
+                )}
+
                 {userData.role === "employer" ? (
                   <>
                     {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
@@ -162,6 +168,12 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       Dodaj swoją kandydaturę
                     </Link>
                   </>
+                ) : (
+                  ""
+                )}
+
+                {userData?.role == "admin" ? (
+                  <Link to="/admin">Ustawienia</Link>
                 ) : (
                   ""
                 )}

@@ -2,10 +2,14 @@ import express, { json } from "express";
 import { connection } from "../config/db.js";
 import bcrypt from "bcryptjs";
 import { fileTypeFromBuffer } from "file-type";
+import jwt from "jsonwebtoken";
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || "changeme";
+
+
 
 router.post("/login", async (req, res) => {
-  let { email, password } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     res.json({ error: "Puste pola" });
@@ -30,7 +34,11 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Niepoprawne dane logowania" });
     }
 
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
+      expiresIn: "8h",
+    });
     res.json({
+      token,
       info: "Zalogowano",
       user: {
         id: user.id,

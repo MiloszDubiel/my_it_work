@@ -1,260 +1,198 @@
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AdminPanel.module.css";
 import axios from "axios";
-import LoadingComponent from "../LoadingComponent/LoadingComponent";
-import ReactPaginate from "react-paginate";
-import UserItem from "./UserAdmin/UserItem";
-const fetchUsers = async () => {
-  try {
-    let response = await axios.get("http://localhost:3001/admin/get-users");
 
-    return response.data;
-  } catch (e) {
-    console.log(e);
-  }
-};
-const fetchOfferts = async () => {
-  try {
-    const request = await axios.get(
-      `http://localhost:5000/api/job-offerts`
-    );
-    return request.data;
-  } catch (e) {
-    console.log(e);
-  }
-};
+const AdminPanel = () => {
+  const [activeTab, setActiveTab] = useState("users");
+  const [users, setUsers] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [offers, setOffers] = useState([]);
 
-const Items = ({ currentItems, users, offerts, forceUpdate }) => {
-  let content = null;
-
-  if (currentItems && users) {
-    content = <UserItem listOfUsers={currentItems} forceUpdate={forceUpdate} />;
-  }
-  return <>{content}</>;
-};
-
-const PaginatedItems = ({
-  itemsPerPage,
-  users,
-  offerts,
-  forceUpdate,
-  forceUpdateItem,
-}) => {
-  const [currentItems, setCurrentItems] = useState(null);
-  const [pageCount, setPageCount] = useState(0);
-  const [itemOffset, setItemOffset] = useState(0);
-  const [items, setItems] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
+  // Pobierz dane po zmianie zakładki
   useEffect(() => {
-    setIsLoading(true);
-    if (users) {
-      fetchUsers().then((res) => {
-        setItems(res);
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(res.slice(itemOffset, endOffset));
-        setPageCount(Math.ceil(res.length / itemsPerPage));
-        setIsLoading(false);
-      });
-    } else if (offerts) {
-    }
+    if (activeTab === "users") loadUsers();
+    if (activeTab === "companies") loadCompanies();
+    if (activeTab === "offers") loadOffers();
+  }, [activeTab]);
 
-    console.log("RERENDER");
-  }, [itemOffset, itemsPerPage, forceUpdateItem]);
+  const loadUsers = () => {
+    axios
+      .get("http://localhost:5000/api/admin/get-users")
+      .then((res) => setUsers(res.data.users))
+      .catch((err) => console.error(err));
+  };
 
-  const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % items.length;
-    setItemOffset(newOffset);
+  const loadCompanies = () => {
+    axios
+      .get("http://localhost:5000/api/admin/get-companies")
+      .then((res) => setCompanies(res.data.companies))
+      .catch((err) => console.error(err));
+  };
+
+  const loadOffers = () => {
+    axios
+      .get("http://localhost:5000/api/admin/get-offers")
+      .then((res) => setOffers(res.data.offers))
+      .catch((err) => console.error(err));
+  };
+
+  const deleteUser = (id) => {
+    if (!window.confirm("Czy na pewno chcesz usunąć użytkownika?")) return;
+
+    axios
+      .post("http://localhost:5000/api/admin/delete-user", { id })
+      .then(() => loadUsers())
+      .catch((err) => console.error(err));
+  };
+
+  const deleteCompany = (id) => {
+    if (!window.confirm("Usunąć firmę?")) return;
+
+    axios
+      .post("http://localhost:5000/api/admin/delete-company", { id })
+      .then(() => loadCompanies())
+      .catch((err) => console.error(err));
+  };
+
+  const deleteOffer = (id) => {
+    if (!window.confirm("Usunąć ofertę pracy?")) return;
+
+    axios
+      .post("http://localhost:5000/api/admin/delete-offer", { id })
+      .then(() => loadOffers())
+      .catch((err) => console.error(err));
   };
 
   return (
-    <>
-      <Items
-        currentItems={currentItems}
-        users={users}
-        offerts={offerts}
-        forceUpdate={forceUpdate}
-        forceUpdateItem={forceUpdateItem}
-      />
-      {isLoading ? (
-        <LoadingComponent />
-      ) : (
-        <ReactPaginate
-          nextLabel=">"
-          onPageChange={handlePageClick}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={2}
-          pageCount={pageCount}
-          previousLabel="<"
-          pageClassName="page-item-for-employers"
-          pageLinkClassName="page-link-for-employers"
-          previousClassName="page-item-for-employers"
-          previousLinkClassName="page-link-for-employers"
-          nextClassName="page-item-for-employers"
-          nextLinkClassName="page-link-for-employers"
-          breakLabel="..."
-          breakClassName="page-item-for-employers"
-          breakLinkClassName="page-link-for-employers"
-          containerClassName="pagination-for-employers"
-          activeClassName="active-for-employers"
-          renderOnZeroPageCount={null}
-        />
-      )}
-    </>
-  );
-};
+    <div className={styles.adminContainer}>
+      <aside className={styles.sidebar}>
+        <h2>Panel Administratora</h2>
+        <ul>
+          <li
+            className={activeTab === "users" ? styles.active : ""}
+            onClick={() => setActiveTab("users")}
+          >
+            👤 Użytkownicy
+          </li>
+          <li
+            className={activeTab === "companies" ? styles.active : ""}
+            onClick={() => setActiveTab("companies")}
+          >
+            🏢 Firmy
+          </li>
+          <li
+            className={activeTab === "offers" ? styles.active : ""}
+            onClick={() => setActiveTab("offers")}
+          >
+            💼 Oferty pracy
+          </li>
+        </ul>
+      </aside>
 
-const AdminPanel = ({ users, jobOffers, companies }) => {
-  const [activeTab, setActiveTab] = useState("users");
-  const [forceUpdateItem, forceUpdate] = useReducer((x) => x + 1, 0);
-  return (
-    <div className={styles.panel}>
-      <h2>Panel administratora</h2>
-
-      {/* Zakładki */}
-      <div className={styles.tabs}>
-        <button
-          className={activeTab === "users" ? styles.active : ""}
-          onClick={() => setActiveTab("users")}
-        >
-          Użytkownicy
-        </button>
-        <button
-          className={activeTab === "jobOffers" ? styles.active : ""}
-          onClick={() => setActiveTab("jobOffers")}
-        >
-          Oferty pracy
-        </button>
-        <button
-          className={activeTab === "companies" ? styles.active : ""}
-          onClick={() => setActiveTab("companies")}
-        >
-          Firmy
-        </button>
-      </div>
-
-      {/* Sekcje */}
-      <div className={styles.content}>
+      <main className={styles.content}>
+        {/* --- UŻYTKOWNICY --- */}
         {activeTab === "users" && (
-          <div>
+          <section className={styles.section}>
             <h3>Lista użytkowników</h3>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Email</th>
-                  <th>Imię</th>
-                  <th>Nazwisko</th>
-                  <th>Rola</th>
-                  <th>Akcje</th>
-                </tr>
-              </thead>
-              <PaginatedItems
-                itemsPerPage={9}
-                users={true}
-                forceUpdate={forceUpdate}
-                forceUpdateItem={forceUpdateItem}
-              />
-              <tbody></tbody>
-            </table>
-          </div>
+            <div className={styles.table}>
+              <div className={styles.headerRow}>
+                <span>ID</span>
+                <span>Email</span>
+                <span>Imię</span>
+                <span>Typ</span>
+                <span>Akcje</span>
+              </div>
+
+              {users.map((u) => (
+                <div className={styles.row} key={u.id}>
+                  <span>{u.id}</span>
+                  <span>{u.email}</span>
+                  <span>
+                    {u.name} {u.surname}
+                  </span>
+                  <span>{u.role}</span>
+                  <span>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => deleteUser(u.id)}
+                    >
+                      🗑
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
-        {activeTab === "jobOffers" && (
-          <div>
+        {/* --- FIRMY --- */}
+        {activeTab === "companies" && (
+          <section className={styles.section}>
+            <h3>Firmy</h3>
+
+            <div className={styles.table}>
+              <div className={styles.headerRow}>
+                <span>ID</span>
+                <span>Nazwa</span>
+                <span>Email</span>
+                <span>Telefon</span>
+                <span>Akcje</span>
+              </div>
+
+              {companies.map((c) => (
+                <div className={styles.row} key={c.id}>
+                  <span>{c.id}</span>
+                  <span>{c.companyName}</span>
+                  <span>{c.email}</span>
+                  <span>{c.phone_number}</span>
+                  <span>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => deleteCompany(c.id)}
+                    >
+                      🗑
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* --- OFERTY PRACY --- */}
+        {activeTab === "offers" && (
+          <section className={styles.section}>
             <h3>Oferty pracy</h3>
 
-            <h4>Oczekujące na akceptację</h4>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Stanowisko</th>
-                  <th>Firma</th>
-                  <th>Lokalizacja</th>
-                  <th>Akcje</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobOffers
-                  ?.filter((o) => o.status === "pending")
-                  .map((o) => (
-                    <tr key={o.id}>
-                      <td>{o.id}</td>
-                      <td>{o.title}</td>
-                      <td>{o.company}</td>
-                      <td>{o.location}</td>
-                      <td>
-                        <button className={styles.primary}>Akceptuj</button>
-                        <button className={styles.danger}>Odrzuć</button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className={styles.table}>
+              <div className={styles.headerRow}>
+                <span>ID</span>
+                <span>Stanowisko</span>
+                <span>Firma</span>
+                <span>Data</span>
+                <span>Akcje</span>
+              </div>
 
-            <h4>Dostępne</h4>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Stanowisko</th>
-                  <th>Firma</th>
-                  <th>Lokalizacja</th>
-                  <th>Akcje</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobOffers
-                  ?.filter((o) => o.status === "active")
-                  .map((o) => (
-                    <tr key={o.id}>
-                      <td>{o.id}</td>
-                      <td>{o.title}</td>
-                      <td>{o.company}</td>
-                      <td>{o.location}</td>
-                      <td>
-                        <button className={styles.danger}>Usuń</button>
-                        <button className={styles.primary}>Edytuj</button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+              {offers.map((o) => (
+                <div className={styles.row} key={o.id}>
+                  <span>{o.id}</span>
+                  <span>{o.title}</span>
+                  <span>{o.companyName}</span>
+                  <span>{o.created_at}</span>
+                  <span>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => deleteOffer(o.id)}
+                    >
+                      🗑
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
-
-        {activeTab === "companies" && (
-          <div>
-            <h3>Firmy</h3>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nazwa</th>
-                  <th>Technologie</th>
-                  <th>Lokalizacja</th>
-                  <th>Akcje</th>
-                </tr>
-              </thead>
-              <tbody>
-                {companies?.map((c) => (
-                  <tr key={c.id}>
-                    <td>{c.id}</td>
-                    <td>{c.name}</td>
-                    <td>{c.technologies?.join(", ")}</td>
-                    <td>{c.location}</td>
-                    <td>
-                      <button className={styles.danger}>Usuń</button>
-                      <button className={styles.primary}>Edytuj</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 };
