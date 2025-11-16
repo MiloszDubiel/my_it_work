@@ -3,17 +3,54 @@ import { connection } from "../config/db.js";
 import { authenticateToken, isAdmin } from "../middleware/authJwt.js";
 const router = express.Router();
 
+function parsePaginationParams(req) {
+  const page = Math.max(1, parseInt(req.query.page || "1", 10));
+  const pageSize = Math.max(
+    1,
+    Math.min(100, parseInt(req.query.pageSize || "10", 10))
+  );
+  const search = (req.query.search || "").trim();
+  const offset = (page - 1) * pageSize;
+  return { page, pageSize, search, offset };
+}
+
 router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   try {
-    const [users] = await connection.query(
-      "SELECT id, email, name, surname, role, is_active, created_at FROM users WHERE role <> 'admin' ORDER BY id DESC"
-    );
-    res.json({ users });
+    const { page, pageSize, search, offset } = parsePaginationParams(req);
+
+    // count total
+    let countSql = "SELECT COUNT(*) AS cnt FROM users";
+    const countParams = [];
+    if (search) {
+      countSql += " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
+      const like = `%${search}%`;
+      countParams.push(like, like, like);
+    }
+    const [[countRow]] = await connection.query(countSql, countParams);
+    const total = countRow.cnt;
+    const totalPages = Math.ceil(total / pageSize);
+
+    // fetch rows
+    let dataSql = `SELECT id, email, name, surname, role, is_active, created_at
+                   FROM users`;
+    const dataParams = [];
+    if (search) {
+      dataSql += " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
+      const like = `%${search}%`;
+      dataParams.push(like, like, like);
+    }
+    dataSql += " ORDER BY id DESC LIMIT ? OFFSET ?";
+    dataParams.push(pageSize, offset);
+
+    const [rows] = await connection.query(dataSql, dataParams);
+
+    res.json({ users: rows, page, pageSize, total, totalPages });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd pobierania użytkowników" });
+    console.error("GET /admin/get-users error:", err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
+
 //Edycja uzytkowników
 router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -44,28 +81,78 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
 
 router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
   try {
-    const [companies] = await connection.query(
-      "SELECT id, companyName, email, phone_number, owner_id, link, img FROM companies ORDER BY id DESC"
-    );
-    res.json({ companies });
+    const { page, pageSize, search, offset } = parsePaginationParams(req);
+
+    let countSql = "SELECT COUNT(*) AS cnt FROM companies";
+    const countParams = [];
+    if (search) {
+      countSql += " WHERE (companyName LIKE ? OR email LIKE ?)";
+      const like = `%${search}%`;
+      countParams.push(like, like);
+    }
+    const [[countRow]] = await connection.query(countSql, countParams);
+    const total = countRow.cnt;
+    const totalPages = Math.ceil(total / pageSize);
+
+    let dataSql = `SELECT id, companyName, email, phone_number, owner_id, link, img, created_at
+                   FROM companies`;
+    const dataParams = [];
+    if (search) {
+      dataSql += " WHERE (companyName LIKE ? OR email LIKE ?)";
+      const like = `%${search}%`;
+      dataParams.push(like, like);
+    }
+    dataSql += " ORDER BY id DESC LIMIT ? OFFSET ?";
+    dataParams.push(pageSize, offset);
+
+    const [rows] = await connection.query(dataSql, dataParams);
+
+    res.json({ companies: rows, page, pageSize, total, totalPages });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd pobierania firm" });
+    console.error("GET /admin/get-companies error:", err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
 
 router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
   try {
-    const [offers] = await connection.query(
-      `SELECT job_offers.*, companies.companyName AS companyName, companies.img AS company_img
-       FROM job_offers
-       LEFT JOIN companies ON companies.id = job_offers.company_id
-       ORDER BY job_offers.id DESC`
-    );
-    res.json({ offers });
+    const { page, pageSize, search, offset } = parsePaginationParams(req);
+
+    // count (join to companies for companyName search)
+    let countSql = `SELECT COUNT(*) AS cnt
+       FROM job_offers jo
+       LEFT JOIN companies c ON c.id = jo.company_id`;
+    const countParams = [];
+    if (search) {
+      countSql += " WHERE (jo.title LIKE ? OR c.companyName LIKE ?)";
+      const like = `%${search}%`;
+      countParams.push(like, like);
+    }
+    const [[countRow]] = await connection.query(countSql, countParams);
+    const total = countRow.cnt;
+    const totalPages = Math.ceil(total / pageSize);
+
+    // fetch rows with joined companyName and img
+    let dataSql = `SELECT jo.id, jo.title, jo.company_id, jo.companyName, jo.img AS job_img,
+              jo.salary, jo.is_active, jo.created_at,
+              c.img AS company_img
+       FROM job_offers jo
+       LEFT JOIN companies c ON c.id = jo.company_id`;
+    const dataParams = [];
+    if (search) {
+      dataSql += " WHERE (jo.title LIKE ? OR c.companyName LIKE ?)";
+      const like = `%${search}%`;
+      dataParams.push(like, like);
+    }
+    dataSql += " ORDER BY jo.id DESC LIMIT ? OFFSET ?";
+    dataParams.push(pageSize, offset);
+
+    const [rows] = await connection.query(dataSql, dataParams);
+
+    res.json({ offers: rows, page, pageSize, total, totalPages });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd pobierania ofert pracy" });
+    console.error("GET /admin/get-offers error:", err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
 
@@ -122,53 +209,6 @@ router.put("/edit-company", authenticateToken, isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd aktualizacji firmy" });
-  }
-});
-
-router.put("/edit-offer", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const {
-      id,
-      title,
-      salary,
-      company_id,
-      companyName,
-      description,
-      is_active,
-      link,
-      type,
-      img,
-      technologies,
-      experience,
-      contractType,
-    } = req.body;
-
-    if (!id) return res.status(400).json({ error: "Brak id oferty" });
-
-    // aktualizuj job_offers
-    await connection.query(
-      `UPDATE job_offers SET title=?, salary=?, company_id=?, companyName=?, description=?, is_active=?, link=?, type=?, img=?, technologies=?, experience=?, contractType=?, updated_at = NOW() WHERE id=?`,
-      [
-        title || null,
-        salary || null,
-        company_id || null,
-        companyName || null,
-        description || null,
-        typeof is_active !== "undefined" ? is_active : 1,
-        link || null,
-        type || null,
-        img || null,
-        technologies ? JSON.stringify(technologies) : null,
-        experience ? JSON.stringify(experience) : null,
-        contractType ? JSON.stringify(contractType) : null,
-        id,
-      ]
-    );
-
-    res.json({ info: "Zaktualizowano ofertę pracy" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd aktualizacji oferty" });
   }
 });
 
