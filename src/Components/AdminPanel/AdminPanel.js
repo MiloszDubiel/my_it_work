@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./AdminPanel.module.css";
 import UserEditModal from "./UserEditModal";
 import CompanyEditModal from "./CompanyEditModal";
+import OfferEditModal from "./OfferEditMOdal";
 import axios from "axios";
 
 const AdminPanel = () => {
@@ -15,13 +16,25 @@ const AdminPanel = () => {
   const [isEditingComapny, setIsEditingCompany] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageComapny, setPageCompany] = useState(1);
+  const [pageOffers, setPageOffers] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [isEditingOffer, setIsEditingOffer] = useState(false);
 
   useEffect(() => {
     if (activeTab === "users") loadUsers();
     if (activeTab === "companies") loadCompanies();
     if (activeTab === "offers") loadOffers();
-  }, [activeTab, isEditing, isEditingComapny, page, search]);
+  }, [
+    activeTab,
+    isEditing,
+    isEditingComapny,
+    page,
+    pageComapny,
+    pageOffers,
+    search,
+  ]);
 
   const loadUsers = () => {
     axios
@@ -43,7 +56,7 @@ const AdminPanel = () => {
   const loadCompanies = () => {
     axios
       .get(
-        `http://localhost:5000/admin/get-companies?page=${page}&search=${search}`,
+        `http://localhost:5000/admin/get-companies?page=${pageComapny}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -60,7 +73,7 @@ const AdminPanel = () => {
   const loadOffers = () => {
     axios
       .get(
-        `http://localhost:5000/api/admin/get-offers?page=${page}&search=${search}`,
+        `http://localhost:5000/admin/get-offers?page=${pageOffers}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -87,7 +100,15 @@ const AdminPanel = () => {
     if (!window.confirm("Usunąć firmę?")) return;
 
     axios
-      .post("http://localhost:5000/api/admin/delete-company", { id })
+      .post(
+        "http://localhost:5000/api/admin/delete-company",
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then(() => loadCompanies())
       .catch((err) => console.error(err));
   };
@@ -96,7 +117,15 @@ const AdminPanel = () => {
     if (!window.confirm("Usunąć ofertę pracy?")) return;
 
     axios
-      .post("http://localhost:5000/api/admin/delete-offer", { id })
+      .post(
+        "http://localhost:5000/api/admin/delete-offer",
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then(() => loadOffers())
       .catch((err) => console.error(err));
   };
@@ -176,12 +205,14 @@ const AdminPanel = () => {
                     >
                       ✏️
                     </button>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => deleteUser(u.id)}
-                    >
-                      🗑
-                    </button>
+                    {u.role !== "admin" && (
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={() => deleteUser(u.id)}
+                      >
+                        🗑
+                      </button>
+                    )}
                   </span>
                 </div>
               ))}
@@ -215,8 +246,8 @@ const AdminPanel = () => {
             {isEditingComapny && (
               <CompanyEditModal
                 company={selectedCompany}
-                onClose={() => setIsEditing(false)}
-                onSave={() => setIsEditing(false)}
+                onClose={() => setIsEditingCompany(false)}
+                onSave={() => setIsEditingCompany(false)}
               />
             )}
             <input
@@ -225,14 +256,13 @@ const AdminPanel = () => {
               className={styles.searchInput}
               value={search}
               onChange={(e) => {
-                setPage(1);
+                setPageCompany(1);
                 setSearch(e.target.value);
               }}
             />
 
             <div className={styles.table}>
               <div className={styles.headerRow}>
-                <span>ID</span>
                 <span>Nazwa</span>
                 <span>Email</span>
                 <span>Telefon</span>
@@ -241,7 +271,6 @@ const AdminPanel = () => {
 
               {companies.map((c) => (
                 <div className={styles.row} key={c.id}>
-                  <span>{c.id}</span>
                   <span>{c.companyName}</span>
                   <span>{c.email}</span>
                   <span>{c.phone_number}</span>
@@ -266,19 +295,19 @@ const AdminPanel = () => {
               ))}
               <div className={styles.pagination}>
                 <button
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => p - 1)}
+                  disabled={pageComapny === 1}
+                  onClick={() => setPageCompany((p) => p - 1)}
                 >
                   ◀ Poprzednia
                 </button>
 
                 <span>
-                  Strona {page} z {totalPages}
+                  Strona {pageComapny} z {totalPages}
                 </span>
 
                 <button
-                  disabled={page === totalPages}
-                  onClick={() => setPage((p) => p + 1)}
+                  disabled={pageComapny === totalPages}
+                  onClick={() => setPageCompany((p) => p + 1)}
                 >
                   Następna ▶
                 </button>
@@ -291,20 +320,26 @@ const AdminPanel = () => {
         {activeTab === "offers" && (
           <section className={styles.section}>
             <h3>Oferty pracy</h3>
+            {isEditingOffer && (
+              <OfferEditModal
+                offer={selectedOffer}
+                onClose={() => setIsEditingOffer(false)}
+                onSave={loadOffers}
+              />
+            )}
             <input
               type="text"
               placeholder="Szukaj po stanowisku"
               className={styles.searchInput}
               value={search}
               onChange={(e) => {
-                setPage(1);
+                setPageOffers(1);
                 setSearch(e.target.value);
               }}
             />
 
             <div className={styles.table}>
               <div className={styles.headerRow}>
-                <span>ID</span>
                 <span>Stanowisko</span>
                 <span>Firma</span>
                 <span>Data</span>
@@ -313,11 +348,19 @@ const AdminPanel = () => {
 
               {offers.map((o) => (
                 <div className={styles.row} key={o.id}>
-                  <span>{o.id}</span>
                   <span>{o.title}</span>
                   <span>{o.companyName}</span>
                   <span>{o.created_at}</span>
                   <span>
+                    <button
+                      className={styles.editBtn}
+                      onClick={() => {
+                        setSelectedOffer(o);
+                        setIsEditingOffer(true);
+                      }}
+                    >
+                      ✏️
+                    </button>
                     <button
                       className={styles.deleteBtn}
                       onClick={() => deleteOffer(o.id)}
@@ -330,19 +373,19 @@ const AdminPanel = () => {
             </div>
             <div className={styles.pagination}>
               <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
+                disabled={pageOffers === 1}
+                onClick={() => setPageOffers((p) => p - 1)}
               >
                 ◀ Poprzednia
               </button>
 
               <span>
-                Strona {page} z {totalPages}
+                Strona {pageOffers} z {totalPages}
               </span>
 
               <button
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                disabled={pageOffers === totalPages}
+                onClick={() => setPageOffers((p) => p + 1)}
               >
                 Następna ▶
               </button>

@@ -9,12 +9,11 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
     email: "",
     phone_number: "",
     link: "",
+    id: company.id,
   });
 
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [logoFile, setLogoFile] = useState(null);
-  const [errors, setErrors] = useState({});
-
+  const [errors, setErrors] = useState("");
+  const [info, setInfo] = useState("");
   useEffect(() => {
     if (company) {
       setForm({
@@ -23,71 +22,60 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
         email: company.email || "",
         phone_number: company.phone_number || "",
         link: company.link || "",
+        id: company.id,
       });
-
-      if (company.img) {
-        setLogoPreview(company.img);
-      }
     }
   }, [company]);
 
   const validate = () => {
-    const e = {};
-
     if (!form.companyName || form.companyName.length < 2) {
-      e.companyName = "Nazwa firmy musi mieć co najmniej 2 znaki.";
+      setErrors("Nazwa firmy musi mieć co najmniej 2 znaki.");
+      return false;
     }
 
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
-      e.email = "Niepoprawny format email.";
+      setErrors("Niepoprawny format email.");
+      return false;
     }
 
     if (form.phone_number && !/^[0-9+\-\s]{5,20}$/.test(form.phone_number)) {
-      e.phone_number = "Niepoprawny numer telefonu.";
+      setErrors("Niepoprawny numer telefonu.");
+      return false;
     }
 
     if (form.link && !/^https?:\/\/.+/.test(form.link)) {
-      e.link = "Podaj poprawny adres URL (https://...)";
+      setErrors("Podaj poprawny adres URL (https://...)");
+      return false;
     }
 
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    if (form.phone_number && !/^[0-9]{9}$/.test(form.phone_number)) {
+      setErrors("Numer telefonu musi mieć dokładnie 9 cyfr.");
+      return false;
+    }
+
+    return true;
   };
 
   const handleChange = (e) => {
+    setErrors("");
+    setInfo("");
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    setLogoFile(file);
-    if (file) {
-      setLogoPreview(URL.createObjectURL(file));
-    }
   };
 
   const save = () => {
     if (!validate()) return;
 
-    const fd = new FormData();
-    fd.append("owner_id", company.owner_id);
-    fd.append("companyName", form.companyName);
-    fd.append("description", form.description);
-    fd.append("email", form.email);
-    fd.append("phone_number", form.phone_number);
-    fd.append("link", form.link);
-
-    if (logoFile) {
-      fd.append("logo", logoFile);
-    }
+    setErrors("");
+    setInfo("");
 
     axios
-      .post("http://localhost:5000/api/employers/set-company-info", fd, {
+      .put("http://localhost:5000/admin/edit-company", form, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
       })
-      .then(() => {
+      .then((res) => {
+        setInfo(res.data.info);
         onSave();
         onClose();
       })
@@ -100,7 +88,8 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
     <div className={styles.modalBackground}>
       <div className={styles.modal}>
         <h2>Edytuj firmę</h2>
-
+        <p className={styles.error}>{errors}</p>
+        <p className={styles.info}>{info}</p>
         <label>Nazwa firmy</label>
         <input
           name="companyName"
@@ -108,9 +97,6 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           onChange={handleChange}
           type="text"
         />
-        {errors.companyName && (
-          <p className={styles.error}>{errors.companyName}</p>
-        )}
 
         <label>Opis</label>
         <textarea
@@ -119,14 +105,13 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           onChange={handleChange}
         ></textarea>
 
-        <label>Email kontaktowy</label>
+        <label>Email kontaktowy do firmy </label>
         <input
           name="email"
           value={form.email}
           onChange={handleChange}
           type="email"
         />
-        {errors.email && <p className={styles.error}>{errors.email}</p>}
 
         <label>Numer telefonu</label>
         <input
@@ -135,9 +120,6 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           onChange={handleChange}
           type="text"
         />
-        {errors.phone_number && (
-          <p className={styles.error}>{errors.phone_number}</p>
-        )}
 
         <label>Link (strona, LinkedIn, itp.)</label>
         <input
@@ -146,15 +128,6 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           onChange={handleChange}
           type="text"
         />
-        {errors.link && <p className={styles.error}>{errors.link}</p>}
-
-        <label>Logo firmy</label>
-
-        <input type="file" accept="image/*" onChange={handleLogoChange} />
-
-        {logoPreview && (
-          <img src={logoPreview} alt="preview" className={styles.preview} />
-        )}
 
         <div className={styles.buttons}>
           <button className={styles.cancelBtn} onClick={onClose}>
@@ -164,7 +137,7 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           <button
             className={styles.saveBtn}
             onClick={save}
-            disabled={Object.keys(errors).length > 0}
+            disabled={errors.length > 0 ? true : false}
           >
             Zapisz
           </button>

@@ -13,16 +13,16 @@ function parsePaginationParams(req) {
   const offset = (page - 1) * pageSize;
   return { page, pageSize, search, offset };
 }
-
+//UZYTKOWNICY
 router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
 
-    // count total
     let countSql = "SELECT COUNT(*) AS cnt FROM users";
     const countParams = [];
     if (search) {
-      countSql += " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
+      countSql +=
+        " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ? AND role)";
       const like = `%${search}%`;
       countParams.push(like, like, like);
     }
@@ -51,7 +51,6 @@ router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-//Edycja uzytkowników
 router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
@@ -78,7 +77,18 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
     res.status(500).json({ error: "Błąd serwera" });
   }
 });
+router.post("/delete-user", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    await connection.query("DELETE FROM users WHERE id = ?", [id]);
+    res.json({ info: "Usunięto użytkownika" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Nie udało się usunąć użytkownika" });
+  }
+});
 
+//Firmy
 router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
@@ -114,6 +124,56 @@ router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
+router.put("/edit-company", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { id, companyName, link, description, email, phone_number, img } =
+      req.body;
+    console.log(req.body);
+    if (!id) return res.status(400).json({ error: "Brak id" });
+
+    await connection.query(
+      `UPDATE companies 
+       SET companyName = ?, link = ?, description = ?, email = ?, phone_number = ?, img = ?
+       WHERE id = ?`,
+      [
+        companyName || null,
+        link || null,
+        description || null,
+        email || null,
+        phone_number || null,
+        img || null,
+        id,
+      ]
+    );
+
+    // opcjonalnie synchronizuj img do job_offers
+    if (img) {
+      await connection.query(
+        "UPDATE job_offers SET img = ? WHERE company_id = ?",
+        [img, id]
+      );
+    }
+
+    res.json({ info: "Zaktualizowano firmę" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd aktualizacji firmy" });
+  }
+});
+
+router.post("/delete-company", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    await connection.query("DELETE FROM job_offers WHERE company_id = ?", [id]);
+    await connection.query("DELETE FROM companies WHERE id = ?", [id]);
+    res.json({ info: "Firma została usunięta" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Nie udało się usunąć firmy" });
+  }
+});
+
+//OFERTY
 router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
@@ -153,85 +213,6 @@ router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
   } catch (err) {
     console.error("GET /admin/get-offers error:", err);
     res.status(500).json({ error: "Błąd serwera" });
-  }
-});
-
-router.put("/edit-user", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { id, name, surname, email, role } = req.body;
-    if (!id) return res.status(400).json({ error: "Brak id" });
-
-    if (!email || !name)
-      return res.status(400).json({ error: "Brak wymaganych pól" });
-
-    await connection.query(
-      "UPDATE users SET name = ?, surname = ?, email = ?, role = ? WHERE id = ?",
-      [name, surname || null, email, role || "user", id]
-    );
-
-    res.json({ info: "Zaktualizowano użytkownika" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd aktualizacji użytkownika" });
-  }
-});
-
-router.put("/edit-company", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { id, companyName, link, description, email, phone_number, img } =
-      req.body;
-    if (!id) return res.status(400).json({ error: "Brak id" });
-
-    await connection.query(
-      `UPDATE companies 
-       SET companyName = ?, link = ?, description = ?, email = ?, phone_number = ?, img = ?
-       WHERE id = ?`,
-      [
-        companyName || null,
-        link || null,
-        description || null,
-        email || null,
-        phone_number || null,
-        img || null,
-        id,
-      ]
-    );
-
-    // opcjonalnie synchronizuj img do job_offers
-    if (img) {
-      await connection.query(
-        "UPDATE job_offers SET img = ? WHERE company_id = ?",
-        [img, id]
-      );
-    }
-
-    res.json({ info: "Zaktualizowano firmę" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd aktualizacji firmy" });
-  }
-});
-
-router.post("/delete-user", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { id } = req.body;
-    await connection.query("DELETE FROM users WHERE id = ?", [id]);
-    res.json({ info: "Usunięto użytkownika" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Nie udało się usunąć użytkownika" });
-  }
-});
-
-router.post("/delete-company", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { id } = req.body;
-    await connection.query("DELETE FROM job_offers WHERE company_id = ?", [id]);
-    await connection.query("DELETE FROM companies WHERE id = ?", [id]);
-    res.json({ info: "Firma została usunięta" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Nie udało się usunąć firmy" });
   }
 });
 

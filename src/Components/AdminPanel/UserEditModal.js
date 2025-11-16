@@ -105,13 +105,19 @@ const UserEditModal = ({ user, onClose, onSave }) => {
           onChange={handleChange}
           type="email"
         />
-
-        <label>Aktywny</label>
-        <select name="is_active" value={form.is_active} onChange={handleChange}>
-          <option value="1">Tak</option>
-          <option value="0">Nie</option>
-        </select>
-
+        {user.role !== "admin" && (
+          <>
+            <label>Aktywny</label>
+            <select
+              name="is_active"
+              value={form.is_active}
+              onChange={handleChange}
+            >
+              <option value="1">Tak</option>
+              <option value="0">Nie</option>
+            </select>
+          </>
+        )}
         <div className={styles.buttons}>
           <button className={styles.cancelBtn} onClick={onClose}>
             Anuluj
