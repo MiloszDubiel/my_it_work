@@ -11,21 +11,19 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
     location: "",
     work_type: "stacjonarna",
   });
-
   const [errors, setErrors] = useState("");
+  const [info, setInfo] = useState("");
 
   useEffect(() => {
     if (offer) {
       setForm({
         title: offer.title || "",
         description: offer.description || "",
-        requirements: offer.requirements || "",
-        salary: offer.salary || "",
-        location: offer.location || "",
-        work_type: offer.work_type || "stacjonarna",
+        is_active: offer.is_active,
       });
     }
   }, [offer]);
+
 
   const validate = () => {
     if (form.title.length < 3) {
@@ -34,6 +32,10 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
     }
     if (form.description.length < 10) {
       setErrors("Opis musi mieć co najmniej 10 znaków.");
+      return false;
+    }
+    if (form.is_active != "1" && form.is_active != "0") {
+      setErrors("Wybierz poprawną opcję.");
       return false;
     }
     return true;
@@ -60,7 +62,8 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
           },
         }
       )
-      .then(() => {
+      .then((res) => {
+        setInfo(res.data.info);
         onSave();
         onClose();
       })
@@ -74,6 +77,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
       <div className={styles.modal}>
         <h2>Edytuj ofertę</h2>
         <p className={styles.error}>{errors}</p>
+        <p className={styles.info}>{info}</p>
 
         <label>Tytuł</label>
         <input
@@ -90,34 +94,10 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
           onChange={handleChange}
         ></textarea>
 
-        <label>Wymagania</label>
-        <textarea
-          name="requirements"
-          value={form.requirements}
-          onChange={handleChange}
-        ></textarea>
-
-        <label>Wynagrodzenie</label>
-        <input
-          name="salary"
-          value={form.salary}
-          onChange={handleChange}
-          type="text"
-        />
-
-        <label>Lokalizacja</label>
-        <input
-          name="location"
-          value={form.location}
-          onChange={handleChange}
-          type="text"
-        />
-
-        <label>Tryb pracy</label>
-        <select name="work_type" value={form.work_type} onChange={handleChange}>
-          <option value="stacjonarna">Stacjonarna</option>
-          <option value="zdalna">Zdalna</option>
-          <option value="hybrydowa">Hybrydowa</option>
+        <label>Aktywny</label>
+        <select name="is_active" value={form.is_active} onChange={handleChange}>
+          <option value="1">Tak</option>
+          <option value="0">Nie</option>
         </select>
 
         <div className={styles.buttons}>

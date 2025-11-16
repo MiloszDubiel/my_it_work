@@ -173,7 +173,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                 )}
 
                 {userData?.role == "admin" ? (
-                  <Link to="/admin">Ustawienia</Link>
+                  <Link to="/admin">Panel administratora</Link>
                 ) : (
                   ""
                 )}

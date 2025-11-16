@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import styles from "./AdminPanel.module.css";
-import UserEditModal from "./UserEditModal";
-import CompanyEditModal from "./CompanyEditModal";
-import OfferEditModal from "./OfferEditMOdal";
+import UserEditModal from "./User/UserEditModal";
+import CompanyEditModal from "./Company/CompanyEditModal";
+import OfferEditModal from "./Offers/OfferEditModal";
 import axios from "axios";
+import Navbar from "../NavBar/NavBar";
+import AdminDashboard from "./Dashboard/AdminDashboard";
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("analise");
   const [users, setUsers] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [offers, setOffers] = useState([]);
@@ -30,6 +32,7 @@ const AdminPanel = () => {
     activeTab,
     isEditing,
     isEditingComapny,
+    isEditingOffer,
     page,
     pageComapny,
     pageOffers,
@@ -118,7 +121,7 @@ const AdminPanel = () => {
 
     axios
       .post(
-        "http://localhost:5000/api/admin/delete-offer",
+        "http://localhost:5000/admin/delete-offer",
         { id },
         {
           headers: {
@@ -132,267 +135,293 @@ const AdminPanel = () => {
   console.log(companies);
   return (
     <div className={styles.adminContainer}>
-      <aside className={styles.sidebar}>
-        <h2>Panel Administratora</h2>
-        <ul>
-          <li
-            className={activeTab === "users" ? styles.active : ""}
-            onClick={() => setActiveTab("users")}
-          >
-            👤 Użytkownicy
-          </li>
-          <li
-            className={activeTab === "companies" ? styles.active : ""}
-            onClick={() => setActiveTab("companies")}
-          >
-            🏢 Firmy
-          </li>
-          <li
-            className={activeTab === "offers" ? styles.active : ""}
-            onClick={() => setActiveTab("offers")}
-          >
-            💼 Oferty pracy
-          </li>
-        </ul>
-      </aside>
+      <Navbar />
+      <div style={{ display: "flex", height: "calc(100% - 80px)" }}>
+        <aside className={styles.sidebar}>
+          <h2>Panel Administratora</h2>
+          <ul>
+            <li
+              className={activeTab === "analise" ? styles.active : ""}
+              onClick={() => setActiveTab("analise")}
+            >
+              📊 Analiza
+            </li>
+            <li
+              className={activeTab === "users" ? styles.active : ""}
+              onClick={() => setActiveTab("users")}
+            >
+              👤 Użytkownicy
+            </li>
+            <li
+              className={activeTab === "companies" ? styles.active : ""}
+              onClick={() => setActiveTab("companies")}
+            >
+              🏢 Firmy
+            </li>
+            <li
+              className={activeTab === "offers" ? styles.active : ""}
+              onClick={() => setActiveTab("offers")}
+            >
+              💼 Oferty pracy
+            </li>
+          </ul>
+        </aside>
 
-      <main className={styles.content}>
-        {activeTab === "users" && (
-          <section className={styles.section}>
-            {isEditing && (
-              <UserEditModal
-                user={selectedUser}
-                onClose={() => setIsEditing(false)}
-                onSave={() => setIsEditing(false)}
+        <main className={styles.content}>
+          {activeTab === "analise" && (
+            <section className={styles.section}>
+              <AdminDashboard />
+            </section>
+          )}
+          {activeTab === "users" && (
+            <section className={styles.section}>
+              {isEditing && (
+                <UserEditModal
+                  user={selectedUser}
+                  onClose={() => setIsEditing(false)}
+                  onSave={() => setIsEditing(false)}
+                />
+              )}
+              <input
+                type="text"
+                placeholder="Szukaj po email / imieniu"
+                className={styles.searchInput}
+                value={search}
+                onChange={(e) => {
+                  setPage(1);
+                  setSearch(e.target.value);
+                }}
               />
-            )}
-            <input
-              type="text"
-              placeholder="Szukaj po email / imieniu"
-              className={styles.searchInput}
-              value={search}
-              onChange={(e) => {
-                setPage(1);
-                setSearch(e.target.value);
-              }}
-            />
 
-            <h3>Lista użytkowników</h3>
-            <div className={styles.table}>
-              <div className={styles.headerRow}>
-                <span>Email</span>
-                <span>Imię</span>
-                <span>Typ</span>
-                <span>Aktywny</span>
-                <span>Akcje</span>
-              </div>
+              <h3>Lista użytkowników</h3>
+              <div className={styles.table}>
+                <div className={styles.headerRow}>
+                  <span>Email</span>
+                  <span>Imię</span>
+                  <span>Typ</span>
+                  <span>Aktywny</span>
+                  <span>Akcje</span>
+                </div>
 
-              {users.map((u) => (
-                <div className={styles.row} key={u.id}>
-                  <span>{u.email}</span>
+                {users.map((u) => (
+                  <div className={styles.row} key={u.id}>
+                    <span>{u.email}</span>
+                    <span>
+                      {u.name} {u.surname}
+                    </span>
+                    <span>{u.role}</span>
+                    <span>{u.is_active === "1" ? "Tak" : "Nie"}</span>
+                    <span style={{ display: " flex", gap: "10px" }}>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setIsEditing(true);
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      {u.role !== "admin" && (
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => deleteUser(u.id)}
+                        >
+                          🗑
+                        </button>
+                      )}
+                    </span>
+                  </div>
+                ))}
+                <div className={styles.pagination}>
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    ◀ Poprzednia
+                  </button>
+
                   <span>
-                    {u.name} {u.surname}
+                    Strona {page} z {totalPages}
                   </span>
-                  <span>{u.role}</span>
-                  <span>{u.is_active === "1" ? "Tak" : "Nie"}</span>
-                  <span style={{ display: " flex", gap: "10px" }}>
-                    <button
-                      className={styles.editBtn}
-                      onClick={() => {
-                        setSelectedUser(u);
-                        setIsEditing(true);
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    {u.role !== "admin" && (
+
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    Następna ▶
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* --- FIRMY --- */}
+          {activeTab === "companies" && (
+            <section className={styles.section}>
+              <h3>Firmy</h3>
+              {isEditingComapny && (
+                <CompanyEditModal
+                  company={selectedCompany}
+                  onClose={() => setIsEditingCompany(false)}
+                  onSave={() => setIsEditingCompany(false)}
+                />
+              )}
+              <input
+                type="text"
+                placeholder="Szukaj po nazwie firmy"
+                className={styles.searchInput}
+                value={search}
+                onChange={(e) => {
+                  setPageCompany(1);
+                  setSearch(e.target.value);
+                }}
+              />
+
+              <div className={styles.table}>
+                <div className={styles.headerRow}>
+                  <span>Nazwa</span>
+                  <span>Email</span>
+                  <span>Telefon</span>
+                  <span>Akcje</span>
+                </div>
+
+                {companies.map((c) => (
+                  <div className={styles.row} key={c.id}>
+                    <span>{c.companyName}</span>
+                    <span>{c.email}</span>
+                    <span>{c.phone_number}</span>
+                    <span style={{ display: " flex", gap: "10px" }}>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() => {
+                          setSelectedCompany(c);
+                          setIsEditingCompany(true);
+                        }}
+                      >
+                        ✏️
+                      </button>
                       <button
                         className={styles.deleteBtn}
-                        onClick={() => deleteUser(u.id)}
+                        onClick={() => deleteCompany(c.id)}
                       >
                         🗑
                       </button>
-                    )}
+                    </span>
+                  </div>
+                ))}
+                <div className={styles.pagination}>
+                  <button
+                    disabled={pageComapny === 1}
+                    onClick={() => setPageCompany((p) => p - 1)}
+                  >
+                    ◀ Poprzednia
+                  </button>
+
+                  <span>
+                    Strona {pageComapny} z {totalPages}
                   </span>
+
+                  <button
+                    disabled={pageComapny === totalPages}
+                    onClick={() => setPageCompany((p) => p + 1)}
+                  >
+                    Następna ▶
+                  </button>
                 </div>
-              ))}
+              </div>
+            </section>
+          )}
+
+          {/* --- OFERTY PRACY --- */}
+          {activeTab === "offers" && (
+            <section className={styles.section}>
+              <h3>Oferty pracy</h3>
+              {isEditingOffer && (
+                <OfferEditModal
+                  offer={selectedOffer}
+                  onClose={() => setIsEditingOffer(false)}
+                  onSave={() => setIsEditingOffer(false)}
+                />
+              )}
+              <input
+                type="text"
+                placeholder="Szukaj po stanowisku"
+                className={styles.searchInput}
+                value={search}
+                onChange={(e) => {
+                  setPageOffers(1);
+                  setSearch(e.target.value);
+                }}
+              />
+
+              <div className={styles.table}>
+                <div className={styles.headerRow}>
+                  <span>Stanowisko</span>
+                  <span>Firma</span>
+                  <span>Data</span>
+                  <span>Aktywna</span>
+                  <span>Akcje</span>
+                </div>
+
+                {offers.map((o) => (
+                  <div className={styles.row} key={o.id}>
+                    <span>{o.title}</span>
+                    <span>{o.companyName}</span>
+                    <span>
+                      {!o.updated_at
+                        ? ""
+                        : new Date(o.updated_at).toLocaleDateString("pl-PL")}
+                    </span>
+                    <span>{o.is_active == "1" ? "Tak" : "Nie"}</span>
+                    <span
+                      style={{
+                        display: " flex",
+                        gap: "10px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <button
+                        className={styles.editBtn}
+                        onClick={() => {
+                          setSelectedOffer(o);
+                          setIsEditingOffer(true);
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={() => deleteOffer(o.id)}
+                      >
+                        🗑
+                      </button>
+                    </span>
+                  </div>
+                ))}
+              </div>
               <div className={styles.pagination}>
                 <button
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => p - 1)}
+                  disabled={pageOffers === 1}
+                  onClick={() => setPageOffers((p) => p - 1)}
                 >
                   ◀ Poprzednia
                 </button>
 
                 <span>
-                  Strona {page} z {totalPages}
+                  Strona {pageOffers} z {totalPages}
                 </span>
 
                 <button
-                  disabled={page === totalPages}
-                  onClick={() => setPage((p) => p + 1)}
+                  disabled={pageOffers === totalPages}
+                  onClick={() => setPageOffers((p) => p + 1)}
                 >
                   Następna ▶
                 </button>
               </div>
-            </div>
-          </section>
-        )}
-
-        {/* --- FIRMY --- */}
-        {activeTab === "companies" && (
-          <section className={styles.section}>
-            <h3>Firmy</h3>
-            {isEditingComapny && (
-              <CompanyEditModal
-                company={selectedCompany}
-                onClose={() => setIsEditingCompany(false)}
-                onSave={() => setIsEditingCompany(false)}
-              />
-            )}
-            <input
-              type="text"
-              placeholder="Szukaj po nazwie firmy"
-              className={styles.searchInput}
-              value={search}
-              onChange={(e) => {
-                setPageCompany(1);
-                setSearch(e.target.value);
-              }}
-            />
-
-            <div className={styles.table}>
-              <div className={styles.headerRow}>
-                <span>Nazwa</span>
-                <span>Email</span>
-                <span>Telefon</span>
-                <span>Akcje</span>
-              </div>
-
-              {companies.map((c) => (
-                <div className={styles.row} key={c.id}>
-                  <span>{c.companyName}</span>
-                  <span>{c.email}</span>
-                  <span>{c.phone_number}</span>
-                  <span>
-                    <button
-                      className={styles.editBtn}
-                      onClick={() => {
-                        setSelectedCompany(c);
-                        setIsEditingCompany(true);
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => deleteCompany(c.id)}
-                    >
-                      🗑
-                    </button>
-                  </span>
-                </div>
-              ))}
-              <div className={styles.pagination}>
-                <button
-                  disabled={pageComapny === 1}
-                  onClick={() => setPageCompany((p) => p - 1)}
-                >
-                  ◀ Poprzednia
-                </button>
-
-                <span>
-                  Strona {pageComapny} z {totalPages}
-                </span>
-
-                <button
-                  disabled={pageComapny === totalPages}
-                  onClick={() => setPageCompany((p) => p + 1)}
-                >
-                  Następna ▶
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* --- OFERTY PRACY --- */}
-        {activeTab === "offers" && (
-          <section className={styles.section}>
-            <h3>Oferty pracy</h3>
-            {isEditingOffer && (
-              <OfferEditModal
-                offer={selectedOffer}
-                onClose={() => setIsEditingOffer(false)}
-                onSave={loadOffers}
-              />
-            )}
-            <input
-              type="text"
-              placeholder="Szukaj po stanowisku"
-              className={styles.searchInput}
-              value={search}
-              onChange={(e) => {
-                setPageOffers(1);
-                setSearch(e.target.value);
-              }}
-            />
-
-            <div className={styles.table}>
-              <div className={styles.headerRow}>
-                <span>Stanowisko</span>
-                <span>Firma</span>
-                <span>Data</span>
-                <span>Akcje</span>
-              </div>
-
-              {offers.map((o) => (
-                <div className={styles.row} key={o.id}>
-                  <span>{o.title}</span>
-                  <span>{o.companyName}</span>
-                  <span>{o.created_at}</span>
-                  <span>
-                    <button
-                      className={styles.editBtn}
-                      onClick={() => {
-                        setSelectedOffer(o);
-                        setIsEditingOffer(true);
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => deleteOffer(o.id)}
-                    >
-                      🗑
-                    </button>
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className={styles.pagination}>
-              <button
-                disabled={pageOffers === 1}
-                onClick={() => setPageOffers((p) => p - 1)}
-              >
-                ◀ Poprzednia
-              </button>
-
-              <span>
-                Strona {pageOffers} z {totalPages}
-              </span>
-
-              <button
-                disabled={pageOffers === totalPages}
-                onClick={() => setPageOffers((p) => p + 1)}
-              >
-                Następna ▶
-              </button>
-            </div>
-          </section>
-        )}
-      </main>
+            </section>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

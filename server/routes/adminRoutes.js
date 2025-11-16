@@ -178,7 +178,6 @@ router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
 
-    // count (join to companies for companyName search)
     let countSql = `SELECT COUNT(*) AS cnt
        FROM job_offers jo
        LEFT JOIN companies c ON c.id = jo.company_id`;
@@ -192,11 +191,9 @@ router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
     const total = countRow.cnt;
     const totalPages = Math.ceil(total / pageSize);
 
-    // fetch rows with joined companyName and img
-    let dataSql = `SELECT jo.id, jo.title, jo.company_id, jo.companyName, jo.img AS job_img,
-              jo.salary, jo.is_active, jo.created_at,
-              c.img AS company_img
+    let dataSql = `SELECT  jo.id, jo.companyName, jo.title, jo.updated_at, jo.is_active, jd.description
        FROM job_offers jo
+       INNER JOIN job_details jd ON jo.id = jd.job_offer_id
        LEFT JOIN companies c ON c.id = jo.company_id`;
     const dataParams = [];
     if (search) {
@@ -219,6 +216,8 @@ router.get("/get-offers", authenticateToken, isAdmin, async (req, res) => {
 router.post("/delete-offer", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.body;
+
+    console.log(id);
     await connection.query("DELETE FROM job_details WHERE job_offer_id = ?", [
       id,
     ]);
@@ -227,6 +226,81 @@ router.post("/delete-offer", authenticateToken, isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Nie udało się usunąć oferty pracy" });
+  }
+});
+router.put("/update-offer", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { id, description, is_active, title } = req.body;
+
+    if (!id) return res.status(400).json({ error: "Brak id" });
+
+    await connection.query(
+      `UPDATE job_offers 
+       SET title = ?, is_active = ?
+       WHERE id = ?`,
+      [title, is_active, id]
+    );
+
+    await connection.query(
+      "UPDATE job_details SET description = ? WHERE job_offer_id = ?",
+      [description, id]
+    );
+
+    res.json({ info: "Zaktualizowano firmę" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd aktualizacji firmy" });
+  }
+});
+
+//STATYSTYKI
+
+router.get("/stats", async (req, res) => {
+  try {
+    // Nowi użytkownicy w czasie (tygodniowo)
+    const [users] = await connection.query(`
+      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count
+      FROM users
+      GROUP BY month
+      ORDER BY month ASC
+    `);
+
+    // Nowe oferty w czasie
+    const [offers] = await connection.query(`
+      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count
+      FROM job_offers
+      GROUP BY month
+      ORDER BY month ASC
+    `);
+
+    // Popularność firm wg liczby ofert
+    const [companies] = await connection.query(`
+      SELECT c.companyName, COUNT(j.id) AS offersCount
+      FROM companies c
+      LEFT JOIN job_offers j ON j.company_id = c.id
+      GROUP BY c.id
+      ORDER BY offersCount DESC
+      LIMIT 10
+    `);
+
+    const [categories] = await connection.query(`
+  SELECT 
+    CASE
+      WHEN title LIKE '%Frontend%' THEN 'Frontend'
+      WHEN title LIKE '%Backend%' THEN 'Backend'
+      WHEN title LIKE '%Fullstack%' THEN 'Fullstack'
+      ELSE 'Inne'
+    END AS category,
+    COUNT(*) AS count
+  FROM job_offers
+  GROUP BY category
+  ORDER BY count DESC
+`);
+
+    res.json({ users, offers, companies, categories });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
 
