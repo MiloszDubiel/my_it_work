@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const LoginForm = () => {
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -19,25 +19,16 @@ const LoginForm = () => {
     setError("");
     setInfo("");
 
+    if (!email || !password) {
+      return setError("Puste pola");
+    }
+
     setLoading(true);
     try {
       let res = await axios.post("http://localhost:5000/auth/login", {
         email,
         password,
       });
-
-      axios
-        .get(`http://localhost:5000/auth/avatar/${email}`, {
-          responseType: "blob",
-        })
-        .then((res) => {
-          const url = URL.createObjectURL(res.data);
-          sessionStorage.setItem("user-avatar", url);
-        })
-        .catch((err) => {
-          sessionStorage.setItem("user-avatar", "");
-          console.error("Błąd pobierania avatara:", err);
-        });
 
       setInfo(res.data.info);
       sessionStorage.setItem("user-data", JSON.stringify(res.data.user));
@@ -145,4 +136,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoginPage;

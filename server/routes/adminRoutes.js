@@ -1,6 +1,7 @@
 import express from "express";
 import { connection } from "../config/db.js";
 import { authenticateToken, isAdmin } from "../middleware/authJwt.js";
+import bcrypt from "bcryptjs";
 const router = express.Router();
 
 function parsePaginationParams(req) {
@@ -18,27 +19,34 @@ router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
 
-    let countSql = "SELECT COUNT(*) AS cnt FROM users";
+    // COUNT
+    let countSql = "SELECT COUNT(*) AS cnt FROM users WHERE role != 'Admin'";
     const countParams = [];
+
     if (search) {
-      countSql +=
-        " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ? AND role)";
+      countSql += " AND (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
       const like = `%${search}%`;
       countParams.push(like, like, like);
     }
+
     const [[countRow]] = await connection.query(countSql, countParams);
     const total = countRow.cnt;
     const totalPages = Math.ceil(total / pageSize);
 
-    // fetch rows
-    let dataSql = `SELECT id, email, name, surname, role, is_active, created_at
-                   FROM users`;
+    // SELECT rows
+    let dataSql = `
+    SELECT id, email, name, surname, role, is_active, created_at
+    FROM users
+    WHERE role != 'Admin'
+  `;
     const dataParams = [];
+
     if (search) {
-      dataSql += " WHERE (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
+      dataSql += " AND (email LIKE ? OR name LIKE ? OR surname LIKE ?)";
       const like = `%${search}%`;
       dataParams.push(like, like, like);
     }
+
     dataSql += " ORDER BY id DESC LIMIT ? OFFSET ?";
     dataParams.push(pageSize, offset);
 
@@ -246,7 +254,7 @@ router.put("/update-offer", authenticateToken, isAdmin, async (req, res) => {
       [description, id]
     );
 
-    res.json({ info: "Zaktualizowano firmę" });
+    res.json({ info: "Zaktualizowano ofertę" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd aktualizacji firmy" });
@@ -302,6 +310,37 @@ router.get("/stats", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Błąd serwera" });
   }
+});
+
+//Hasło
+router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const adminId = req.user.id;
+
+  const [rows] = await connection.query(
+    "SELECT password FROM users WHERE id = ?",
+    [adminId]
+  );
+
+  console.log("Old password:", oldPassword);
+  console.log("Hash from DB:", rows[0].password);
+  console.log("Compare:", await bcrypt.compare(oldPassword, rows[0].password));
+  console.log("Admin ID:", adminId);
+
+  const match = await bcrypt.compare(oldPassword, rows[0].password);
+
+  if (!match) {
+    return res.status(400).json({ msg: "Wrong password" });
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+
+  await connection.query("UPDATE users SET password = ? WHERE id = ?", [
+    newHash,
+    adminId,
+  ]);
+
+  res.json({ msg: "Password updated" });
 });
 
 export default router;

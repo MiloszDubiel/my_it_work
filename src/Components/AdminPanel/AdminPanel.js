@@ -6,6 +6,7 @@ import OfferEditModal from "./Offers/OfferEditModal";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import AdminDashboard from "./Dashboard/AdminDashboard";
+import AdminSettings from "./AdminSettings/AdminSettings";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("analise");
@@ -162,6 +163,12 @@ const AdminPanel = () => {
               onClick={() => setActiveTab("offers")}
             >
               💼 Oferty pracy
+            </li>
+            <li
+              className={activeTab === "settings" ? styles.active : ""}
+              onClick={() => setActiveTab("settings")}
+            >
+              ⚙️ Ustawienia
             </li>
           </ul>
         </aside>
@@ -417,6 +424,11 @@ const AdminPanel = () => {
                   Następna ▶
                 </button>
               </div>
+            </section>
+          )}
+          {activeTab === "settings" && (
+            <section className={styles.section}>
+              <AdminSettings />
             </section>
           )}
         </main>

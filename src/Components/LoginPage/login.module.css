@@ -53,8 +53,7 @@
 }
 
 .input:focus {
-  border-color: #ff8a00;
-  box-shadow: 0 4px 18px rgba(255, 138, 0, 0.08);
+  border-color: #2563eb;
 }
 
 .pwdWrapper {
@@ -70,14 +69,14 @@
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: #ff8a00;
+  color: #2563eb;
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
 }
 
 .togglePwd:focus {
-  outline: 2px solid rgba(255, 138, 0, 0.16);
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 
@@ -111,7 +110,7 @@
   height: 46px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(90deg, #ff8a00, #ff5a00);
+  background: #2563eb;
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -136,7 +135,7 @@
 }
 
 .link {
-  color: #ff6a00;
+  color: #2563eb;
   font-weight: 600;
   text-decoration: none;
 }

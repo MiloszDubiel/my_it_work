@@ -8,16 +8,17 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [role, setRole] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
   const validate = () => {
     if (!email) return "Podaj adres e-mail.";
-    if (!password || password.length < 6)
+    if (!password || password.length < 8)
       return "Hasło musi mieć co najmniej 8 znaków.";
     if (password !== repeatPassword) return "Hasła są różne";
-
+    if (role === "employer" && !companyName) return "Podaj nazwę firmy";
     return null;
   };
 
@@ -33,16 +34,23 @@ const RegisterPage = () => {
 
     setLoading(true);
     try {
-      if (role.length === 0) {
+      if (!role) {
         setError("Nie wybrano roli");
         return;
       }
-      let res = await axios.post("http://localhost:5000/auth/registre", {
+
+      const payload = {
         email,
         password,
         repeatPassword,
         role,
-      });
+        ...(role === "employer" ? { companyName } : {}),
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/auth/registre",
+        payload
+      );
       setInfo(res.data.info);
     } catch (err) {
       setError(JSON.parse(err.request.response).error);
@@ -59,7 +67,7 @@ const RegisterPage = () => {
         aria-label="Formularz rejestracji"
       >
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <h2 className={styles.title}>Zarejestruj się </h2>
+          <h2 className={styles.title}>Zarejestruj się</h2>
 
           {error && (
             <div className={styles.error} role="alert">
@@ -80,9 +88,7 @@ const RegisterPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              autoComplete="email"
               required
-              aria-required="true"
             />
           </label>
 
@@ -94,11 +100,10 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Hasło"
-              autoComplete="current-password"
               required
-              aria-required="true"
             />
           </label>
+
           <label className={styles.field}>
             <span className={styles.label}>Powtórz hasło</span>
             <input
@@ -107,26 +112,41 @@ const RegisterPage = () => {
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
               placeholder="Powtórz hasło"
-              autoComplete="current-password"
               required
-              aria-required="true"
             />
           </label>
+
           <label className={styles.field}>
             <span className={styles.label}>Utwórz konto jako:</span>
             <select
               className={styles.input}
+              value={role}
               onChange={(e) => setRole(e.target.value)}
               required
             >
-              <option disabled selected value>
-                {" "}
-                -- Wybierz --{" "}
+              <option disabled value="">
+                -- Wybierz --
               </option>
-              <option value="Candidate">Kandydat</option>
-              <option value="Employer">Pracodawca</option>
+              <option value="candidate">Kandydat</option>
+              <option value="employer">Pracodawca</option>
             </select>
           </label>
+
+          {/* Pokazuje się tylko dla pracodawcy */}
+          {role === "employer" && (
+            <label className={styles.field}>
+              <span className={styles.label}>Nazwa firmy</span>
+              <input
+                className={styles.input}
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Nazwa firmy"
+                required
+              />
+            </label>
+          )}
+
           <button
             className={styles.btnPrimary}
             type="submit"
@@ -134,6 +154,7 @@ const RegisterPage = () => {
           >
             {loading ? <span className={styles.spinner} /> : "Zarejestruj"}
           </button>
+
           <div className={styles.footer}>
             <span>Masz już konto?</span>{" "}
             <Link to="/login" className={styles.link}>

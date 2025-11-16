@@ -184,6 +184,7 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                       "user-data",
                       JSON.stringify({ info: "Wylogowano" })
                     );
+                    sessionStorage.removeItem("token");
                     account.current.classList.toggle(styles.accountDivHide);
                     navigate("/");
                   }}

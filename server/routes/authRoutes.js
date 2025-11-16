@@ -6,8 +6,6 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
-
-
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -34,6 +32,10 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Niepoprawne dane logowania" });
     }
 
+    if (result[0].is_active == 0) {
+      return res.status(403).json({ error: "Konto niekatywne " });
+    }
+
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
       expiresIn: "8h",
     });
@@ -55,33 +57,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/avatar/:email", async (req, res) => {
-  const { email } = req.params;
-
-  try {
-    const [rows] = await connection.query(
-      "SELECT avatar FROM users WHERE email = ?",
-      [email]
-    );
-
-    if (rows.length === 0 || !rows[0].avatar) {
-      return res.status(404).json({ error: "Avatar nie znaleziony" });
-    }
-
-    const type = await fileTypeFromBuffer(rows[0].avatar);
-    res.setHeader("Content-Type", type?.mime || "application/octet-stream");
-    res.send(rows[0].avatar);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd pobierania avatara" });
-  }
-});
-
 router.post("/registre", async (req, res) => {
-  let { email, password, repeatPassword, role } = req.body;
+  let { email, password, repeatPassword, role, companyName } = req.body;
 
   if (!email || !password || !repeatPassword || !role) {
     return res.status(400).json({ error: "Puste pola" });
+  }
+
+  if (role == "employer" && !companyName) {
+    return res.status(400).json({ error: "Nie podano nazwy firmy" });
   }
   if (password !== repeatPassword) {
     return res.status(400).json({ error: "Hasła są rózne" });
@@ -100,12 +84,29 @@ router.post("/registre", async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
 
+    if (role == "employer") {
+      let [result] = await connection.query(
+        "INSERT INTO users (email, password, role, is_active) VALUES (?, ?, ?, '0')",
+        [email, hash, role]
+      );
+
+      const employerId = result.insertId;
+
+      await connection.query(
+        "INSERT INTO companies (companyName, owner_id) VALUES (?, ?)",
+        [companyName, employerId]
+      );
+
+      return res.json({
+        info: "Konto zostanie zweryfikowane i zostanie aktywowane przez Administratora",
+      });
+    }
+
     await connection.query(
-      "INSERT INTO users (email, password, role) VALUES (?, ?, ?)",
+      "INSERT INTO users (email, password, role, is_active) VALUES (?, ?, ?, '1')",
       [email, hash, role]
     );
-
-    res.json({ info: "Zarejstrowano pomyślnie" });
+    return res.json({ info: "Zarejstrowano pomyślnie" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Wewnętrzny błąd serwera" });

@@ -37,7 +37,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
       setOffer({
         ...offer,
-        company: res.data.companyInfo[0].companyName,
+        company: res.data.companyInfo[0]?.companyName,
         company_id: res.data.companyInfo[0].id,
       });
     };

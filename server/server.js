@@ -28,7 +28,7 @@ const server = http.createServer(app);
 // ✅ Konfiguracja Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Twój frontend
+    origin: "http://localhost:3000", 
     methods: ["GET", "POST"],
   },
 });

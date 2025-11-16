@@ -24,14 +24,13 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
     }
   }, [offer]);
 
-
   const validate = () => {
     if (form.title.length < 3) {
       setErrors("Tytuł musi mieć co najmniej 3 znaki.");
       return false;
     }
-    if (form.description.length < 10) {
-      setErrors("Opis musi mieć co najmniej 10 znaków.");
+    if (!form.description?.length) {
+      setErrors("Brak opisu oferty");
       return false;
     }
     if (form.is_active != "1" && form.is_active != "0") {
@@ -64,8 +63,12 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
       )
       .then((res) => {
         setInfo(res.data.info);
-        onSave();
-        onClose();
+        console.log(res);
+
+        setTimeout(() => {
+          onSave();
+          onClose();
+        }, 1000);
       })
       .catch((err) => console.log(err));
   };

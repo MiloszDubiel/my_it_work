@@ -136,10 +136,16 @@ router.post("/add", async (req, res) => {
     await conn.query(
       `
       INSERT INTO job_details
-      (job_offer_id, requirements, benefits, responsibilities)
-      VALUES (?, ?, ?, ?)
+      (job_offer_id, description, requirements, benefits, responsibilities)
+      VALUES (?, ?,?, ?, ?)
       `,
-      [offerId, requirements || "", benefits || "", responsibilities || ""]
+      [
+        offerId,
+        description,
+        requirements || "",
+        benefits || "",
+        responsibilities || "",
+      ]
     );
 
     await conn.commit();
