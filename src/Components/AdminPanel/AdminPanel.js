@@ -104,7 +104,7 @@ const AdminPanel = () => {
 
     axios
       .post(
-        "http://localhost:5000/api/admin/delete-company",
+        "http://localhost:5000/admin/delete-company",
         { id },
         {
           headers: {
@@ -132,7 +132,6 @@ const AdminPanel = () => {
       .then(() => loadOffers())
       .catch((err) => console.error(err));
   };
-  console.log(companies);
   return (
     <div className={styles.adminContainer}>
       <Navbar />
