@@ -51,6 +51,59 @@ const OfferInfo = ({ offer, id }) => {
     }
   };
 
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [appliedDate, setAppliedDate] = useState(null);
+
+  useEffect(() => {
+    const checkApplication = async () => {
+      if (!userData?.id || !offer?.id) return;
+
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/applications/${userData.id}/${offer.id}`
+        );
+        setAlreadyApplied(res.data.applied);
+        setAppliedDate(res.data.applied_at);
+      } catch (err) {
+        console.error("Błąd przy sprawdzaniu aplikacji:", err);
+      }
+    };
+    checkApplication();
+  }, [userData?.id, offer?.id]);
+
+  const applyToOffer = async () => {
+    if (!userData?.id) return alert("Musisz być zalogowany, aby aplikować");
+
+    if (alreadyApplied) {
+      return alert(
+        `Już aplikowałeś na tę ofertę w dniu: ${new Date(
+          appliedDate
+        ).toLocaleDateString()}`
+      );
+    }
+
+    const confirmApply = window.confirm(
+      "Czy na pewno chcesz aplikować na tę ofertę?"
+    );
+    if (!confirmApply) return;
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/job-offerts/applications",
+        {
+          user_id: userData.id,
+          offer_id: offer.id,
+        }
+      );
+      alert(res.data.message);
+      setAlreadyApplied(true);
+      setAppliedDate(new Date());
+    } catch (err) {
+      console.error(err);
+      alert("Błąd przy aplikowaniu");
+    }
+  };
+
   return (
     <div
       id="offer-details-container"
@@ -115,7 +168,24 @@ const OfferInfo = ({ offer, id }) => {
           </div>
           <div className={styles.headerRight}>
             <a href={offer.link} target="_blank" style={{ all: "unset" }}>
-              <button className={styles.applyBtn}>Szczegóły aplikacji</button>
+              {offer.source == "scraped" ? (
+                <button className={styles.applyBtn}>
+                  Przejdz do strony z ofertą{" "}
+                </button>
+              ) : (
+                <>
+                  <button className={styles.applyBtn} onClick={applyToOffer}>
+                    {alreadyApplied ? "Już aplikowano" : "Aplikuj"}
+                  </button>
+
+                  {alreadyApplied && appliedDate && (
+                    <p style={{ marginTop: "5px", color: "green" }}>
+                      Aplikowano dnia:{" "}
+                      {new Date(appliedDate).toLocaleDateString()}
+                    </p>
+                  )}
+                </>
+              )}
             </a>
           </div>{" "}
         </section>

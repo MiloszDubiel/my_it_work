@@ -29,10 +29,6 @@ router.get("/", async (req, res) => {
 
 router.get("/scrape", async (req, res) => {
   try {
-    // const { code } = req.params;
-    // if (code !== process.env.KEY_TO_SCRAPE) {
-    //   return res.status(403).json({ error: "Unauthorized" });
-    // }
     await scrapeAll();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -266,6 +262,39 @@ router.post("/update", async (req, res) => {
     res.status(500).json({ error: "Błąd serwera" });
   } finally {
     conn.release();
+  }
+});
+
+router.post("/applications", async (req, res) => {
+  const { user_id, offer_id } = req.body;
+
+  try {
+    await connection.query(
+      "INSERT INTO applications (user_id, offer_id) VALUES (?, ?)",
+      [user_id, offer_id]
+    );
+    res.json({ message: "Aplikacja została dodana" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
+});
+
+router.get("/applications/:userId/:offerId", async (req, res) => {
+  const { userId, offerId } = req.params;
+  try {
+    const [rows] = await connection.query(
+      "SELECT applied_at FROM applications WHERE user_id = ? AND offer_id = ?",
+      [userId, offerId]
+    );
+    if (rows.length > 0) {
+      res.json({ applied: true, applied_at: rows[0].applied_at });
+    } else {
+      res.json({ applied: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
 export default router;

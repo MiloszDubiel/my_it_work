@@ -25,12 +25,12 @@ const UserEditModal = ({ user, onClose, onSave }) => {
   }, [user]);
 
   const validate = () => {
-    if (!form.name || form.name.length < 2) {
+    if (user.role != "employer" && (!form.name || form.name.length < 2)) {
       setErrors("Imię musi mieć co najmniej 2 znaki.");
       return false;
     }
 
-    if (!form.surname || form.surname.length < 2) {
+    if (user.role != "employer" && (!form.surname || form.surname.length < 2)) {
       setErrors("Nazwisko musi mieć co najmniej 2 znaki.");
       return false;
     }
@@ -82,21 +82,25 @@ const UserEditModal = ({ user, onClose, onSave }) => {
         <h2>Edytuj użytkownika</h2>
         <p className={styles.error}>{errors}</p>
 
-        <label>Imię</label>
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          type="text"
-        />
+        {user.role != "employer" && (
+          <>
+            <label>Imię</label>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              type="text"
+            />
 
-        <label>Nazwisko</label>
-        <input
-          name="surname"
-          value={form.surname}
-          onChange={handleChange}
-          type="text"
-        />
+            <label>Nazwisko</label>
+            <input
+              name="surname"
+              value={form.surname}
+              onChange={handleChange}
+              type="text"
+            />
+          </>
+        )}
 
         <label>Email</label>
         <input

@@ -39,7 +39,6 @@ const CandidateSettings = ({ applications = [] }) => {
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
   const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
-  
 
   const cvInputRef = useRef();
   const coverInputRef = useRef();
@@ -67,46 +66,48 @@ const CandidateSettings = ({ applications = [] }) => {
       )
       .then((res) => {
         console.log(res.data);
-        setCandidateProfile({
-          ...candidateProfile,
-          career_level: res.data.candiate[0]?.exp,
-          languages: JSON.parse(res.data.candiate[0]?.lang),
-          education: JSON.parse(res.data.candiate[0]?.edu),
-          location: res.data.candiate[0]?.locations,
-          desired_position: res.data.candiate[0]?.target_job,
-          current_position: res.data.candiate[0]?.present_job,
-          phone_number: res.data.candiate[0].phone_number,
-          availability: res.data.candiate[0].access,
-          remote_preference: res.data.candiate[0].working_mode,
-          skills: JSON.parse(res.data.candiate[0]?.skills),
-          github: res.data.candiate[0].link_git,
-        });
-      });
 
-    axios
-      .get(`http://localhost:5000/user/candidate-cv/${userData.id}`, {
-        responseType: "arraybuffer",
-      })
-      .then((res) => {
-        const blob = new Blob([res.data], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        setCvPreviewUrl(url);
-      });
+        if (res.data.candiate) {
+          setCandidateProfile({
+            ...candidateProfile,
+            career_level: res.data.candiate[0]?.exp,
+            languages: JSON.parse(res.data.candiate[0]?.lang),
+            education: JSON.parse(res.data.candiate[0]?.edu),
+            location: res.data.candiate[0]?.locations,
+            desired_position: res.data.candiate[0]?.target_job,
+            current_position: res.data.candiate[0]?.present_job,
+            phone_number: res.data.candiate[0].phone_number,
+            availability: res.data.candiate[0].access,
+            remote_preference: res.data.candiate[0].working_mode,
+            skills: JSON.parse(res.data.candiate[0]?.skills),
+            github: res.data.candiate[0].link_git,
+          });
+          axios
+            .get(`http://localhost:5000/user/candidate-cv/${userData.id}`, {
+              responseType: "arraybuffer",
+            })
+            .then((res) => {
+              const blob = new Blob([res.data], { type: "application/pdf" });
+              const url = URL.createObjectURL(blob);
+              setCvPreviewUrl(url);
+            });
 
-    axios
-      .get(`http://localhost:5000/user/candidate-cover/${userData.id}`, {
-        responseType: "arraybuffer",
-      })
-      .then((res) => {
-        const blob = new Blob([res.data], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        setCoverPreviewUrl(url);
-      });
+          axios
+            .get(`http://localhost:5000/user/candidate-cover/${userData.id}`, {
+              responseType: "arraybuffer",
+            })
+            .then((res) => {
+              const blob = new Blob([res.data], { type: "application/pdf" });
+              const url = URL.createObjectURL(blob);
+              setCoverPreviewUrl(url);
+            });
 
-    axios
-      .get(`http://localhost:5000/user/favorites/${userData.id}}`)
-      .then((res) => {
-        setFavorites(res.data);
+          axios
+            .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+            .then((res) => {
+              setFavorites(res.data);
+            });
+        }
       });
   }, []);
 
@@ -742,7 +743,6 @@ const CandidateSettings = ({ applications = [] }) => {
                   <button type="submit" className={styles.saveBtn}>
                     Zapisz zmiany
                   </button>
-                  
                 </>
               )}
             </form>

@@ -64,9 +64,8 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
     const userId = req.params.id;
     const { name, surname, email, is_active } = req.body;
 
-    console.log(req.body);
-
-    if (!name || !surname || !email || !is_active) {
+    
+    if (!email || !is_active) {
       return res.status(400).json({ error: "Brak wymaganych danych" });
     }
 

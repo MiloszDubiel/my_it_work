@@ -95,7 +95,15 @@ const AdminPanel = () => {
     if (!window.confirm("Czy na pewno chcesz usunąć użytkownika?")) return;
 
     axios
-      .post("http://localhost:5000/api/admin/delete-user", { id })
+      .post(
+        "http://localhost:5000/admin/delete-user",
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then(() => loadUsers())
       .catch((err) => console.error(err));
   };
