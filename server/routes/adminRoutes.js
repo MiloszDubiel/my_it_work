@@ -1,17 +1,44 @@
 import express from "express";
 import { connection } from "../config/db.js";
-import { authenticateToken, isAdmin } from "../middleware/auth.js";
+import { authenticateToken, isAdmin } from "../middleware/authJwt.js";
 const router = express.Router();
 
 router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   try {
     const [users] = await connection.query(
-      "SELECT id, email, name, surname, role, created_at FROM users ORDER BY id DESC"
+      "SELECT id, email, name, surname, role, is_active, created_at FROM users WHERE role <> 'admin' ORDER BY id DESC"
     );
     res.json({ users });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd pobierania użytkowników" });
+  }
+});
+//Edycja uzytkowników
+router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { name, surname, email, is_active } = req.body;
+
+    console.log(req.body);
+
+    if (!name || !surname || !email || !is_active) {
+      return res.status(400).json({ error: "Brak wymaganych danych" });
+    }
+
+    const [result] = await connection.query(
+      "UPDATE users SET name=?, surname=?, email=?, is_active=? WHERE id=?",
+      [name, surname, email, is_active, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Użytkownik nie istnieje" });
+    }
+
+    res.json({ message: "Użytkownik zaktualizowany poprawnie" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd serwera" });
   }
 });
 

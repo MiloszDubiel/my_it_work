@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./AdminPanel.module.css";
+import UserEditModal from "./UserEditModal";
 import axios from "axios";
 
 const AdminPanel = () => {
@@ -7,17 +8,20 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [offers, setOffers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Pobierz dane po zmianie zakładki
   useEffect(() => {
     if (activeTab === "users") loadUsers();
     if (activeTab === "companies") loadCompanies();
     if (activeTab === "offers") loadOffers();
-  }, [activeTab]);
+  }, [activeTab, isEditing]);
 
   const loadUsers = () => {
     axios
-      .get("http://localhost:5000/api/admin/get-users")
+      .get("http://localhost:5000/admin/get-users", {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+      })
       .then((res) => setUsers(res.data.users))
       .catch((err) => console.error(err));
   };
@@ -90,28 +94,43 @@ const AdminPanel = () => {
       </aside>
 
       <main className={styles.content}>
-        {/* --- UŻYTKOWNICY --- */}
         {activeTab === "users" && (
           <section className={styles.section}>
+            {isEditing && (
+              <UserEditModal
+                user={selectedUser}
+                onClose={() => setIsEditing(false)}
+                onSave={() => setIsEditing(false)}
+              />
+            )}
             <h3>Lista użytkowników</h3>
             <div className={styles.table}>
               <div className={styles.headerRow}>
-                <span>ID</span>
                 <span>Email</span>
                 <span>Imię</span>
                 <span>Typ</span>
+                <span>Aktywny</span>
                 <span>Akcje</span>
               </div>
 
               {users.map((u) => (
                 <div className={styles.row} key={u.id}>
-                  <span>{u.id}</span>
                   <span>{u.email}</span>
                   <span>
                     {u.name} {u.surname}
                   </span>
                   <span>{u.role}</span>
-                  <span>
+                  <span>{u.is_active === "1" ? "Tak" : "Nie"}</span>
+                  <span style={{ display: " flex", gap: "10px" }}>
+                    <button
+                      className={styles.editBtn}
+                      onClick={() => {
+                        setSelectedUser(u);
+                        setIsEditing(true);
+                      }}
+                    >
+                      ✏️
+                    </button>
                     <button
                       className={styles.deleteBtn}
                       onClick={() => deleteUser(u.id)}

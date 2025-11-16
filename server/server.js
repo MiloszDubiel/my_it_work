@@ -5,6 +5,7 @@ import employersRoutes from "./routes/employersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import http from "http";
 
 import { Server } from "socket.io";
@@ -20,6 +21,7 @@ app.use("/api/employers", employersRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
 app.use("/messager", chatRoutes);
+app.use("/admin", adminRoutes);
 
 const server = http.createServer(app);
 
@@ -61,8 +63,6 @@ io.on("connection", (socket) => {
     console.log("🔴 Użytkownik odłączony:", socket.id);
   });
 });
-
-
 
 server.listen(5001, () => console.log("Server działa na porcie 5001"));
 app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));

@@ -90,3 +90,12 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.editBtn {
+  background: rgb(68, 173, 19);
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
