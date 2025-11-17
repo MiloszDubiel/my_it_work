@@ -11,7 +11,7 @@ const EmployerSettings = () => {
   const [logoPreviewUrl, setLogoPreviewUrl] = useState(null);
   const [company, setCompany] = useState({});
   const [info, setInfo] = useState("");
-  const [error, setErorr] = useState("");
+  const [error, setError] = useState("");
   const [offers, setOffers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [dataToChange, setDataToChange] = useState({
@@ -65,58 +65,46 @@ const EmployerSettings = () => {
     e.preventDefault();
     document.querySelector(`.${styles.content}`).scroll(0, 0);
 
-    setErorr("");
+    setError("");
     setInfo("");
 
-    if (!company.companyName?.trim()) {
-      return setErorr("Nazwa firmy jest wymagana.");
-    }
-
     if (!company.description?.trim()) {
-      return setErorr("Opis firmy jest wymagany.");
+      return setError("Opis firmy jest wymagany.");
     }
 
     const urlRegex = /^(https?:\/\/)?([\w\d\-]+\.)+\w{2,}(\/[^\s]*)?$/i;
     if (company.link && !urlRegex.test(company.link)) {
-      return setErorr("Podaj poprawny adres URL (np. https://firma.pl).");
+      return setError("Podaj poprawny adres URL (np. https://firma.pl).");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!company.email?.trim()) {
-      return setErorr("Email kontaktowy jest wymagany.");
+      return setError("Email kontaktowy jest wymagany.");
     } else if (!emailRegex.test(company.email)) {
-      return setErorr("Podaj poprawny adres email.");
+      return setError("Podaj poprawny adres email.");
     }
 
     const phoneRegex = /^[0-9]{9}$/;
     if (!company?.phone_number) {
-      return setErorr("Numer telefonu jest wymagany.");
+      return setError("Numer telefonu jest wymagany.");
     } else if (!phoneRegex.test(company.phone_number)) {
-      return setErorr("Telefon musi zawierać dokładnie 9 cyfr.");
+      return setError("Telefon musi zawierać dokładnie 9 cyfr.");
     }
 
-    const formData = new FormData();
-    formData.append("owner_id", userData.id);
-    formData.append("companyName", company.companyName);
-    formData.append("description", company.description);
-    formData.append("link", company.link || "");
-    formData.append("email", company.email);
-    formData.append("phone_number", company.phone_number);
-
-    if (logoFile) {
-      formData.append("logo", logoFile);
-    }
-
+   
     let res = await axios.post(
       "http://localhost:5000/api/employers/set-company-info",
-      formData,
       {
-        headers: { "Content-Type": "multipart/form-data" },
+        owner_id: userData.id,
+        description: company.description,
+        link: company.link || "",
+        email: company.email || "",
+        phone_number: company.phone_number || "",
       }
     );
 
     if (res.status === 200) {
-      setInfo("Zapisano. Trwa odświeżanie storny...");
+      setInfo("Zapisano. Trwa odświeżanie strony...");
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -127,33 +115,33 @@ const EmployerSettings = () => {
     e.preventDefault();
 
     setInfo("");
-    setErorr("");
+    setError("");
 
     if (!dataToChange.name?.trim()) {
-      return setErorr("Imię jest wymagane.");
+      return setError("Imię jest wymagane.");
     }
 
     if (!dataToChange.surname?.trim()) {
-      return setErorr("Nazwisko jest wymagane.");
+      return setError("Nazwisko jest wymagane.");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!dataToChange.email?.trim()) {
-      return setErorr("Email jest wymagany.");
+      return setError("Email jest wymagany.");
     } else if (!emailRegex.test(dataToChange.email)) {
-      return setErorr("Podaj poprawny email.");
+      return setError("Podaj poprawny email.");
     }
     if (dataToChange.newPassword) {
       const passwordRegex =
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
       if (!passwordRegex.test(dataToChange.newPassword)) {
-        return setErorr(
+        return setError(
           "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
         );
       }
 
       if (dataToChange.newPassword !== dataToChange.repeatPassword) {
-        return setErorr("Hasła są różne.");
+        return setError("Hasła są różne.");
       }
     }
 
@@ -175,9 +163,53 @@ const EmployerSettings = () => {
 
       if (res.data.error) {
         document.querySelector(`.${styles.content}`).scroll(0, 0);
-        setErorr(res.data.error);
+        setError(res.data.error);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSubmitDetails = async (e) => {
+    e.preventDefault();
+
+    setInfo("");
+    setError("");
+
+    if (!company.companyName?.trim()) {
+      return setError("Nazwa firmy jest wymagana.");
+    }
+
+    if (!/^\d{10}$/.test(company.nip)) {
+      setError("Nip musi mieć 10 znaków.");
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append("owner_id", userData.id);
+    formData.append("companyName", company.companyName);
+    formData.append("nip", company.nip);
+    formData.append("company_id", company.id);
+
+    if (logoFile) {
+      formData.append("logo", logoFile);
+    }
+
+    try {
+      let res = await axios.post(
+        "http://localhost:5000/api/employers/request-company-change",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (res.status == 200) {
+        return setInfo(res.data.info);
+      }
+    } catch (err) {
+      setError(err.response.data.error);
+    }
   };
 
   return (
@@ -222,18 +254,56 @@ const EmployerSettings = () => {
           <p className={styles.info}>{info}</p>
           {activeTab === "company" && (
             <section className={styles.section}>
-              <h3>Informacje o firmie</h3>
-              <form onSubmit={handleSubmit}>
-                <label>Nazwa firmy</label>
+              <h3>Podstawowe informacje o firmie</h3>
+              <form onSubmit={handleSubmitDetails}>
+                <label>Nazwa</label>
                 <input
                   type="text"
-                  placeholder="Wprowadź nazwę firmy"
+                  placeholder="Nazwa"
                   value={company?.companyName}
                   onChange={(e) =>
                     setCompany({ ...company, companyName: e.target.value })
                   }
                 />
 
+                <label>NIP</label>
+                <input
+                  type="text"
+                  placeholder="NIP"
+                  value={company?.nip}
+                  onChange={(e) =>
+                    setCompany({ ...company, nip: e.target.value })
+                  }
+                />
+
+                <label>Logo firmy</label>
+
+                <div className={styles.logoPreview}>
+                  <img
+                    src={
+                      logoPreviewUrl ||
+                      `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
+                    }
+                    alt="Logo firmy"
+                  />
+                </div>
+
+                <input
+                  type="file"
+                  accept="image/png"
+                  onChange={(e) => {
+                    setLogoFile(e.target.files[0]);
+                    setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
+                  }}
+                />
+
+                <button type="submit" className={styles.saveBtn}>
+                  Zapisz
+                </button>
+              </form>
+              <hr style={{ margin: "15px" }} />
+              <h3>Dodatkowe informacje o firmie</h3>
+              <form onSubmit={handleSubmit}>
                 <label>Opis</label>
                 <textarea
                   placeholder="Opisz swoją firmę..."
@@ -272,27 +342,6 @@ const EmployerSettings = () => {
                   onChange={(e) =>
                     setCompany({ ...company, phone_number: e.target.value })
                   }
-                />
-
-                <label>Logo firmy</label>
-
-                <div className={styles.logoPreview}>
-                  <img
-                    src={
-                      logoPreviewUrl ||
-                      `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
-                    }
-                    alt="Logo firmy"
-                  />
-                </div>
-
-                <input
-                  type="file"
-                  accept="image/png"
-                  onChange={(e) => {
-                    setLogoFile(e.target.files[0]);
-                    setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
-                  }}
                 />
 
                 <button type="submit" className={styles.saveBtn}>

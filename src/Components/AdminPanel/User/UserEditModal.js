@@ -11,8 +11,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
   });
 
   const [errors, setErrors] = useState("");
-  const [message, setMessage] = useState("");
-
+  const [info, setInfo] = useState("");
   useEffect(() => {
     if (user) {
       setForm({
@@ -53,6 +52,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
 
   const handleChange = (e) => {
     setErrors("");
+    setInfo("");
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -60,6 +60,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
     if (!validate()) return;
 
     setErrors("");
+    setInfo("");
 
     axios
       .put(`http://localhost:5000/admin/users/${user.id}`, form, {
@@ -67,9 +68,12 @@ const UserEditModal = ({ user, onClose, onSave }) => {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
       })
-      .then(() => {
-        onSave();
-        onClose();
+      .then((res) => {
+        setInfo(res.data.info);
+        setTimeout(() => {
+          onSave();
+          onClose();
+        }, 1000);
       })
       .catch((err) => console.log(err));
   };
@@ -81,6 +85,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
       <div className={styles.modal}>
         <h2>Edytuj użytkownika</h2>
         <p className={styles.error}>{errors}</p>
+        <p className={styles.info}>{info}</p>
 
         {user.role != "employer" && (
           <>

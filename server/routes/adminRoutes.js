@@ -64,7 +64,6 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
     const userId = req.params.id;
     const { name, surname, email, is_active } = req.body;
 
-    
     if (!email || !is_active) {
       return res.status(400).json({ error: "Brak wymaganych danych" });
     }
@@ -78,7 +77,7 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
       return res.status(404).json({ error: "Użytkownik nie istnieje" });
     }
 
-    res.json({ message: "Użytkownik zaktualizowany poprawnie" });
+    res.json({ info: "Użytkownik zaktualizowany poprawnie" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd serwera" });
@@ -111,7 +110,7 @@ router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
     const total = countRow.cnt;
     const totalPages = Math.ceil(total / pageSize);
 
-    let dataSql = `SELECT id, companyName, email, phone_number, owner_id, link, img, created_at
+    let dataSql = `SELECT *
                    FROM companies`;
     const dataParams = [];
     if (search) {
@@ -133,35 +132,17 @@ router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
 
 router.put("/edit-company", authenticateToken, isAdmin, async (req, res) => {
   try {
-    const { id, companyName, link, description, email, phone_number, img } =
-      req.body;
-    console.log(req.body);
+    const { id, companyName, nip } = req.body;
     if (!id) return res.status(400).json({ error: "Brak id" });
 
     await connection.query(
       `UPDATE companies 
-       SET companyName = ?, link = ?, description = ?, email = ?, phone_number = ?, img = ?
+       SET companyName = ?, nip =? 
        WHERE id = ?`,
-      [
-        companyName || null,
-        link || null,
-        description || null,
-        email || null,
-        phone_number || null,
-        img || null,
-        id,
-      ]
+      [companyName, nip, id]
     );
 
-    // opcjonalnie synchronizuj img do job_offers
-    if (img) {
-      await connection.query(
-        "UPDATE job_offers SET img = ? WHERE company_id = ?",
-        [img, id]
-      );
-    }
-
-    res.json({ info: "Zaktualizowano firmę" });
+    res.status(200).json({ info: "Zaktualizowano firmę" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd aktualizacji firmy" });

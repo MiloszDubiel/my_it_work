@@ -5,23 +5,17 @@ import axios from "axios";
 const CompanyEditModal = ({ company, onClose, onSave }) => {
   const [form, setForm] = useState({
     companyName: "",
-    description: "",
-    email: "",
-    phone_number: "",
-    link: "",
-    id: company.id,
+    nip: "",
+    id: "",
   });
 
-  const [errors, setErrors] = useState("");
+  const [errors, setError] = useState("");
   const [info, setInfo] = useState("");
   useEffect(() => {
     if (company) {
       setForm({
         companyName: company.companyName,
-        description: company.description || "",
-        email: company.email || "",
-        phone_number: company.phone_number || "",
-        link: company.link || "",
+        nip: company.nip,
         id: company.id,
       });
     }
@@ -29,27 +23,12 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
 
   const validate = () => {
     if (!form.companyName || form.companyName.length < 2) {
-      setErrors("Nazwa firmy musi mieć co najmniej 2 znaki.");
+      setError("Nazwa firmy musi mieć co najmniej 2 znaki.");
       return false;
     }
 
-    if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
-      setErrors("Niepoprawny format email.");
-      return false;
-    }
-
-    if (form.phone_number && !/^[0-9+\-\s]{5,20}$/.test(form.phone_number)) {
-      setErrors("Niepoprawny numer telefonu.");
-      return false;
-    }
-
-    if (form.link && !/^https?:\/\/.+/.test(form.link)) {
-      setErrors("Podaj poprawny adres URL (https://...)");
-      return false;
-    }
-
-    if (form.phone_number && !/^[0-9]{9}$/.test(form.phone_number)) {
-      setErrors("Numer telefonu musi mieć dokładnie 9 cyfr.");
+    if (!/^\d{10}$/.test(form.nip)) {
+      setError("Nip musi mieć 10 znaków.");
       return false;
     }
 
@@ -57,7 +36,7 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
   };
 
   const handleChange = (e) => {
-    setErrors("");
+    setError("");
     setInfo("");
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -65,7 +44,7 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
   const save = () => {
     if (!validate()) return;
 
-    setErrors("");
+    setError("");
     setInfo("");
 
     axios
@@ -76,8 +55,10 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
       })
       .then((res) => {
         setInfo(res.data.info);
-        onSave();
-        onClose();
+        setTimeout(() => {
+          onSave();
+          onClose();
+        }, 1000);
       })
       .catch((err) => console.log(err));
   };
@@ -97,34 +78,10 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           onChange={handleChange}
           type="text"
         />
-
-        <label>Opis</label>
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-        ></textarea>
-
-        <label>Email kontaktowy do firmy </label>
+        <label>NIP</label>
         <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          type="email"
-        />
-
-        <label>Numer telefonu</label>
-        <input
-          name="phone_number"
-          value={form.phone_number}
-          onChange={handleChange}
-          type="text"
-        />
-
-        <label>Link (strona, LinkedIn, itp.)</label>
-        <input
-          name="link"
-          value={form.link}
+          name="nip"
+          value={form.nip}
           onChange={handleChange}
           type="text"
         />

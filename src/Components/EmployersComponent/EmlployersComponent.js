@@ -85,8 +85,9 @@ const EmployersComponent = () => {
                             </span>
                           ))}
 
-                      {JSON.parse(offer.technologies)[0].slice(0, 2).length <
-                      JSON.parse(offer.technologies)[0].length ? (
+                      {offer.technologies &&
+                      JSON.parse(offer.technologies)[0].slice(0, 2).length <
+                        JSON.parse(offer.technologies)[0].length ? (
                         <p className={styles.item}>i więcej... </p>
                       ) : (
                         ""

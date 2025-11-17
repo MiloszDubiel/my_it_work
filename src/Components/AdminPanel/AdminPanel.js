@@ -7,6 +7,7 @@ import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import AdminDashboard from "./Dashboard/AdminDashboard";
 import AdminSettings from "./AdminSettings/AdminSettings";
+import ConfirmModal from "../PromptModals/ConfirmModal";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("analise");
@@ -24,6 +25,9 @@ const AdminPanel = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isEditingOffer, setIsEditingOffer] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [message, setMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(null);
 
   useEffect(() => {
     if (activeTab === "users") loadUsers();
@@ -92,8 +96,6 @@ const AdminPanel = () => {
   };
 
   const deleteUser = (id) => {
-    if (!window.confirm("Czy na pewno chcesz usunąć użytkownika?")) return;
-
     axios
       .post(
         "http://localhost:5000/admin/delete-user",
@@ -109,8 +111,6 @@ const AdminPanel = () => {
   };
 
   const deleteCompany = (id) => {
-    if (!window.confirm("Usunąć firmę?")) return;
-
     axios
       .post(
         "http://localhost:5000/admin/delete-company",
@@ -126,8 +126,6 @@ const AdminPanel = () => {
   };
 
   const deleteOffer = (id) => {
-    if (!window.confirm("Usunąć ofertę pracy?")) return;
-
     axios
       .post(
         "http://localhost:5000/admin/delete-offer",
@@ -140,6 +138,32 @@ const AdminPanel = () => {
       )
       .then(() => loadOffers())
       .catch((err) => console.error(err));
+  };
+
+  const handleConfirm = (result) => {
+    setShowConfirm(false);
+
+    if (result && confirmAction) {
+      confirmAction();
+    }
+
+    setConfirmAction(null);
+  };
+
+  const askDeleteUser = (id) => {
+    setMessage("Czy na pewno chcesz usunąć użytkownika?");
+    setConfirmAction(() => () => deleteUser(id));
+    setShowConfirm(true);
+  };
+  const askDeleteCompany = (id) => {
+    setMessage("Czy na pewno chcesz usunąć firmę?");
+    setConfirmAction(() => () => deleteCompany(id));
+    setShowConfirm(true);
+  };
+  const askDeleteOffer = (id) => {
+    setMessage("Czy na pewno chcesz usunąć ofertę pracy?");
+    setConfirmAction(() => () => deleteOffer(id));
+    setShowConfirm(true);
   };
   return (
     <div className={styles.adminContainer}>
@@ -182,6 +206,14 @@ const AdminPanel = () => {
         </aside>
 
         <main className={styles.content}>
+          {showConfirm && (
+            <ConfirmModal
+              message={message}
+              onConfirm={handleConfirm}
+              onCancel={handleConfirm}
+            />
+          )}
+
           {activeTab === "analise" && (
             <section className={styles.section}>
               <AdminDashboard />
@@ -209,43 +241,52 @@ const AdminPanel = () => {
 
               <h3>Lista użytkowników</h3>
               <div className={styles.table}>
-                <div className={styles.headerRow}>
-                  <span>Email</span>
-                  <span>Imię</span>
-                  <span>Typ</span>
-                  <span>Aktywny</span>
-                  <span>Akcje</span>
-                </div>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Email</th>
+                      <th>Imię</th>
+                      <th>Typ</th>
+                      <th>Aktywny</th>
+                      <th>Akcje</th>
+                    </tr>
+                  </thead>
 
-                {users.map((u) => (
-                  <div className={styles.row} key={u.id}>
-                    <span>{u.email}</span>
-                    <span>
-                      {u.name} {u.surname}
-                    </span>
-                    <span>{u.role}</span>
-                    <span>{u.is_active === "1" ? "Tak" : "Nie"}</span>
-                    <span style={{ display: " flex", gap: "10px" }}>
-                      <button
-                        className={styles.editBtn}
-                        onClick={() => {
-                          setSelectedUser(u);
-                          setIsEditing(true);
-                        }}
-                      >
-                        ✏️
-                      </button>
-                      {u.role !== "admin" && (
-                        <button
-                          className={styles.deleteBtn}
-                          onClick={() => deleteUser(u.id)}
-                        >
-                          🗑
-                        </button>
-                      )}
-                    </span>
-                  </div>
-                ))}
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id}>
+                        <td>{u.email}</td>
+                        <td>
+                          {u.name} {u.surname}
+                        </td>
+                        <td>{u.role}</td>
+                        <td>{u.is_active === "1" ? "Tak" : "Nie"}</td>
+                        <td>
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <button
+                              className={styles.editBtn}
+                              onClick={() => {
+                                setSelectedUser(u);
+                                setIsEditing(true);
+                              }}
+                            >
+                              ✏️
+                            </button>
+
+                            {u.role !== "admin" && (
+                              <button
+                                className={styles.deleteBtn}
+                                onClick={() => askDeleteUser(u.id)}
+                              >
+                                🗑
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <div className={styles.pagination}>
                   <button
                     disabled={page === 1}
@@ -268,7 +309,6 @@ const AdminPanel = () => {
               </div>
             </section>
           )}
-
           {/* --- FIRMY --- */}
           {activeTab === "companies" && (
             <section className={styles.section}>
@@ -292,37 +332,46 @@ const AdminPanel = () => {
               />
 
               <div className={styles.table}>
-                <div className={styles.headerRow}>
-                  <span>Nazwa</span>
-                  <span>Email</span>
-                  <span>Telefon</span>
-                  <span>Akcje</span>
-                </div>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Nazwa</th>
+                      <th>NIP</th>
 
-                {companies.map((c) => (
-                  <div className={styles.row} key={c.id}>
-                    <span>{c.companyName}</span>
-                    <span>{c.email}</span>
-                    <span>{c.phone_number}</span>
-                    <span style={{ display: " flex", gap: "10px" }}>
-                      <button
-                        className={styles.editBtn}
-                        onClick={() => {
-                          setSelectedCompany(c);
-                          setIsEditingCompany(true);
-                        }}
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => deleteCompany(c.id)}
-                      >
-                        🗑
-                      </button>
-                    </span>
-                  </div>
-                ))}
+                      <th>Akcje</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {companies.map((c) => (
+                      <tr key={c.id}>
+                        <td>{c.companyName}</td>
+                        <td>{c.nip}</td>
+                        <td>
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <button
+                              className={styles.editBtn}
+                              onClick={() => {
+                                setSelectedCompany(c);
+                                setIsEditingCompany(true);
+                              }}
+                            >
+                              ✏️
+                            </button>
+
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => askDeleteCompany(c.id)}
+                            >
+                              🗑
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
                 <div className={styles.pagination}>
                   <button
                     disabled={pageComapny === 1}
@@ -345,7 +394,6 @@ const AdminPanel = () => {
               </div>
             </section>
           )}
-
           {/* --- OFERTY PRACY --- */}
           {activeTab === "offers" && (
             <section className={styles.section}>
@@ -369,49 +417,60 @@ const AdminPanel = () => {
               />
 
               <div className={styles.table}>
-                <div className={styles.headerRow}>
-                  <span>Stanowisko</span>
-                  <span>Firma</span>
-                  <span>Data</span>
-                  <span>Aktywna</span>
-                  <span>Akcje</span>
-                </div>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Stanowisko</th>
+                      <th>Firma</th>
+                      <th>Data</th>
+                      <th>Aktywna</th>
+                      <th>Akcje</th>
+                    </tr>
+                  </thead>
 
-                {offers.map((o) => (
-                  <div className={styles.row} key={o.id}>
-                    <span>{o.title}</span>
-                    <span>{o.companyName}</span>
-                    <span>
-                      {!o.updated_at
-                        ? ""
-                        : new Date(o.updated_at).toLocaleDateString("pl-PL")}
-                    </span>
-                    <span>{o.is_active == "1" ? "Tak" : "Nie"}</span>
-                    <span
-                      style={{
-                        display: " flex",
-                        gap: "10px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <button
-                        className={styles.editBtn}
-                        onClick={() => {
-                          setSelectedOffer(o);
-                          setIsEditingOffer(true);
-                        }}
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => deleteOffer(o.id)}
-                      >
-                        🗑
-                      </button>
-                    </span>
-                  </div>
-                ))}
+                  <tbody>
+                    {offers.map((o) => (
+                      <tr key={o.id}>
+                        <td>{o.title}</td>
+                        <td>{o.companyName}</td>
+                        <td>
+                          {!o.updated_at
+                            ? ""
+                            : new Date(o.updated_at).toLocaleDateString(
+                                "pl-PL"
+                              )}
+                        </td>
+                        <td>{o.is_active == "1" ? "Tak" : "Nie"}</td>
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <button
+                              className={styles.editBtn}
+                              onClick={() => {
+                                setSelectedOffer(o);
+                                setIsEditingOffer(true);
+                              }}
+                            >
+                              ✏️
+                            </button>
+
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => askDeleteOffer(o.id)}
+                            >
+                              🗑
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
               <div className={styles.pagination}>
                 <button

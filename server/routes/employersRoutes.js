@@ -1,9 +1,5 @@
 import express, { json } from "express";
-import { getEmployers } from "../scrappers/employerScraper.js";
-import {
-  saveEmployersToDb,
-  getAllEmployers,
-} from "../services/employerService.js";
+import { getAllEmployers } from "../services/employerService.js";
 import {
   getFillteredEmployers,
   getCompanyInfo,
@@ -63,15 +59,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/scrape", async (req, res) => {
-  try {
-    const offers = await getEmployers();
-    const [result] = await saveEmployersToDb(offers);
-    res.json({ inserted: result.affectedRows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 router.post("/get-company-info", async (req, res) => {
   const { id } = req.body;
 
@@ -82,78 +69,56 @@ router.post("/get-company-info", async (req, res) => {
   return res.json({ companyInfo: await getCompanyInfo(id) });
 });
 
+router.post("/set-company-info", async (req, res) => {
+  try {
+    const { owner_id, description, link, email, phone_number } = req.body;
+
+    await connection.query(
+      "UPDATE companies SET description=?, link=?, email=?, phone_number=? WHERE owner_id=?",
+      [description, link, email, phone_number, owner_id]
+    );
+
+    return res.status(200).json({ info: "Zapisano zmiany" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Błąd serwera" });
+  }
+});
+
 router.post(
-  "/set-company-info",
+  "/request-company-change",
   uploadLogo.single("logo"),
   async (req, res) => {
+    const { owner_id, companyName, nip, company_id } = req.body;
+
+    const [rows] = await connection.query(
+      "SELECT * FROM company_change_requests WHERE company_id = ? AND employer_id = ?",
+      [company_id, owner_id]
+    );
+
+    if (rows.length > 0) {
+      return res.status(400).json({
+        error: "Poprzednia prośba czeka na odpowiedź administrator.",
+      });
+    }
+
+    const logo = req.file ? req.file.filename : null;
+    const logoLink = logo
+      ? `http://localhost:5000/api/employers/get-company-logo/${owner_id}`
+      : null;
+
     try {
-      const { owner_id, companyName, description, link, email, phone_number } =
-        req.body;
+      await connection.query(
+        `INSERT INTO company_change_requests 
+            (company_id, employer_id, new_company_name, new_nip, new_logo) 
+             VALUES (?, ?, ?, ?, ?)`,
+        [company_id, owner_id, companyName, nip, logo]
+      );
 
-      const logo = req.file ? req.file.filename : null;
-      const logoLink = logo
-        ? `http://localhost:5000/api/employers/get-company-logo/${owner_id}`
-        : null;
-
-      // Pobieramy istniejącą firmę
-      const owner = await getCompanyInfo(owner_id);
-
-      if (owner.length === 0) {
-        // INSERT nowej firmy
-        const query = logo
-          ? "INSERT INTO companies (companyName, description, link, email, phone_number, owner_id, uploaded_image, img) VALUES (?,?,?,?,?,?,?,?)"
-          : "INSERT INTO companies (companyName, description, link, email, phone_number, owner_id) VALUES (?,?,?,?,?,?)";
-
-        const params = logo
-          ? [
-              companyName,
-              description,
-              link,
-              email,
-              phone_number,
-              owner_id,
-              logo,
-              logoLink,
-            ]
-          : [companyName, description, link, email, phone_number, owner_id];
-
-        await connection.query(query, params);
-
-        return res.status(200).json({ info: "Zapisano firmę" });
-      }
-
-      // UPDATE istniejącej firmy
-      const updateQuery = logo
-        ? "UPDATE companies SET companyName=?, description=?, link=?, email=?, phone_number=?, uploaded_image=?, img=? WHERE owner_id=?"
-        : "UPDATE companies SET companyName=?, description=?, link=?, email=?, phone_number=? WHERE owner_id=?";
-
-      const updateParams = logo
-        ? [
-            companyName,
-            description,
-            link,
-            email,
-            phone_number,
-            logo,
-            logoLink,
-            owner_id,
-          ]
-        : [companyName, description, link, email, phone_number, owner_id];
-
-      await connection.query(updateQuery, updateParams);
-
-      // Jeśli logo się zmieniło, aktualizujemy kolumnę img w job_offers
-      if (logo) {
-        await connection.query(
-          "UPDATE job_offers SET img=? WHERE company_id=?",
-          [logoLink, owner[0].id]
-        );
-      }
-
-      return res.status(200).json({ info: "Zapisano zmiany" });
+      res.status(200).json({ info: "Wysłano prośbę do administratora." });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Błąd serwera" });
+      console.log(err);
+      res.status(500).json({ error: "Błąd serwera." });
     }
   }
 );
