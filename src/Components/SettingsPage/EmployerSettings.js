@@ -91,7 +91,6 @@ const EmployerSettings = () => {
       return setError("Telefon musi zawierać dokładnie 9 cyfr.");
     }
 
-   
     let res = await axios.post(
       "http://localhost:5000/api/employers/set-company-info",
       {
@@ -215,291 +214,294 @@ const EmployerSettings = () => {
   return (
     <div className={styles.container1} id="settings">
       <div className={styles.container}>
-        <aside className={styles.sidebar}>
-          <h2 style={{ color: "black" }}>Panel pracodawcy</h2>
-          <ul>
-            <li
+        <div className={styles.actionsBar}>
+          <button
+            className={styles.closeBtn}
+            onClick={() => {
+              document.querySelector("#settings").style.display = "none";
+              document.querySelector("#root").style.overflow = "auto";
+            }}
+          >
+            <IoMdClose />
+          </button>
+        </div>
+
+        <div className={styles.settingsBody}>
+          <aside className={styles.sidebar}>
+            <h2 style={{ color: "black" }}>Panel pracodawcy</h2>
+
+            <button
               className={activeTab === "company" ? styles.active : ""}
               onClick={() => setActiveTab("company")}
             >
               🏢 Informacje o firmie
-            </li>
-            <li
+            </button>
+            <button
               className={activeTab === "offers" ? styles.active : ""}
               onClick={() => setActiveTab("offers")}
             >
               💼 Oferty pracy
-            </li>
-            <li
+            </button>
+            <button
               className={activeTab === "settings" ? styles.active : ""}
               onClick={() => setActiveTab("settings")}
             >
               ⚙️ Ustawienia konta
-            </li>
-          </ul>
-        </aside>
-
-        <main className={styles.content}>
-          <div className={styles.rightActions}>
-            <button style={{ all: "unset", cursor: "pointer" }}>
-              <IoMdClose
-                onClick={() => {
-                  document.querySelector("#settings").style.display = "none";
-                  document.querySelector("#root").style.overflow = "auto";
-                }}
-              />
             </button>
-          </div>
-          <p className={styles.error}>{error}</p>
-          <p className={styles.info}>{info}</p>
-          {activeTab === "company" && (
-            <section className={styles.section}>
-              <h3>Podstawowe informacje o firmie</h3>
-              <form onSubmit={handleSubmitDetails}>
-                <label>Nazwa</label>
-                <input
-                  type="text"
-                  placeholder="Nazwa"
-                  value={company?.companyName}
-                  onChange={(e) =>
-                    setCompany({ ...company, companyName: e.target.value })
-                  }
-                />
+          </aside>
 
-                <label>NIP</label>
-                <input
-                  type="text"
-                  placeholder="NIP"
-                  value={company?.nip}
-                  onChange={(e) =>
-                    setCompany({ ...company, nip: e.target.value })
-                  }
-                />
-
-                <label>Logo firmy</label>
-
-                <div className={styles.logoPreview}>
-                  <img
-                    src={
-                      logoPreviewUrl ||
-                      `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
+          <div className={styles.content}>
+            <p className={styles.error}>{error}</p>
+            <p className={styles.info}>{info}</p>
+            {activeTab === "company" && (
+              <section className={styles.section}>
+                <form onSubmit={handleSubmitDetails} className={styles.form}>
+                  <h3>Podstawowe informacje o firmie</h3>
+                  <label>Nazwa</label>
+                  <input
+                    type="text"
+                    placeholder="Nazwa"
+                    value={company?.companyName}
+                    onChange={(e) =>
+                      setCompany({ ...company, companyName: e.target.value })
                     }
-                    alt="Logo firmy"
                   />
-                </div>
 
-                <input
-                  type="file"
-                  accept="image/png"
-                  onChange={(e) => {
-                    setLogoFile(e.target.files[0]);
-                    setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
-                  }}
-                />
+                  <label>NIP</label>
+                  <input
+                    type="text"
+                    placeholder="NIP"
+                    value={company?.nip}
+                    onChange={(e) =>
+                      setCompany({ ...company, nip: e.target.value })
+                    }
+                  />
 
-                <button type="submit" className={styles.saveBtn}>
-                  Zapisz
-                </button>
-              </form>
-              <hr style={{ margin: "15px" }} />
-              <h3>Dodatkowe informacje o firmie</h3>
-              <form onSubmit={handleSubmit}>
-                <label>Opis</label>
-                <textarea
-                  placeholder="Opisz swoją firmę..."
-                  value={company?.description}
-                  onChange={(e) =>
-                    setCompany({ ...company, description: e.target.value })
-                  }
-                />
+                  <label>Logo firmy</label>
 
-                <label>Strona internetowa</label>
-                <input
-                  type="url"
-                  placeholder="https://twojafirma.pl"
-                  value={company?.link}
-                  onChange={(e) =>
-                    setCompany({ ...company, link: e.target.value })
-                  }
-                />
-
-                <label>Email kontaktowy</label>
-                <input
-                  type="email"
-                  placeholder="kontakt@firma.pl"
-                  value={company?.email}
-                  onChange={(e) =>
-                    setCompany({ ...company, email: e.target.value })
-                  }
-                />
-
-                <label>Numer telefonu</label>
-                <input
-                  type="tel"
-                  placeholder="123456789"
-                  value={company?.phone_number}
-                  maxLength={9}
-                  onChange={(e) =>
-                    setCompany({ ...company, phone_number: e.target.value })
-                  }
-                />
-
-                <button type="submit" className={styles.saveBtn}>
-                  Zapisz
-                </button>
-              </form>
-            </section>
-          )}
-          {activeTab === "offers" && (
-            <section className={styles.section}>
-              <AddJobOffer onOfferAdded={handleOfferAdded} />
-              <h3>Tutaj możesz zarządzać swoimi ofertami pracy</h3>
-              <button
-                className={styles.addBtn}
-                onClick={() => {
-                  document.querySelector("#add-job-offer").style.display =
-                    "flex";
-                }}
-              >
-                ➕ Dodaj nową ofertę
-              </button>
-
-              <div className={styles.table}>
-                <div className={styles.rowHeader}>
-                  <span>Nazwa stanowiska</span>
-                  <span>Status</span>
-                  <span>Data dodania</span>
-                  <span>Akcje</span>
-                </div>
-
-                {offers.length > 0 ? (
-                  offers.map((offer) => (
-                    <>
-                      <UpdateJobOffer offer={offer} />
-                      <div key={offer.id} className={styles.row}>
-                        <span>{offer.title}</span>
-                        <span>
-                          {offer.is_active === 0
-                            ? "W trakcie weryfikacje"
-                            : "Aktywna"}
-                        </span>
-                        <span>
-                          {new Date(offer.updated_at).toLocaleDateString()}
-                        </span>
-                        <span className={styles.actions}>
-                          <button
-                            onClick={() => {
-                              document.querySelector(
-                                `.update-job-offer${offer.id}`
-                              ).style.display = "flex";
-                            }}
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={async () => {
-                              if (
-                                window.confirm(
-                                  `Czy napewno chcesz usunąc oferte ${offer.title} `
-                                )
-                              ) {
-                                let res = await axios.delete(
-                                  `http://localhost:5000/api/job-offerts/delete/${offer.id}`
-                                );
-                                console.log(res);
-                                if (res.data.success) {
-                                  setRefresh(!refresh);
-                                }
-                              }
-                            }}
-                          >
-                            🗑️
-                          </button>
-                        </span>
-                      </div>
-                    </>
-                  ))
-                ) : (
-                  <div className={styles.row}>
-                    <span colSpan={4}>Brak ofert pracy</span>
+                  <div className={styles.logoPreview}>
+                    <img
+                      src={
+                        logoPreviewUrl ||
+                        `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
+                      }
+                      alt="Logo firmy"
+                    />
                   </div>
-                )}
-              </div>
-            </section>
-          )}
-          {activeTab === "settings" && (
-            <section className={styles.section}>
-              <h3>Ustawienia konta</h3>
-              <form onSubmit={handleSubmitUserInfo}>
-                <label>Imię</label>
-                <input
-                  type="text"
-                  placeholder="Jan"
-                  value={dataToChange.name}
-                  onChange={(e) =>
-                    setDataToChange({ ...dataToChange, name: e.target.value })
-                  }
-                />
 
-                <label>Nazwisko</label>
-                <input
-                  type="text"
-                  placeholder="Kowalski"
-                  value={dataToChange.surname}
-                  onChange={(e) =>
-                    setDataToChange({
-                      ...dataToChange,
-                      surname: e.target.value,
-                    })
-                  }
-                />
+                  <input
+                    type="file"
+                    accept="image/png"
+                    onChange={(e) => {
+                      setLogoFile(e.target.files[0]);
+                      setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
+                    }}
+                  />
 
-                <label>Email</label>
-                <input
-                  type="email"
-                  placeholder="jan@firma.pl"
-                  value={dataToChange.email}
-                  onChange={(e) =>
-                    setDataToChange({
-                      ...dataToChange,
-                      email: e.target.value,
-                    })
-                  }
-                />
+                  <button type="submit" className={styles.saveBtn}>
+                    Zapisz
+                  </button>
+                </form>
+                <hr style={{ margin: "15px" }} />
+                <h3>Dodatkowe informacje o firmie</h3>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                  <label>Opis</label>
+                  <textarea
+                    placeholder="Opisz swoją firmę..."
+                    value={company?.description}
+                    onChange={(e) =>
+                      setCompany({ ...company, description: e.target.value })
+                    }
+                  />
 
-                <label>Nowe hasło</label>
-                <input
-                  type="password"
-                  placeholder="********"
-                  value={dataToChange.newPassword}
-                  onChange={(e) =>
-                    setDataToChange({
-                      ...dataToChange,
-                      newPassword: e.target.value,
-                    })
-                  }
-                />
+                  <label>Strona internetowa</label>
+                  <input
+                    type="url"
+                    placeholder="https://twojafirma.pl"
+                    value={company?.link}
+                    onChange={(e) =>
+                      setCompany({ ...company, link: e.target.value })
+                    }
+                  />
 
-                <label>Powtórz hasło</label>
-                <input
-                  type="password"
-                  placeholder="********"
-                  value={dataToChange.repeatPassword}
-                  onChange={(e) =>
-                    setDataToChange({
-                      ...dataToChange,
-                      repeatPassword: e.target.value,
-                    })
-                  }
-                />
+                  <label>Email kontaktowy</label>
+                  <input
+                    type="email"
+                    placeholder="kontakt@firma.pl"
+                    value={company?.email}
+                    onChange={(e) =>
+                      setCompany({ ...company, email: e.target.value })
+                    }
+                  />
 
-                <button type="submit" className={styles.saveBtn}>
-                  Zapisz zmiany
+                  <label>Numer telefonu</label>
+                  <input
+                    type="tel"
+                    placeholder="123456789"
+                    value={company?.phone_number}
+                    maxLength={9}
+                    onChange={(e) =>
+                      setCompany({ ...company, phone_number: e.target.value })
+                    }
+                  />
+
+                  <button type="submit" className={styles.saveBtn}>
+                    Zapisz
+                  </button>
+                </form>
+              </section>
+            )}
+            {activeTab === "offers" && (
+              <section className={styles.section}>
+                <AddJobOffer onOfferAdded={handleOfferAdded} />
+                <h3>Tutaj możesz zarządzać swoimi ofertami pracy</h3>
+                <button
+                  className={styles.addBtn}
+                  onClick={() => {
+                    document.querySelector("#add-job-offer").style.display =
+                      "flex";
+                  }}
+                >
+                  ➕ Dodaj nową ofertę
                 </button>
-              </form>
-            </section>
-          )}
-        </main>
+
+                <div className={styles.table}>
+                  <div className={styles.rowHeader}>
+                    <span>Nazwa stanowiska</span>
+                    <span>Status</span>
+                    <span>Data dodania</span>
+                    <span>Akcje</span>
+                  </div>
+
+                  {offers.length > 0 ? (
+                    offers.map((offer) => (
+                      <>
+                        <UpdateJobOffer offer={offer} />
+                        <div key={offer.id} className={styles.row}>
+                          <span>{offer.title}</span>
+                          <span>
+                            {offer.is_active === 0
+                              ? "W trakcie weryfikacje"
+                              : "Aktywna"}
+                          </span>
+                          <span>
+                            {new Date(offer.updated_at).toLocaleDateString()}
+                          </span>
+                          <span className={styles.actions}>
+                            <button
+                              onClick={() => {
+                                document.querySelector(
+                                  `.update-job-offer${offer.id}`
+                                ).style.display = "flex";
+                              }}
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (
+                                  window.confirm(
+                                    `Czy napewno chcesz usunąc oferte ${offer.title} `
+                                  )
+                                ) {
+                                  let res = await axios.delete(
+                                    `http://localhost:5000/api/job-offerts/delete/${offer.id}`
+                                  );
+                                  console.log(res);
+                                  if (res.data.success) {
+                                    setRefresh(!refresh);
+                                  }
+                                }
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </span>
+                        </div>
+                      </>
+                    ))
+                  ) : (
+                    <div className={styles.row}>
+                      <span colSpan={4}>Brak ofert pracy</span>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+            {activeTab === "settings" && (
+              <section className={styles.section}>
+                <h3>Ustawienia konta</h3>
+                <form onSubmit={handleSubmitUserInfo} className={styles.form}>
+                  <label>Imię</label>
+                  <input
+                    type="text"
+                    placeholder="Jan"
+                    value={dataToChange.name}
+                    onChange={(e) =>
+                      setDataToChange({ ...dataToChange, name: e.target.value })
+                    }
+                  />
+
+                  <label>Nazwisko</label>
+                  <input
+                    type="text"
+                    placeholder="Kowalski"
+                    value={dataToChange.surname}
+                    onChange={(e) =>
+                      setDataToChange({
+                        ...dataToChange,
+                        surname: e.target.value,
+                      })
+                    }
+                  />
+
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    placeholder="jan@firma.pl"
+                    value={dataToChange.email}
+                    onChange={(e) =>
+                      setDataToChange({
+                        ...dataToChange,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+
+                  <label>Nowe hasło</label>
+                  <input
+                    type="password"
+                    placeholder="********"
+                    value={dataToChange.newPassword}
+                    onChange={(e) =>
+                      setDataToChange({
+                        ...dataToChange,
+                        newPassword: e.target.value,
+                      })
+                    }
+                  />
+
+                  <label>Powtórz hasło</label>
+                  <input
+                    type="password"
+                    placeholder="********"
+                    value={dataToChange.repeatPassword}
+                    onChange={(e) =>
+                      setDataToChange({
+                        ...dataToChange,
+                        repeatPassword: e.target.value,
+                      })
+                    }
+                  />
+
+                  <button type="submit" className={styles.saveBtn}>
+                    Zapisz zmiany
+                  </button>
+                </form>
+              </section>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

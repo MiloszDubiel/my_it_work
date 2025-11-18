@@ -26,7 +26,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       let res = await axios.post("http://localhost:5000/auth/login", {
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 

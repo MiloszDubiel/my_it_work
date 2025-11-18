@@ -28,6 +28,10 @@ const AdminPanel = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmAction, setConfirmAction] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [showRequestConfirm, setShowRequestConfirm] = useState(false);
+  const [pendingRequestId, setPendingRequestId] = useState(null);
+  const [pendingType, setPendingType] = useState(null); // "approve" | "reject"
 
   useEffect(() => {
     if (activeTab === "users") loadUsers();
@@ -43,6 +47,20 @@ const AdminPanel = () => {
     pageOffers,
     search,
   ]);
+
+  const loadRequests = () => {
+    axios
+      .get("http://localhost:5000/admin/company-change-requests", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setRequests(res.data.requests));
+  };
+
+  useEffect(() => {
+    loadRequests();
+  }, []);
 
   const loadUsers = () => {
     axios
@@ -165,6 +183,63 @@ const AdminPanel = () => {
     setConfirmAction(() => () => deleteOffer(id));
     setShowConfirm(true);
   };
+
+  const askApprove = (id) => {
+    setPendingRequestId(id);
+    setPendingType("approve");
+    setMessage("Czy na pewno chcesz zaakceptować zmianę danych firmy?");
+    setShowRequestConfirm(true);
+  };
+
+  const askReject = (id) => {
+    setPendingRequestId(id);
+    setPendingType("reject");
+    setMessage("Czy na pewno chcesz odrzucić zmianę danych firmy?");
+    setShowRequestConfirm(true);
+  };
+
+  const handleRequestConfirm = async (result) => {
+    setShowRequestConfirm(false);
+
+    if (!result) return;
+
+    if (pendingType === "approve") {
+      await approve(pendingRequestId);
+    } else if (pendingType === "reject") {
+      await reject(pendingRequestId);
+    }
+
+    setPendingRequestId(null);
+    setPendingType(null);
+  };
+
+  const approve = async (id) => {
+    await axios.post(
+      "http://localhost:5000/admin/approve-company-change",
+      { request_id: id },
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      }
+    );
+    loadRequests();
+    loadCompanies();
+  };
+
+  const reject = async (id) => {
+    await axios.post(
+      "http://localhost:5000/admin/reject-company-change",
+      { request_id: id },
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      }
+    );
+    loadRequests();
+  };
+
   return (
     <div className={styles.adminContainer}>
       <Navbar />
@@ -211,6 +286,13 @@ const AdminPanel = () => {
               message={message}
               onConfirm={handleConfirm}
               onCancel={handleConfirm}
+            />
+          )}
+          {showRequestConfirm && (
+            <ConfirmModal
+              message={message}
+              onConfirm={handleRequestConfirm}
+              onCancel={handleRequestConfirm}
             />
           )}
 
@@ -390,6 +472,51 @@ const AdminPanel = () => {
                   >
                     Następna ▶
                   </button>
+                </div>
+                <h3>Prośby o zmiane danych</h3>
+                <div>
+                  <h2>Prośby o zmianę danych firmy</h2>
+
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Firma (stara → nowa)</th>
+                        <th>NIP (stary → nowy)</th>
+                        <th>Logo</th>
+                        <th>Akcje</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {requests.map((r) => (
+                        <tr key={r.id}>
+                          <td>
+                            {r.old_name} → <b>{r.new_company_name}</b>
+                          </td>
+                          <td>
+                            {r.old_nip} → <b>{r.new_nip}</b>
+                          </td>
+                          <td>
+                            <img src={r.new_logo} alt="new logo" height="40" />
+                          </td>
+                          <td>
+                            <button
+                              className={styles.approve}
+                              onClick={() => askApprove(r.id)}
+                            >
+                              ✔
+                            </button>
+                            <button
+                              className={styles.reject}
+                              onClick={() => askReject(r.id)}
+                            >
+                              ✖
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </section>

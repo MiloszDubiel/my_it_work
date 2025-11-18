@@ -5,12 +5,18 @@ import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import LoadingComponent from "../LoadingComponent/LoadingComponent";
 import { CiStar } from "react-icons/ci";
+import ConfirmModal from "../PromptModals/ConfirmModal";
+import InfoModal from "../PromptModals/InfoModal";
 
 const OfferInfo = ({ offer, id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  let confirmCallback = null;
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -60,7 +66,7 @@ const OfferInfo = ({ offer, id }) => {
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/applications/${userData.id}/${offer.id}`
+          `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`
         );
         setAlreadyApplied(res.data.applied);
         setAppliedDate(res.data.applied_at);
@@ -72,36 +78,45 @@ const OfferInfo = ({ offer, id }) => {
   }, [userData?.id, offer?.id]);
 
   const applyToOffer = async () => {
-    if (!userData?.id) return alert("Musisz być zalogowany, aby aplikować");
+    if (!userData?.id) {
+      setModalMessage("Musisz być zalogowany, aby aplikować");
+      setShowInfo(true);
+      return;
+    }
 
     if (alreadyApplied) {
-      return alert(
-        `Już aplikowałeś na tę ofertę w dniu: ${new Date(
+      setModalMessage(
+        `Już aplikowałeś na tę ofertę: ${new Date(
           appliedDate
         ).toLocaleDateString()}`
       );
+      setShowInfo(true);
+      return;
     }
 
-    const confirmApply = window.confirm(
-      "Czy na pewno chcesz aplikować na tę ofertę?"
-    );
-    if (!confirmApply) return;
+    // 🔥 teraz confirm modal zamiast window.confirm
+    setModalMessage("Czy na pewno chcesz aplikować na tę ofertę?");
+    setShowConfirm(true);
 
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/job-offerts/applications",
-        {
-          user_id: userData.id,
-          offer_id: offer.id,
-        }
-      );
-      alert(res.data.message);
-      setAlreadyApplied(true);
-      setAppliedDate(new Date());
-    } catch (err) {
-      console.error(err);
-      alert("Błąd przy aplikowaniu");
-    }
+    confirmCallback = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/job-offerts/applications",
+          {
+            user_id: userData.id,
+            offer_id: offer.id,
+          }
+        );
+
+        setModalMessage(res.data.message);
+        setShowInfo(true);
+        setAlreadyApplied(true);
+        setAppliedDate(new Date());
+      } catch (err) {
+        setModalMessage("Błąd przy aplikowaniu");
+        setShowInfo(true);
+      }
+    };
   };
 
   return (
@@ -110,15 +125,11 @@ const OfferInfo = ({ offer, id }) => {
       className={styles.container + " " + `offer-details-container${offer.id}`}
     >
       <main className={styles.wrapper} aria-labelledby="job-title">
-        <nav
-          className={styles.actionsBar}
-          role="navigation"
-          aria-label="Akcje oferty"
-        >
-          <div style={{ display: "flex", gap: " 10px" }}>
+        <div className={styles.actionsBar}>
+          <div style={{ display: "flex", gap: "10px" }}>
             <button className={styles.iconBtn}>Udostępnij</button>
 
-            {userData?.email && userData?.role === "candidate" ? (
+            {userData?.email && userData?.role === "candidate" && (
               <button onClick={toggleFavorite} className={styles.iconBtn}>
                 {isFavorite ? (
                   <CiStar className={styles.starFilled} />
@@ -126,25 +137,21 @@ const OfferInfo = ({ offer, id }) => {
                   <CiStar className={styles.starEmpty} />
                 )}
               </button>
-            ) : (
-              ""
             )}
           </div>
 
-          <div className={styles.rightActions}>
-            <button style={{ all: "unset", cursor: "pointer" }}>
-              <IoMdClose
-                onClick={() => {
-                  document.querySelector(
-                    `.offer-details-container${offer.id}`
-                  ).style.display = "none";
-
-                  document.querySelector("#root").style.overflow = "auto";
-                }}
-              />
-            </button>
-          </div>
-        </nav>
+          <button
+            className={styles.closeBtn}
+            onClick={() => {
+              document.querySelector(
+                `.offer-details-container${offer.id}`
+              ).style.display = "none";
+              document.querySelector("#root").style.overflow = "auto";
+            }}
+          >
+            <IoMdClose />
+          </button>
+        </div>
 
         <section className={styles.hero}>
           <div className={styles.headerLeft}>
@@ -179,7 +186,13 @@ const OfferInfo = ({ offer, id }) => {
                   </button>
 
                   {alreadyApplied && appliedDate && (
-                    <p style={{ marginTop: "5px", color: "green" }}>
+                    <p
+                      style={{
+                        marginTop: "5px",
+                        color: "green",
+                        fontSize: "12px",
+                      }}
+                    >
                       Aplikowano dnia:{" "}
                       {new Date(appliedDate).toLocaleDateString()}
                     </p>

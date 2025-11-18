@@ -40,7 +40,7 @@ const RegisterPage = () => {
       }
 
       const payload = {
-        email,
+        email: email.trim().toLowerCase(),
         password,
         repeatPassword,
         role,

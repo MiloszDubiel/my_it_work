@@ -323,4 +323,78 @@ router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
   res.json({ msg: "Password updated" });
 });
 
+//Zmiana danych firmy
+router.get(
+  "/company-change-requests",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const [rows] = await connection.query(`
+            SELECT r.*, 
+                   c.companyName AS old_name, 
+                   c.nip AS old_nip,
+                   c.img AS old_logo
+            FROM company_change_requests r
+            LEFT JOIN companies c ON c.id = r.company_id
+            WHERE r.status = 'pending'
+            ORDER BY r.created_at DESC
+        `);
+
+      res.json({ requests: rows });
+    } catch (err) {
+      res.status(500).json({ error: "Błąd serwera." });
+    }
+  }
+);
+router.post(
+  "/approve-company-change",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { request_id } = req.body;
+
+    const [[request]] = await connection.query(
+      `SELECT * FROM company_change_requests WHERE id = ?`,
+      [request_id]
+    );
+
+    if (!request) return res.status(404).json({ error: "Nie znaleziono." });
+
+    await connection.query(
+      `UPDATE companies
+         SET companyName = ?, nip = ?, img = ?
+         WHERE id = ?`,
+      [
+        request.new_company_name,
+        request.new_nip,
+        request.new_logo,
+        request.company_id,
+      ]
+    );
+
+    await connection.query(
+      `UPDATE company_change_requests SET status = 'approved' WHERE id = ?`,
+      [request_id]
+    );
+
+    res.json({ msg: "Zmieniono dane firmy." });
+  }
+);
+
+router.post(
+  "/reject-company-change",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { request_id } = req.body;
+
+    await connection.query(
+      `UPDATE company_change_requests SET status = 'rejected' WHERE id = ?`,
+      [request_id]
+    );
+
+    res.json({ msg: "Prośbę odrzucono." });
+  }
+);
 export default router;

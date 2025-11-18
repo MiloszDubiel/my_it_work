@@ -9,7 +9,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ChatPage from "../Chat/ChatPage";
 
-const Navbar = ({ offertPage, candidatePage, employersPage }) => {
+const Navbar = ({ employersPage }) => {
   let account = useRef(null);
 
   //Dane użytkownika po zalogowaniu
@@ -66,14 +66,16 @@ const Navbar = ({ offertPage, candidatePage, employersPage }) => {
                   Pracodawcy IT
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/candidates"
-                  style={{ textDecoration: "none", color: "black" }}
-                >
-                  Kandydaci IT
-                </Link>
-              </li>
+              {userData?.role === "employer" && (
+                <li>
+                  <Link
+                    to="/candidates"
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    Kandydaci IT
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
           <div className={styles.account}>

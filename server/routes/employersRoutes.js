@@ -92,7 +92,7 @@ router.post(
     const { owner_id, companyName, nip, company_id } = req.body;
 
     const [rows] = await connection.query(
-      "SELECT * FROM company_change_requests WHERE company_id = ? AND employer_id = ?",
+      "SELECT * FROM company_change_requests WHERE company_id = ? AND employer_id = ? AND  status = 'pending'",
       [company_id, owner_id]
     );
 
