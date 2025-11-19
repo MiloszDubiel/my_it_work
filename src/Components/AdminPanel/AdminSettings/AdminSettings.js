@@ -22,8 +22,15 @@ const AdminSettings = () => {
   const changePassword = () => {
     setMessage("");
 
-    if (newPassword.length < 6) {
-      return setMessage("Nowe hasło musi mieć co najmniej 6 znaków");
+    if (
+      newPassword.length < 8 ||
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/.test(
+        newPassword
+      )
+    ) {
+      return setMessage(
+        "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
+      );
     }
 
     axios

@@ -1,47 +1,83 @@
-import express, { json } from "express";
-import multer from "multer";
+import express from "express";
+import {
+  uploadCvAndRef,
+  avatarUpload,
+} from "../middleware/settingMiddleware.js";
 import { connection } from "../config/db.js";
-import { editUser, getCandiatInfo } from "../services/settingService.js";
-import path from "path";
-import fs from "fs";
+import { getCandiatInfo } from "../services/settingService.js";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let dir;
 
-    if (file.fieldname === "cv") {
-      dir = "uploads/cv";
-    } else if (file.fieldname === "references") {
-      dir = "uploads/references";
+router.post(
+  "/edit-profile",
+  avatarUpload.single("avatar"),
+  async (req, res) => {
+    try {
+      const { id, name, surname, email, newPassword, repeatPassword } =
+        req.body;
+
+      if (!id || !email) {
+        return { error: "Brak id lub email" };
+      }
+      let avatarPath = null;
+
+      if (req.file) {
+        avatarPath = `http://localhost:5000/uploads/avatars/avatar_${id}.png`;
+      }
+
+      const fields = [];
+      const values = [];
+
+      if (name) {
+        fields.push("name = ?");
+        values.push(name);
+      }
+      if (surname) {
+        fields.push("surname = ?");
+        values.push(surname);
+      }
+      if (email) {
+        fields.push("email = ?");
+        values.push(email);
+      }
+
+      if (avatarPath) {
+        fields.push("avatar = ?");
+        values.push(avatarPath);
+      }
+
+      if (newPassword && newPassword === repeatPassword) {
+        fields.push("password = ?");
+
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(newPassword, salt);
+
+        values.push(hash);
+      }
+
+      values.push(id);
+
+      await connection.query(
+        `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
+        values
+      );
+
+      const [user] = await connection.query(
+        "SELECT name, surname, email, id, avatar, role FROM users WHERE id = ? ",
+        [id]
+      );
+
+      res.status(200).json({
+        info: "Profil zaktualizowany",
+        userData: user[0],
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Błąd serwera" });
     }
-
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-    cb(null, dir);
-  },
-
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-
-    if (file.fieldname === "cv") {
-      cb(null, `cv_${req.body.user_id}${ext}`);
-    } else if (file.fieldname === "references") {
-      cb(null, `ref_${req.body.user_id}${ext}`);
-    }
-  },
-});
-
-export const uploadFiles = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
-
-router.post("/edit-profile", async (req, res) => {
-  editUser(req.body).then((el) => {
-    return res.json(el);
-  });
-});
+  }
+);
 
 router.post("/get-candiate-info", async (req, res) => {
   const { id } = req.body;
@@ -49,9 +85,7 @@ router.post("/get-candiate-info", async (req, res) => {
   if (!id) {
     return res.status(400).json({ error: "Niepoprawne dane" });
   }
-
   const candiat = await getCandiatInfo(id);
-  res.setHeader("Content-Type", "application/pdf");
   return res.json({ candiate: candiat });
 });
 
@@ -90,7 +124,7 @@ router.get("/favorites/:user_id", async (req, res) => {
 
 router.post(
   "/set-candidate-info",
-  uploadFiles.fields([
+  uploadCvAndRef.fields([
     { name: "cv", maxCount: 1 },
     { name: "references", maxCount: 1 },
   ]),
@@ -112,14 +146,16 @@ router.post(
         career_level,
       } = req.body;
 
-      const cvFile = req.files?.cv?.[0]?.filename || null;
-      const refFile = req.files?.references?.[0]?.filename || null;
+      console.log(req.files?.cv);
+
+      const cvFile = req.files?.cv || null;
+      const refFile = req.files?.references || null;
 
       const cvPath = cvFile
         ? `http://localhost:5000/uploads/cv/cv_${user_id}.pdf`
         : null;
       const refPath = refFile
-        ? `http://localhost:5000/uploads/cv/cv_${user_id}.pdf`
+        ? `http://localhost:5000/uploads/references/ref_${user_id}.pdf`
         : null;
 
       const [rows] = await connection.query(
@@ -128,7 +164,6 @@ router.post(
       );
 
       if (rows.length === 0) {
-
         await connection.query(
           `INSERT INTO candidate_info
             (user_id, cv, "references", locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level)
@@ -158,43 +193,59 @@ router.post(
         });
       }
 
+      const existing = rows[0];
+
+      const updateFields = [
+        "locations = ?",
+        "skills = ?",
+        "lang = ?",
+        "edu = ?",
+        "exp = ?",
+        "link_git = ?",
+        "working_mode = ?",
+        "present_job = ?",
+        "target_job = ?",
+        "phone_number = ?",
+        "access = ?",
+        "career_level = ?",
+      ];
+
+      const updateValues = [
+        locations,
+        skills,
+        lang,
+        edu,
+        exp,
+        link_git,
+        working_mode,
+        present_job,
+        target_job,
+        phone_number,
+        access,
+        career_level,
+      ];
+
+      // TYLKO jeśli przesłano nowe CV -> aktualizuj
+      if (cvPath) {
+        updateFields.push("cv = ?");
+        updateValues.push(cvPath);
+      }
+
+      // TYLKO jeśli przesłano nowe referencje -> aktualizuj
+      if (refPath) {
+        updateFields.push("`references` = ?");
+        updateValues.push(refPath);
+      }
+
+      updateValues.push(user_id);
+
       await connection.query(
         `UPDATE candidate_info
-   SET 
-     cv = ?,
-     \`references\` = ?,
-     locations = ?,
-     skills = ?,
-     lang = ?,
-     edu = ?,
-     exp = ?,
-     link_git = ?,
-     working_mode = ?,
-     present_job = ?,
-     target_job = ?,
-     phone_number = ?,
-     access = ?,
-     career_level = ?,
-     updated_at = NOW()
-   WHERE user_id = ?`,
-        [
-          cvPath,
-          refPath,
-          locations,
-          skills,
-          lang,
-          edu,
-          exp,
-          link_git,
-          working_mode,
-          present_job,
-          target_job,
-          phone_number,
-          access,
-          career_level,
-          user_id,
-        ]
+         SET ${updateFields.join(", ")}, updated_at = NOW()
+         WHERE user_id = ?`,
+        updateValues
       );
+
       res.json({
         success: true,
         info: "Profil kandydata zaktualizowany",
@@ -205,5 +256,58 @@ router.post(
     }
   }
 );
+
+//Pobieranie złozony moich cv
+
+router.post("/get-user-applications", async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const [rows] = await connection.query(
+      `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status
+       FROM job_applications
+       JOIN job_offers ON job_applications.offer_id = job_offers.id
+       WHERE job_applications.user_id = ?
+       ORDER BY created_at DESC`,
+      [user_id]
+    );
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
+});
+
+//anuluje złozenie cv
+
+router.delete("/cancel-application/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Sprawdź czy aplikacja istnieje
+    const [rows] = await connection.query(
+      "SELECT * FROM job_applications WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aplikacja nie istnieje" });
+    }
+
+    // Możesz zamiast usuwać — ustawić status = 'cancelled'
+    await connection.query(
+      "UPDATE job_applications SET status = 'anulowana' WHERE id = ?",
+      [id]
+    );
+
+    res
+      .status(200)
+      .json({ info: "Aplikacja została anulowana." });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
+});
 
 export default router;

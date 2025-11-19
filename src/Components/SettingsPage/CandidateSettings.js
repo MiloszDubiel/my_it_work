@@ -2,18 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
-const CandidateSettings = ({ applications = [] }) => {
+import ConfirmModal from "../PromptModals/ConfirmModal";
+
+const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
-  const [DataToChange, setDataToChange] = useState({
+  const [applications, setApplications] = useState([]);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [ProfielData, setProfielData] = useState({
     ...userData,
     newPassword: "",
     repeatPassword: "",
-    coverLetter: "",
-    cv: null,
-    avatar: null,
     repo: "",
   });
   const [favorites, setFavorites] = useState([]);
@@ -40,8 +42,9 @@ const CandidateSettings = ({ applications = [] }) => {
   const [referenceFile, setReferenceFile] = useState(null);
   const [referencePreviewUrl, setReferencePreviewUrl] = useState(null);
   const referenceInputRef = useRef();
-
   const cvInputRef = useRef();
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(ProfielData.avatar);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,16 +60,10 @@ const CandidateSettings = ({ applications = [] }) => {
         return res.data.info?.length > 0 ? setIsCreate(true) : "";
       });
     axios
-      .post(
-        "http://localhost:5000/user/get-candiate-info",
-        {
-          id: userData.id,
-        },
-        {}
-      )
+      .post("http://localhost:5000/user/get-candiate-info", {
+        id: userData.id,
+      })
       .then((res) => {
-        console.log(res.data);
-
         if (res.data.candiate) {
           setCandidateProfile({
             ...candidateProfile,
@@ -82,14 +79,15 @@ const CandidateSettings = ({ applications = [] }) => {
             skills: JSON.parse(res.data.candiate[0]?.skills),
             github: res.data.candiate[0].link_git,
           });
-
           setCvPreviewUrl(res.data.candiate[0].cv);
+          setReferencePreviewUrl(res.data.candiate[0]?.references);
         }
       });
-  }, []);
 
+    getMyApplayings();
+  }, []);
   useEffect(() => {
-    document.addEventListener("setIsFavorite", () => {
+    window.addEventListener("setIsFavorite", () => {
       axios
         .get(`http://localhost:5000/user/favorites/${userData.id}}`)
         .then((res) => {
@@ -98,61 +96,89 @@ const CandidateSettings = ({ applications = [] }) => {
     });
   });
 
+  const getMyApplayings = async () => {
+    const res = await axios.post(
+      `http://localhost:5000/user/get-user-applications`,
+      {
+        user_id: userData.id,
+      }
+    );
+
+    if (res.status == 200) {
+      setApplications(res.data);
+    }
+  };
+
   const handleSubmitUserInfo = async (e) => {
     e.preventDefault();
 
     setInfo("");
     setErorr("");
 
-    if (!DataToChange.name?.trim()) {
+    if (!ProfielData.name?.trim()) {
       return setErorr("Imię jest wymagane.");
     }
 
-    if (!DataToChange.surname?.trim()) {
+    if (!ProfielData.surname?.trim()) {
       return setErorr("Nazwisko jest wymagane.");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!DataToChange.email?.trim()) {
+    if (!ProfielData.email?.trim()) {
       return setErorr("Email jest wymagany.");
-    } else if (!emailRegex.test(DataToChange.email)) {
+    } else if (!emailRegex.test(ProfielData.email)) {
       return setErorr("Podaj poprawny email.");
     }
-    if (DataToChange.newPassword) {
+    if (ProfielData.newPassword) {
       const passwordRegex =
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
-      if (!passwordRegex.test(DataToChange.newPassword)) {
+      if (!passwordRegex.test(ProfielData.newPassword)) {
         return setErorr(
           "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
         );
       }
 
-      if (DataToChange.newPassword !== DataToChange.repeatPassword) {
+      if (ProfielData.newPassword !== ProfielData.repeatPassword) {
         return setErorr("Hasła są różne.");
       }
     }
 
-    try {
-      let res = await axios.post("http://localhost:5000/user/edit-profile", {
-        ...DataToChange,
-        id: userData.id,
-      });
+    const formData = new FormData();
+    formData.append("id", userData.id);
+    formData.append("name", ProfielData.name);
+    formData.append("surname", ProfielData.surname);
+    formData.append("email", ProfielData.email);
+    formData.append("newPassword", ProfielData.newPassword);
+    formData.append("repeatPassword", ProfielData.repeatPassword);
 
-      if (res.data.info) {
-        setInfo(res.data.info + "" + ". Trwa odświeżanie strony...");
+    if (avatarFile) {
+      formData.append("avatar", avatarFile);
+    }
+
+    try {
+      let res = await axios.post(
+        "http://localhost:5000/user/edit-profile",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (res.status === 200) {
+        setInfo("Profil zaktualizowany");
         sessionStorage.setItem("user-data", JSON.stringify(res.data.userData));
         document.querySelector(`.${styles.content}`).scroll(0, 0);
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        //fetchUserData();
       }
 
-      if (res.data.error) {
-        document.querySelector(`.${styles.content}`).scroll(0, 0);
-        setErorr(res.data.error);
-      }
-    } catch (err) {}
+      // if (res.data.error) {
+      //   document.querySelector(`.${styles.content}`).scroll(0, 0);
+      //   setErorr(res.data.error);
+      // }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSavecandidateProfile = async (e) => {
@@ -286,8 +312,30 @@ const CandidateSettings = ({ applications = [] }) => {
     }
   };
 
+  const cancelApplication = async () => {
+    if (!selectedApp) return;
+
+    const res = await axios.delete(
+      `http://localhost:5000/user/cancel-application/${selectedApp}`
+    );
+
+    if (res.data == 200) {
+      setInfo("Usunięto apliukacj");
+      getMyApplayings();
+    }
+
+    setShowCancelModal(false);
+  };
+
   return (
     <div className={styles.container1} id="settings">
+      {showCancelModal && (
+        <ConfirmModal
+          message="Czy na pewno chcesz anulować tę aplikację?"
+          onConfirm={() => cancelApplication()}
+          onCancel={() => setShowCancelModal(false)}
+        />
+      )}
       <div className={styles.container}>
         <div className={styles.actionsBar}>
           <button
@@ -331,7 +379,7 @@ const CandidateSettings = ({ applications = [] }) => {
                 setActiveTab("applications");
               }}
             >
-              Złożone CV
+              Złożone aplikacje
             </button>
             <button
               className={activeTab === "favorites" ? styles.active : ""}
@@ -355,9 +403,9 @@ const CandidateSettings = ({ applications = [] }) => {
                 <input
                   type="text"
                   placeholder="Jan"
-                  value={DataToChange.name}
+                  value={ProfielData.name}
                   onChange={(e) =>
-                    setDataToChange({ ...DataToChange, name: e.target.value })
+                    setProfielData({ ...ProfielData, name: e.target.value })
                   }
                 />
 
@@ -365,10 +413,10 @@ const CandidateSettings = ({ applications = [] }) => {
                 <input
                   type="text"
                   placeholder="Kowalski"
-                  value={DataToChange.surname}
+                  value={ProfielData.surname}
                   onChange={(e) =>
-                    setDataToChange({
-                      ...DataToChange,
+                    setProfielData({
+                      ...ProfielData,
                       surname: e.target.value,
                     })
                   }
@@ -378,10 +426,10 @@ const CandidateSettings = ({ applications = [] }) => {
                 <input
                   type="email"
                   placeholder="jan@firma.pl"
-                  value={DataToChange.email}
+                  value={ProfielData.email}
                   onChange={(e) =>
-                    setDataToChange({
-                      ...DataToChange,
+                    setProfielData({
+                      ...ProfielData,
                       email: e.target.value,
                     })
                   }
@@ -391,10 +439,10 @@ const CandidateSettings = ({ applications = [] }) => {
                 <input
                   type="password"
                   placeholder="********"
-                  value={DataToChange.newPassword}
+                  value={ProfielData.newPassword}
                   onChange={(e) =>
-                    setDataToChange({
-                      ...DataToChange,
+                    setProfielData({
+                      ...ProfielData,
                       newPassword: e.target.value,
                     })
                   }
@@ -404,13 +452,35 @@ const CandidateSettings = ({ applications = [] }) => {
                 <input
                   type="password"
                   placeholder="********"
-                  value={DataToChange.repeatPassword}
+                  value={ProfielData.repeatPassword}
                   onChange={(e) =>
-                    setDataToChange({
-                      ...DataToChange,
+                    setProfielData({
+                      ...ProfielData,
                       repeatPassword: e.target.value,
                     })
                   }
+                />
+
+                <label>Zdjęcie profilowe</label>
+
+                {avatarPreview ? (
+                  <div className={styles.avatarPreview}>
+                    <img src={avatarPreview} alt="avatar" />
+                  </div>
+                ) : (
+                  <p>Brak zdjęcia profilowego</p>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/png"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    setAvatarFile(file);
+                    if (file) {
+                      setAvatarPreview(URL.createObjectURL(file));
+                    }
+                  }}
                 />
 
                 <button type="submit" className={styles.saveBtn}>
@@ -735,27 +805,48 @@ const CandidateSettings = ({ applications = [] }) => {
 
             {activeTab === "applications" && (
               <div className={styles.tableContainer}>
-                <h2>Moje kandydatury</h2>
+                <h2>Złożone aplikacje</h2>
+
                 {applications.length === 0 ? (
                   <p>Nie masz jeszcze żadnych aplikacji.</p>
                 ) : (
-                  <table>
+                  <table className={styles.appTable}>
                     <thead>
                       <tr>
                         <th>Stanowisko</th>
                         <th>Firma</th>
                         <th>Status</th>
                         <th>Data</th>
+                        <th>Akcja</th>
                       </tr>
                     </thead>
                     <tbody>
                       {applications.map((app) => (
                         <tr key={app.id}>
-                          <td>{app.job_title}</td>
-                          <td>{app.company_name}</td>
-                          <td>{app.status}</td>
+                          <td>{app.title}</td>
+                          <td>{app.companyName}</td>
+                          <td className={styles[`status_${app.status}`]}>
+                            {app.status}
+                          </td>
                           <td>
                             {new Date(app.created_at).toLocaleDateString()}
+                          </td>
+                          <td>
+                            {app.status !== "anulowana" ? (
+                              <button
+                                className={styles.cancelBtn}
+                                onClick={() => {
+                                  setSelectedApp(app.id);
+                                  setShowCancelModal(true);
+                                }}
+                              >
+                                Anuluj
+                              </button>
+                            ) : (
+                              <span className={styles.cancelledText}>
+                                Anulowano
+                              </span>
+                            )}
                           </td>
                         </tr>
                       ))}

@@ -7,16 +7,11 @@ import EmployerSettings from "../SettingsPage/EmployerSettings";
 import CandidateSettings from "../SettingsPage/CandidateSettings";
 import { FiMessageSquare } from "react-icons/fi";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import ChatPage from "../Chat/ChatPage";
 
 const Navbar = ({ employersPage }) => {
   let account = useRef(null);
-
-  //Dane użytkownika po zalogowaniu
   let userData = JSON.parse(sessionStorage.getItem("user-data"));
   let navigate = useNavigate();
-
-  const [avatar, setAvatar] = useState(sessionStorage.getItem("user-avatar"));
 
   return (
     <>
@@ -85,23 +80,24 @@ const Navbar = ({ employersPage }) => {
                     account.current.classList.toggle(styles.accountDivHide);
                   }}
                   style={{
-                    background: `url(${avatar})`,
+                    background: `url(${userData?.avatar})`,
                     backgroundSize: "cover",
                   }}
                 >
-                  <IoPersonOutline className={styles.icon} />
+                  {!userData?.avatar && (
+                    <IoPersonOutline className={styles.icon} />
+                  )}
                 </button>
                 <button
                   onClick={() => {
-                    let dis =
-                      document.querySelector("#chatContainer").style.display;
-
-                    if (dis === "none")
-                      document.querySelector("#chatContainer").style.display =
-                        "flex";
-                    else
-                      document.querySelector("#chatContainer").style.display =
-                        "none";
+                    // let dis =
+                    //   document.querySelector("#chatContainer").style.display;
+                    // if (dis === "none")
+                    //   document.querySelector("#chatContainer").style.display =
+                    //     "flex";
+                    // else
+                    //   document.querySelector("#chatContainer").style.display =
+                    //     "none";
                   }}
                 >
                   <FiMessageSquare className={styles.icon} />

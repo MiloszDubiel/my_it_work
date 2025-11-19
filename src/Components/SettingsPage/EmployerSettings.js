@@ -47,6 +47,7 @@ const EmployerSettings = () => {
         employer_id: userData.id,
       })
       .then((res) => {
+        console.log(res.data);
         setApplications(res.data.applications);
       })
       .catch((err) => console.error(err));
@@ -217,7 +218,7 @@ const EmployerSettings = () => {
       );
 
       if (res.status == 200) {
-        return setInfo(res.data.info);
+        return setInfo("Wysłano prośbę do administratora");
       }
     } catch (err) {
       setError(err.response.data.error);
@@ -474,7 +475,7 @@ const EmployerSettings = () => {
 
                         <span className={styles.appActions}>
                           <button
-                            onClick={() => window.open(app.cv_link, "_blank")}
+                            onClick={() => window.open(app.cv, "_blank")}
                             className={styles.smallBtn}
                           >
                             📄 CV

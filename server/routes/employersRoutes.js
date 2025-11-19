@@ -4,41 +4,10 @@ import {
   getFillteredEmployers,
   getCompanyInfo,
 } from "../services/employerService.js";
-
 import { connection } from "../config/db.js";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { uploadLogo } from "../middleware/settingMiddleware.js";
 
 const router = express.Router();
-
-//Konfiguracja przesyłania zdjec
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dir = "uploads/company_logos";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, "company_" + req.body.owner_id + ext);
-  },
-});
-
-function fileFilter(req, file, cb) {
-  const allowed = ["image/png", "image/jpeg"];
-  if (!allowed.includes(file.mimetype)) {
-    return cb(new Error("Invalid file type"), false);
-  }
-  cb(null, true);
-}
-
-export const uploadLogo = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB
-});
 
 router.post("/filltred", async (req, res) => {
   try {
@@ -89,36 +58,56 @@ router.post(
   "/request-company-change",
   uploadLogo.single("logo"),
   async (req, res) => {
-    const { owner_id, companyName, nip, company_id } = req.body;
-
-    const [rows] = await connection.query(
-      "SELECT * FROM company_change_requests WHERE company_id = ? AND employer_id = ? AND  status = 'pending'",
-      [company_id, owner_id]
-    );
-
-    if (rows.length > 0) {
-      return res.status(400).json({
-        error: "Poprzednia prośba czeka na odpowiedź administrator.",
-      });
-    }
-
-    const logo = req.file ? req.file.filename : null;
-    const logoLink = logo
-      ? `http://localhost:5000/api/employers/get-company-logo/${owner_id}`
-      : null;
-
     try {
-      await connection.query(
-        `INSERT INTO company_change_requests 
-            (company_id, employer_id, new_company_name, new_nip, new_logo) 
-             VALUES (?, ?, ?, ?, ?)`,
-        [company_id, owner_id, companyName, nip, logo]
+      const { owner_id, companyName, nip, company_id } = req.body;
+
+      // --- 1. Czy istnieje już oczekujący request? -----------------------
+      const [rows] = await connection.query(
+        `SELECT * FROM company_change_requests 
+         WHERE company_id = ? 
+         AND employer_id = ? 
+         AND status = 'pending'`,
+        [company_id, owner_id]
       );
 
-      res.status(200).json({ info: "Wysłano prośbę do administratora." });
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ error: "Błąd serwera." });
+      if (rows.length > 0) {
+        return res.status(400).json({
+          error: "Poprzednia prośba czeka na odpowiedź administratora.",
+        });
+      }
+
+      // --- 2. Zapis logo ---------------------------------------------------
+      let logoPath = null;
+
+      if (req.file) {
+        logoPath = `http:localhost:5000/uploads/company_logos/logo_${company_id}${path.extname(
+          req.file.originalname
+        )}`;
+      }
+
+      // --- 3. Zapis nowego requesta ---------------------------------------
+      const sql = `
+        INSERT INTO company_change_requests 
+        (company_id, employer_id, new_company_name, new_nip, new_logo, status)
+        VALUES (?, ?, ?, ?, ?, 'pending')
+      `;
+
+      await connection.query(sql, [
+        company_id,
+        owner_id,
+        companyName || null,
+        nip || null,
+        logoPath || null,
+      ]);
+
+      return res.status(200).json({
+        info: "Wysłano prośbę do administratora.",
+      });
+    } catch (e) {
+      console.error(e);
+      return res
+        .status(500)
+        .json({ error: "Błąd serwera", details: e.message });
     }
   }
 );
@@ -191,22 +180,26 @@ router.post("/get-my-applications", async (req, res) => {
       job_offers.title,
       job_offers.employer_id,
       users.email, users.surname,
-      users.name
+      users.name,
+      users.avatar,
+      candidate_info.cv
       FROM job_applications
       JOIN  job_offers ON job_applications.offer_id = job_offers.id
       JOIN users ON job_applications.user_id = users.id
+      JOIN candidate_info ON users.id = candidate_info.user_id
       WHERE job_offers.employer_id = ?
       ORDER BY job_applications.created_at DESC`,
       [employer_id]
     );
 
+
+    
     res.json({ applications: rows });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 router.post("/update-application-status", async (req, res) => {
   const { application_id, status } = req.body;

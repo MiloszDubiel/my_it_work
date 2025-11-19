@@ -49,6 +49,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         surname: user.surname,
         phone_number: user.phone_number,
+        avatar: user.avatar,
       },
     });
   } catch (error) {
