@@ -228,6 +228,110 @@ select:focus {
   border-radius: 8px;
   object-fit: cover;
 }
+/* ===== APLIKACJE ===== */
+
+.appTable {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.appHeader,
+.appRow {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e3e4;
+  align-items: center;
+}
+
+.appHeader {
+  font-weight: bold;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.appRow {
+  background: #fff;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.appRow:hover {
+  background: #f1f5ff;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.userInfo img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+.appActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.smallBtn,
+.smallBtnOutline {
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.smallBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.smallBtn:hover {
+  background: #1e4fc5;
+}
+
+.smallBtnOutline {
+  background: white;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+}
+
+.smallBtnOutline:hover {
+  background: #eff4ff;
+}
+
+.deleteBtn {
+  background: #dc2626;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: #b91c1c;
+}
+
+.noApps {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+}
 
 .section {
   background: white;

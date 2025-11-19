@@ -110,8 +110,8 @@ router.post("/add", async (req, res) => {
     const [jobOfferResult] = await conn.query(
       `
       INSERT INTO job_offers 
-      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?)
       `,
       [
         title,
@@ -125,6 +125,7 @@ router.post("/add", async (req, res) => {
         0,
         "own",
         "user",
+        employer_id,
       ]
     );
 
@@ -270,7 +271,7 @@ router.post("/applications", async (req, res) => {
 
   try {
     await connection.query(
-      "INSERT INTO applications (user_id, offer_id) VALUES (?, ?)",
+      "INSERT INTO job_applications (user_id, offer_id) VALUES (?, ?)",
       [user_id, offer_id]
     );
     res.json({ message: "Aplikacja została dodana" });
@@ -284,11 +285,11 @@ router.get("/applications/:userId/:offerId", async (req, res) => {
   const { userId, offerId } = req.params;
   try {
     const [rows] = await connection.query(
-      "SELECT applied_at FROM applications WHERE user_id = ? AND offer_id = ?",
+      "SELECT created_at FROM job_applications WHERE user_id = ? AND offer_id = ?",
       [userId, offerId]
     );
     if (rows.length > 0) {
-      res.json({ applied: true, applied_at: rows[0].applied_at });
+      res.json({ applied: true, applied_at: rows[0].created_at });
     } else {
       res.json({ applied: false });
     }

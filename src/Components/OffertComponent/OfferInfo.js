@@ -1,5 +1,5 @@
 import NavBar from "../NavBar/NavBar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styles from "./ofertinfo.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
@@ -16,7 +16,7 @@ const OfferInfo = ({ offer, id }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  let confirmCallback = null;
+  const confirmCallbackRef = useRef(null);
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -68,6 +68,7 @@ const OfferInfo = ({ offer, id }) => {
         const res = await axios.get(
           `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`
         );
+        console.log(res);
         setAlreadyApplied(res.data.applied);
         setAppliedDate(res.data.applied_at);
       } catch (err) {
@@ -98,7 +99,8 @@ const OfferInfo = ({ offer, id }) => {
     setModalMessage("Czy na pewno chcesz aplikować na tę ofertę?");
     setShowConfirm(true);
 
-    confirmCallback = async () => {
+    confirmCallbackRef.current = async () => {
+      console.log("DUPA");
       try {
         const res = await axios.post(
           "http://localhost:5000/api/job-offerts/applications",
@@ -124,6 +126,18 @@ const OfferInfo = ({ offer, id }) => {
       id="offer-details-container"
       className={styles.container + " " + `offer-details-container${offer.id}`}
     >
+      {showConfirm && (
+        <ConfirmModal
+          message={modalMessage}
+          onConfirm={() => {
+            if (confirmCallbackRef.current) {
+              confirmCallbackRef.current();
+            }
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
       <main className={styles.wrapper} aria-labelledby="job-title">
         <div className={styles.actionsBar}>
           <div style={{ display: "flex", gap: "10px" }}>

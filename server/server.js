@@ -22,13 +22,14 @@ app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
 app.use("/messager", chatRoutes);
 app.use("/admin", adminRoutes);
+app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);
 
 // ✅ Konfiguracja Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", 
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });

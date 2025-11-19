@@ -19,6 +19,7 @@ const EmployerSettings = () => {
     newPassword: "",
     repeatPassword: "",
   });
+  const [applications, setApplications] = useState([]);
 
   useEffect(() => {
     axios
@@ -40,10 +41,22 @@ const EmployerSettings = () => {
       .catch((err) => console.error(err));
   };
 
+  const fetchApplications = async () => {
+    axios
+      .post("http://localhost:5000/api/employers/get-my-applications", {
+        employer_id: userData.id,
+      })
+      .then((res) => {
+        setApplications(res.data.applications);
+      })
+      .catch((err) => console.error(err));
+  };
+
   useEffect(() => {
     if (activeTab === "offers") {
       fetchOffers();
     }
+    if (activeTab === "applications") fetchApplications();
   }, [activeTab, refresh]);
 
   useEffect(() => {
@@ -243,6 +256,12 @@ const EmployerSettings = () => {
               💼 Oferty pracy
             </button>
             <button
+              className={activeTab === "applications" ? styles.active : ""}
+              onClick={() => setActiveTab("applications")}
+            >
+              Aplikacje na moje oferty pracy
+            </button>
+            <button
               className={activeTab === "settings" ? styles.active : ""}
               onClick={() => setActiveTab("settings")}
             >
@@ -424,6 +443,65 @@ const EmployerSettings = () => {
                     <div className={styles.row}>
                       <span colSpan={4}>Brak ofert pracy</span>
                     </div>
+                  )}
+                </div>
+              </section>
+            )}
+            {activeTab === "applications" && (
+              <section className={styles.section}>
+                <h3>Aplikacje na moje oferty pracy</h3>
+
+                <div className={styles.appTable}>
+                  <div className={styles.appHeader}>
+                    <span>Kandydat</span>
+                    <span>Stanowisko</span>
+                    <span>Data aplikacji</span>
+                    <span>Akcje</span>
+                  </div>
+
+                  {applications.length > 0 ? (
+                    applications.map((app) => (
+                      <div key={app.id} className={styles.appRow}>
+                        <span className={styles.userInfo}>
+                          <img src={app.avatar} alt="avatar" />
+                          {app.name} {app.surname}
+                        </span>
+
+                        <span>{app.title}</span>
+                        <span>
+                          {new Date(app.created_at).toLocaleDateString("pl-PL")}
+                        </span>
+
+                        <span className={styles.appActions}>
+                          <button
+                            onClick={() => window.open(app.cv_link, "_blank")}
+                            className={styles.smallBtn}
+                          >
+                            📄 CV
+                          </button>
+
+                          <button className={styles.smallBtnOutline}>
+                            👤 Profil
+                          </button>
+
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={async () => {
+                              if (window.confirm("Usunąć tę aplikację?")) {
+                                let res = await axios.delete(
+                                  `http://localhost:5000/api/employers/delete-application/${app.id}`
+                                );
+                                if (res.data.success) setRefresh(!refresh);
+                              }
+                            }}
+                          >
+                            🗑
+                          </button>
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={styles.noApps}>Brak aplikacji</div>
                   )}
                 </div>
               </section>

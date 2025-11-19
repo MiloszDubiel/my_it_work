@@ -177,4 +177,58 @@ router.post("/get-my-offers", async (req, res) => {
   }
 });
 
+router.post("/get-my-applications", async (req, res) => {
+  const { employer_id } = req.body;
+  console.log(employer_id);
+  if (!employer_id) {
+    return res.status(400).json({ error: "Missing employer ID" });
+  }
+
+  try {
+    const [rows] = await connection.query(
+      `SELECT
+      job_applications.*,
+      job_offers.title,
+      job_offers.employer_id,
+      users.email, users.surname,
+      users.name
+      FROM job_applications
+      JOIN  job_offers ON job_applications.offer_id = job_offers.id
+      JOIN users ON job_applications.user_id = users.id
+      WHERE job_offers.employer_id = ?
+      ORDER BY job_applications.created_at DESC`,
+      [employer_id]
+    );
+
+    res.json({ applications: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+router.post("/update-application-status", async (req, res) => {
+  const { application_id, status } = req.body;
+
+  if (!application_id || !status) {
+    return res.status(400).json({ error: "Missing data" });
+  }
+
+  try {
+    const [result] = await connection.query(
+      "UPDATE job_applications SET status = ? WHERE id = ?",
+      [status, application_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    res.json({ success: true, info: "Status updated" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;

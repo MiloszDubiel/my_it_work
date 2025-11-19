@@ -23,12 +23,10 @@ const Navbar = ({ employersPage }) => {
       {userData?.role == "employer" ? (
         <>
           <EmployerSettings />
-          <ChatPage />
         </>
       ) : userData?.role === "candidate" ? (
         <>
           <CandidateSettings />
-          <ChatPage />
         </>
       ) : (
         ""
@@ -121,86 +119,87 @@ const Navbar = ({ employersPage }) => {
                 <IoPersonOutline className={styles.icon} />
               </button>
             )}
-          </div>
-          <div
-            className={styles.accountDiv + " " + styles.accountDivHide}
-            ref={account}
-            id="accountDiv"
-          >
-            {userData?.email ? (
-              <>
-                {userData?.role !== "admin" ? (
-                  <Link
-                    onClick={() => {
-                      document.querySelector("#settings").style.display =
-                        "flex";
-                      document.querySelector("#root").style.overflow = "hidden";
-
-                      sessionStorage.setItem("tab", "company");
-                      window.dispatchEvent(new Event("setting-changed"));
-                    }}
-                  >
-                    Ustawienia
-                  </Link>
-                ) : (
-                  ""
-                )}
-
-                {userData.role === "employer" ? (
-                  <>
-                    {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
-
+            <div
+              className={styles.accountDiv + " " + styles.accountDivHide}
+              ref={account}
+              id="accountDiv"
+            >
+              {userData?.email ? (
+                <>
+                  {userData?.role !== "admin" ? (
                     <Link
                       onClick={() => {
                         document.querySelector("#settings").style.display =
                           "flex";
-                        sessionStorage.setItem("tab", "offers");
+                        document.querySelector("#root").style.overflow =
+                          "hidden";
+
+                        sessionStorage.setItem("tab", "company");
                         window.dispatchEvent(new Event("setting-changed"));
                       }}
                     >
-                      Zarządzaj ogłoszeniemi o pracę
+                      Ustawienia
                     </Link>
-                  </>
-                ) : (
-                  ""
-                )}
-                {userData.role === "Candidate" ? (
-                  <>
-                    <Link to="/user/add-candidate">
-                      Dodaj swoją kandydaturę
-                    </Link>
-                  </>
-                ) : (
-                  ""
-                )}
+                  ) : (
+                    ""
+                  )}
 
-                {userData?.role == "admin" ? (
-                  <Link to="/admin">Panel administratora</Link>
-                ) : (
-                  ""
-                )}
+                  {userData.role === "employer" ? (
+                    <>
+                      {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
 
-                <Link
-                  onClick={() => {
-                    sessionStorage.setItem(
-                      "user-data",
-                      JSON.stringify({ info: "Wylogowano" })
-                    );
-                    sessionStorage.removeItem("token", "");
-                    account.current.classList.toggle(styles.accountDivHide);
-                    navigate("/");
-                  }}
-                >
-                  Wyloguj
-                </Link>
-              </>
-            ) : (
-              <>
-                {""}
-                <Link to="/login">Zaloguj się</Link>
-                <Link to="/register">Zarejestruj się</Link>
-              </>
-            )}
+                      <Link
+                        onClick={() => {
+                          document.querySelector("#settings").style.display =
+                            "flex";
+                          sessionStorage.setItem("tab", "offers");
+                          window.dispatchEvent(new Event("setting-changed"));
+                        }}
+                      >
+                        Zarządzaj ogłoszeniemi o pracę
+                      </Link>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                  {userData.role === "Candidate" ? (
+                    <>
+                      <Link to="/user/add-candidate">
+                        Dodaj swoją kandydaturę
+                      </Link>
+                    </>
+                  ) : (
+                    ""
+                  )}
+
+                  {userData?.role == "admin" ? (
+                    <Link to="/admin">Panel administratora</Link>
+                  ) : (
+                    ""
+                  )}
+
+                  <Link
+                    onClick={() => {
+                      sessionStorage.setItem(
+                        "user-data",
+                        JSON.stringify({ info: "Wylogowano" })
+                      );
+                      sessionStorage.removeItem("token", "");
+                      account.current.classList.toggle(styles.accountDivHide);
+                      navigate("/");
+                    }}
+                  >
+                    Wyloguj
+                  </Link>
+                </>
+              ) : (
+                <>
+                  {""}
+                  <Link to="/login">Zaloguj się</Link>
+                  <Link to="/register">Zarejestruj się</Link>
+                </>
+              )}
+            </div>
           </div>
         </nav>
       </header>

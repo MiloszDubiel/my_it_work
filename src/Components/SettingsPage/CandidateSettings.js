@@ -35,13 +35,13 @@ const CandidateSettings = ({ applications = [] }) => {
     remote_preference: "Remote",
   });
   const [cvFile, setCvFile] = useState(null);
-  const [coverLetterFile, setCoverLetterFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
-  const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
+  const [referenceFile, setReferenceFile] = useState(null);
+  const [referencePreviewUrl, setReferencePreviewUrl] = useState(null);
+  const referenceInputRef = useRef();
 
   const cvInputRef = useRef();
-  const coverInputRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,21 +82,8 @@ const CandidateSettings = ({ applications = [] }) => {
             skills: JSON.parse(res.data.candiate[0]?.skills),
             github: res.data.candiate[0].link_git,
           });
-          axios
-            .get(`http://localhost:5000/user/candidate-cv/${userData.id}`, {
-              responseType: "arraybuffer",
-            })
-            .then((res) => {
-              const blob = new Blob([res.data], { type: "application/pdf" });
-              const url = URL.createObjectURL(blob);
-              setCvPreviewUrl(url);
-            });
 
-          axios
-            .get(`http://localhost:5000/user/favorites/${userData.id}}`)
-            .then((res) => {
-              setFavorites(res.data);
-            });
+          setCvPreviewUrl(res.data.candiate[0].cv);
         }
       });
   }, []);
@@ -205,8 +192,9 @@ const CandidateSettings = ({ applications = [] }) => {
     formData.append("access", candidateProfile.availability);
     formData.append("career_level", candidateProfile.career_level);
 
+    if (referenceFile) formData.append("references", referenceFile);
     if (cvFile) formData.append("cv", cvFile);
-    if (coverLetterFile) formData.append("cover_letter", coverLetterFile);
+
     try {
       const res = await axios.post(
         "http://localhost:5000/user/set-candidate-info",
@@ -224,7 +212,7 @@ const CandidateSettings = ({ applications = [] }) => {
     } catch (err) {
       console.error(err);
       e.target.parentElement.scrollTo(0, 0);
-      setErorr("Profil kandydata zapisany pomyślnie!");
+      setErorr("Bład podczas zapisywania!");
     }
   };
 
@@ -302,13 +290,14 @@ const CandidateSettings = ({ applications = [] }) => {
     <div className={styles.container1} id="settings">
       <div className={styles.container}>
         <div className={styles.actionsBar}>
-          <button className={styles.closeBtn}>
-            <IoMdClose
-              onClick={() => {
-                document.querySelector("#settings").style.display = "none";
-                document.querySelector("#root").style.overflow = "auto";
-              }}
-            />
+          <button
+            className={styles.closeBtn}
+            onClick={() => {
+              document.querySelector("#settings").style.display = "none";
+              document.querySelector("#root").style.overflow = "auto";
+            }}
+          >
+            <IoMdClose />
           </button>
         </div>
 
@@ -684,24 +673,25 @@ const CandidateSettings = ({ applications = [] }) => {
                     />
 
                     <label>Referencje</label>
-                    {coverPreviewUrl ? (
+                    {referencePreviewUrl ? (
                       <div className={styles.cvPreview}>
                         <a
-                          href={coverPreviewUrl}
+                          href={referencePreviewUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Zobacz aktualny list motywacyjny
+                          Zobacz aktualne referencje
                         </a>
                       </div>
                     ) : (
-                      <p>Brak przesłanego listu motywacyjnego</p>
+                      <p>Brak przesłanych referencji</p>
                     )}
+
                     <input
                       type="file"
-                      ref={coverInputRef}
+                      ref={referenceInputRef}
                       accept=".pdf"
-                      onChange={(e) => setCoverLetterFile(e.target.files[0])}
+                      onChange={(e) => setReferenceFile(e.target.files[0])}
                     />
 
                     <label>GitHub</label>
