@@ -140,7 +140,7 @@ const Navbar = ({ employersPage }) => {
                     ""
                   )}
 
-                  {userData.role === "employer" ? (
+                  {userData?.role === "employer" ? (
                     <>
                       {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
 
@@ -158,7 +158,7 @@ const Navbar = ({ employersPage }) => {
                   ) : (
                     ""
                   )}
-                  {userData.role === "Candidate" ? (
+                  {userData?.role === "Candidate" ? (
                     <>
                       <Link to="/user/add-candidate">
                         Dodaj swoją kandydaturę

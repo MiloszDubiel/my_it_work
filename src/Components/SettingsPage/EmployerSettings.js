@@ -47,7 +47,7 @@ const EmployerSettings = () => {
         employer_id: userData.id,
       })
       .then((res) => {
-        console.log(res.data);
+        console.log()
         setApplications(res.data.applications);
       })
       .catch((err) => console.error(err));

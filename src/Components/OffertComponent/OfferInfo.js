@@ -8,7 +8,7 @@ import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import InfoModal from "../PromptModals/InfoModal";
 
-const OfferInfo = ({ offer, id }) => {
+const OfferInfo = ({ offer, id, is_favorite }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,7 @@ const OfferInfo = ({ offer, id }) => {
 
     if (offer?.id && userData?.id) checkFavorite();
   }, [offer?.id, userData?.id]);
+
   const toggleFavorite = async () => {
     try {
       if (isFavorite) {
@@ -61,22 +62,26 @@ const OfferInfo = ({ offer, id }) => {
   const [appliedDate, setAppliedDate] = useState(null);
 
   useEffect(() => {
-    const checkApplication = async () => {
-      if (!userData?.id || !offer?.id) return;
-
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`
-        );
-        console.log(res);
-        setAlreadyApplied(res.data.applied);
-        setAppliedDate(res.data.applied_at);
-      } catch (err) {
-        console.error("Błąd przy sprawdzaniu aplikacji:", err);
-      }
-    };
     checkApplication();
   }, [userData?.id, offer?.id]);
+
+  useEffect(() => {
+    window.addEventListener("deleted-application", checkApplication);
+  });
+
+  const checkApplication = async () => {
+    if (!userData?.id || !offer?.id) return;
+
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`
+      );
+      setAlreadyApplied(res.data.applied);
+      setAppliedDate(res.data.applied_at);
+    } catch (err) {
+      console.error("Błąd przy sprawdzaniu aplikacji:", err);
+    }
+  };
 
   const applyToOffer = async () => {
     if (!userData?.id) {
@@ -100,7 +105,6 @@ const OfferInfo = ({ offer, id }) => {
     setShowConfirm(true);
 
     confirmCallbackRef.current = async () => {
-      console.log("DUPA");
       try {
         const res = await axios.post(
           "http://localhost:5000/api/job-offerts/applications",
@@ -114,6 +118,7 @@ const OfferInfo = ({ offer, id }) => {
         setShowInfo(true);
         setAlreadyApplied(true);
         setAppliedDate(new Date());
+        window.dispatchEvent(new Event("applied"));
       } catch (err) {
         setModalMessage("Błąd przy aplikowaniu");
         setShowInfo(true);
@@ -124,7 +129,13 @@ const OfferInfo = ({ offer, id }) => {
   return (
     <div
       id="offer-details-container"
-      className={styles.container + " " + `offer-details-container${offer.id}`}
+      className={
+        styles.container +
+        " " +
+        (is_favorite
+          ? `favorite${offer.id}`
+          : `offer-details-container${offer.id}`)
+      }
     >
       {showConfirm && (
         <ConfirmModal
@@ -157,6 +168,12 @@ const OfferInfo = ({ offer, id }) => {
           <button
             className={styles.closeBtn}
             onClick={() => {
+              if (is_favorite) {
+                document.querySelector(`.favorite${offer.id}`).style.display =
+                  "none";
+                document.querySelector("#root").style.overflow = "auto";
+                return;
+              }
               document.querySelector(
                 `.offer-details-container${offer.id}`
               ).style.display = "none";
@@ -193,7 +210,9 @@ const OfferInfo = ({ offer, id }) => {
                 <button className={styles.applyBtn}>
                   Przejdz do strony z ofertą{" "}
                 </button>
-              ) : (
+              ) : userData?.role != "employer" &&
+                userData?.role != "admin" &&
+                !!userData?.role ? (
                 <>
                   <button className={styles.applyBtn} onClick={applyToOffer}>
                     {alreadyApplied ? "Już aplikowano" : "Aplikuj"}
@@ -212,6 +231,10 @@ const OfferInfo = ({ offer, id }) => {
                     </p>
                   )}
                 </>
+              ) : (
+                <button className={styles.applyBtn}>
+                  Zaloguj się, aby aplikować
+                </button>
               )}
             </a>
           </div>{" "}

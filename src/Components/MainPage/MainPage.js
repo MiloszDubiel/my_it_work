@@ -3,6 +3,7 @@ import Navbar from "../NavBar/NavBar";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import OfferInfo from "../OffertComponent/OfferInfo";
 
 const MainPage = () => {
   const [offers, setOffers] = useState([]);
@@ -48,16 +49,24 @@ const MainPage = () => {
         <div className={styles.jobsGrid}>
           {offers?.map((el) => {
             return (
-              <div className={styles.jobCard}>
-                <h3>{el.title}</h3>
-                <p>{el.companyName}</p>
-                <span>
-                  {JSON.parse(el.contractType)[0]}
-                </span>
-                <Link to="/job-offers/1" className={styles.detailsBtn}>
-                  Szczegóły
-                </Link>
-              </div>
+              <>
+                <OfferInfo offer={el} />
+                <div className={styles.jobCard}>
+                  <h3>{el.title}</h3>
+                  <p>{el.companyName}</p>
+                  <span>{JSON.parse(el.contractType)[0]}</span>
+                  <button
+                    className={styles.detailsBtn}
+                    onClick={() => {
+                      document.querySelector(
+                        `.offer-details-container${el.id}`
+                      ).style.display = "flex";
+                    }}
+                  >
+                    Szczegóły
+                  </button>
+                </div>
+              </>
             );
           })}
         </div>

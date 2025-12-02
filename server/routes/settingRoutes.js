@@ -108,9 +108,10 @@ router.get("/favorites/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
     const [rows] = await connection.query(
-      `SELECT j.*, f.created_at AS added_at
+      `SELECT j.*, f.created_at AS added_at , jd.description, jd.requirements, jd.benefits, jd.responsibilities
        FROM favorites f
        JOIN job_offers j ON f.offer_id = j.id
+       JOIN job_details jd ON j.id = jd.job_offer_id 
        WHERE f.user_id = ?`,
       [user_id]
     );
@@ -301,9 +302,7 @@ router.delete("/cancel-application/:id", async (req, res) => {
       [id]
     );
 
-    res
-      .status(200)
-      .json({ info: "Aplikacja została anulowana." });
+    res.status(200).json({ info: "Aplikacja została anulowana." });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Błąd serwera" });

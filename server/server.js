@@ -5,6 +5,7 @@ import employersRoutes from "./routes/employersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import candidateRoutes from './routes/candidateRoutes.js'
 import adminRoutes from "./routes/adminRoutes.js";
 import http from "http";
 
@@ -18,10 +19,12 @@ app.use(express.json());
 
 app.use("/api/job-offerts", jobOffertsRoutes);
 app.use("/api/employers", employersRoutes);
+app.use("/api/candidates", candidateRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
 app.use("/messager", chatRoutes);
 app.use("/admin", adminRoutes);
+
 app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);

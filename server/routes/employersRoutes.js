@@ -168,7 +168,6 @@ router.post("/get-my-offers", async (req, res) => {
 
 router.post("/get-my-applications", async (req, res) => {
   const { employer_id } = req.body;
-  console.log(employer_id);
   if (!employer_id) {
     return res.status(400).json({ error: "Missing employer ID" });
   }
@@ -187,13 +186,11 @@ router.post("/get-my-applications", async (req, res) => {
       JOIN  job_offers ON job_applications.offer_id = job_offers.id
       JOIN users ON job_applications.user_id = users.id
       JOIN candidate_info ON users.id = candidate_info.user_id
-      WHERE job_offers.employer_id = ?
+      WHERE job_offers.employer_id = ? AND  job_applications.status <> 'anulowana'
       ORDER BY job_applications.created_at DESC`,
       [employer_id]
     );
 
-
-    
     res.json({ applications: rows });
   } catch (err) {
     console.error(err);

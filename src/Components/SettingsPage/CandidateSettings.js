@@ -3,6 +3,7 @@ import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
+import OfferInfo from "../OffertComponent/OfferInfo";
 
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -93,6 +94,11 @@ const CandidateSettings = () => {
         .then((res) => {
           setFavorites(res.data);
         });
+    });
+  });
+  useEffect(() => {
+    window.addEventListener("applied", () => {
+      getMyApplayings();
     });
   });
 
@@ -313,14 +319,16 @@ const CandidateSettings = () => {
   };
 
   const cancelApplication = async () => {
+    setInfo("");
     if (!selectedApp) return;
 
     const res = await axios.delete(
       `http://localhost:5000/user/cancel-application/${selectedApp}`
     );
 
-    if (res.data == 200) {
-      setInfo("Usunięto apliukacj");
+    if (res.status == 200) {
+      setInfo("Usunięto aplikacje");
+      window.dispatchEvent(new Event("deleted-application"));
       getMyApplayings();
     }
 
@@ -863,22 +871,29 @@ const CandidateSettings = () => {
                   <p>Brak zapisanych ofert.</p>
                 ) : (
                   favorites.map((offer) => (
-                    <div
-                      key={offer.id}
-                      className={styles.offerCard}
-                      onClick={() => {
-                        document.querySelector(
-                          `.offer-details-container${offer.id}`
-                        ).style.display = "flex";
-                      }}
-                    >
-                      <img src={offer.img} alt={offer.title} />
-                      <div>
-                        <h4>{offer.title}</h4>
-                        <p>{offer.company_name}</p>
-                        <span>{offer.locations}</span>
+                    <>
+                      <OfferInfo
+                        offer={offer}
+                        id={offer.id}
+                        is_favorite={true}
+                      />
+                      <div
+                        key={offer.id}
+                        className={styles.offerCard}
+                        onClick={() => {
+                          document.querySelector(
+                            `.favorite${offer.id}`
+                          ).style.display = "flex";
+                        }}
+                      >
+                        <img src={offer.img} alt={offer.title} />
+                        <div>
+                          <h4>{offer.title}</h4>
+                          <p>{offer.company_name}</p>
+                          <span>{offer.locations}</span>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   ))
                 )}
               </div>

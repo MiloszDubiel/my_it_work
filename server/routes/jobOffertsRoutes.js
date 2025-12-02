@@ -268,6 +268,7 @@ router.post("/update", async (req, res) => {
 
 router.post("/applications", async (req, res) => {
   const { user_id, offer_id } = req.body;
+  console.log(user_id, offer_id);
 
   try {
     await connection.query(
@@ -285,7 +286,7 @@ router.get("/applications/:userId/:offerId", async (req, res) => {
   const { userId, offerId } = req.params;
   try {
     const [rows] = await connection.query(
-      "SELECT created_at FROM job_applications WHERE user_id = ? AND offer_id = ?",
+      "SELECT created_at FROM job_applications WHERE user_id = ? AND offer_id = ? AND status <> 'anulowana'",
       [userId, offerId]
     );
     if (rows.length > 0) {

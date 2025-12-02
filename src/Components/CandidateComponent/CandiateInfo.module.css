@@ -23,7 +23,7 @@
 
 .actionsBar {
   display: flex;
-  justify-content: space-between;
+  justify-content: right;
   align-items: center;
   margin-bottom: 14px;
   gap: 8px;
@@ -54,7 +54,7 @@
 .hero {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   padding: 18px;
   background: linear-gradient(180deg, #ffffff, #fbfbfb);
@@ -88,8 +88,8 @@
 }
 
 .logo {
-  width: 56px;
-  height: 56px;
+  height: 100px;
+  width: 100px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #e6e9ee;
@@ -305,6 +305,43 @@
   width: 22px;
   height: 22px;
   color: #475569;
+}
+
+.linkButton {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 8px 0;
+  transition: background 0.2s ease;
+}
+
+.linkButton:hover {
+  background-color: #1e40af;
+}
+
+.linkButtonSmall {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #475569;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.2s ease;
+}
+
+.linkButtonSmall:hover {
+  background-color: #334155;
+}
+
+.refList {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 6px;
 }
 
 /* small screens */

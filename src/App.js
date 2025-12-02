@@ -3,7 +3,7 @@ import MainPage from "./Components/MainPage/MainPage";
 import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
 import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
-import CandidateComponent from "./Components/CandidateComponent/CandidateComponent";
+import CandidatePage from "./Components/CandidateComponent/CandidatePage";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
 import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
@@ -20,7 +20,7 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/job-offers" element={<JobOffersPage />} />
           <Route path="/employers" element={<EmployersComponent />} />
-          <Route path="/candidates" element={<CandidateComponent />} />
+          <Route path="/candidates" element={<CandidatePage />} />
           <Route
             path="/job-offers/filltred"
             element={<FiltredJobOffersPage offersPage={true} />}
