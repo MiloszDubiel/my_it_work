@@ -22,9 +22,11 @@ export default function Chat({ conversationId, userId }) {
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5001/messages/${conversationId}`
+        `http://localhost:5000/chat/messages/${conversationId}`
       );
       setMessages(res.data);
+
+      console.log(res.data);
     } catch (err) {
       console.error("Błąd pobierania wiadomości:", err);
     }
@@ -65,7 +67,6 @@ export default function Chat({ conversationId, userId }) {
 
   return (
     <div className={styles.chatContainer}>
-      
       <div className={styles.messagesContainer}>
         {messages.map((msg) => (
           <div

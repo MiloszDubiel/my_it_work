@@ -5,9 +5,10 @@ import employersRoutes from "./routes/employersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
-import candidateRoutes from './routes/candidateRoutes.js'
+import candidateRoutes from "./routes/candidateRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import http from "http";
+import { connection } from "./config/db.js";
 
 import { Server } from "socket.io";
 
@@ -24,6 +25,7 @@ app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
 app.use("/messager", chatRoutes);
 app.use("/admin", adminRoutes);
+app.use("/chat", chatRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
@@ -40,14 +42,12 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("🟢 Użytkownik połączony:", socket.id);
 
-  // Dołączanie do pokoju konwersacji
   socket.on("join_conversation", (conversationId) => {
     socket.join(conversationId);
     console.log(`👥 Użytkownik dołączył do konwersacji ${conversationId}`);
   });
 
-  socket.on("send_message", async (data) => {
-    const { conversation_id, sender_id, content } = data;
+  socket.on("send_message", async ({ conversation_id, sender_id, content }) => {
     const [result] = await connection.query(
       "INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)",
       [conversation_id, sender_id, content]
@@ -60,6 +60,7 @@ io.on("connection", (socket) => {
       content,
       created_at: new Date(),
     };
+
     io.to(conversation_id).emit("receive_message", message);
   });
 

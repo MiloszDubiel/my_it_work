@@ -5,13 +5,16 @@ const router = express.Router();
 // ====== API REST (np. do pobrania historii wiadomości) ======
 router.get("/messages/:conversationId", async (req, res) => {
   const { conversationId } = req.params;
+
+  console.log(conversationId);
+
   const [rows] = await connection.query(
     "SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at ASC",
     [conversationId]
   );
+
   res.json(rows);
 });
-
 // 📨 Pobierz listę rozmów użytkownika (dla pracodawcy lub kandydata)
 router.get("/conversations/:userId", async (req, res) => {
   const { userId } = req.params;
@@ -60,4 +63,36 @@ router.post("/conversation/start", async (req, res) => {
   }
 });
 
+router.post("/create", async (req, res) => {
+  try {
+    const { employer_id, candidate_id } = req.body;
+
+    // Czy istnieje konwersacja?
+    const [existing] = await connection.query(
+      "SELECT * FROM conversations WHERE employer_id = ? AND candidate_id = ? LIMIT 1",
+      [employer_id, candidate_id]
+    );
+
+    if (existing.length) {
+      return res.json(existing[0]);
+    }
+
+    // Tworzenie nowej konwersacji
+    const [result] = await connection.query(
+      "INSERT INTO conversations (employer_id, candidate_id) VALUES (?, ?)",
+      [employer_id, candidate_id]
+    );
+
+    const newConversation = {
+      id: result.insertId,
+      employer_id,
+      candidate_id,
+    };
+
+    return res.json(newConversation);
+  } catch (err) {
+    console.error("Błąd tworzenia konwersacji:", err);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
+});
 export default router;

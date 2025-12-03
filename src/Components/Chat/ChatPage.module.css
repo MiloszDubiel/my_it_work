@@ -1,54 +1,113 @@
 .container {
-  width: 100%;
+  display: none;
   position: fixed;
+  z-index: 1111;
+  background-color: rgba(68, 68, 68, 0.3);
+  top: 0;
+  left: 0;
   height: 100%;
-  background: #0000003d;
-  display: flex;
+  width: 100%;
   justify-content: center;
   align-items: center;
-  z-index: 111111;
-  display: none;
+  overflow: hidden;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  color: #0f172a;
+  height: 90%;
+  width: 90%;
+  max-width: 1080px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #fbfbfb 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.actionsBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
 .rightActions {
-  width: calc(100% - 30px);
   display: flex;
-  justify-content: end;
-  position: absolute;
-  top: 10px;
-  right: 30px;
+  gap: 8px;
 }
 
-.chatPage {
-  display: flex;
-  height: 80%;
-  width: 1000px;
-  background: #f9fafc;
-  border-radius: 1rem;
+.closeBtn {
+  all: unset;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #e6e9ee;
+  border-radius: 8px;
+  transition: background 0.2s ease, border-color 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.closeBtn svg {
+  width: 22px;
+  height: 22px;
+  color: #475569;
+}
+
+/* GRID LAYOUT */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 18px;
+  height: 100%;
   overflow: hidden;
-  z-index: 11111;
 }
 
-.inbox {
-  width: 30%;
-  border-right: 1px solid #ddd;
+.leftCol {
   background: #fff;
-  padding: 1rem;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
   overflow-y: auto;
 }
 
+.rightCol {
+  background: #fff;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* LIST OF CONVERSATIONS */
+.inbox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .inbox h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
 
 .conversation {
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 0.75rem;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s;
 }
 
 .conversation:hover {
@@ -60,36 +119,54 @@
 }
 
 .avatarPlaceholder {
-  background: #007bff;
-  color: #fff;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  display: grid;
+  place-items: center;
   font-weight: bold;
 }
 
+/* CHAT AREA */
 .chatArea {
-  width: 70%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f7f9fc;
+  position: relative;
 }
 
 .placeholder {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   flex: 1;
   color: #888;
+  font-size: 16px;
 }
 
-.empty {
-  color: #888;
-  font-style: italic;
-  text-align: center;
-  margin-top: 2rem;
+/* SCROLLBARS */
+.leftCol::-webkit-scrollbar,
+.rightCol::-webkit-scrollbar {
+  width: 6px;
+}
+
+.leftCol::-webkit-scrollbar-thumb,
+.rightCol::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .rightCol {
+    margin-top: 16px;
+    height: 400px;
+  }
 }

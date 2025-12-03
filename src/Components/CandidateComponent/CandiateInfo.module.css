@@ -310,7 +310,7 @@
 .linkButton {
   display: inline-block;
   padding: 10px 16px;
-  background-color: #2563eb;
+  background-color: #3b82f6;
   color: white;
   border-radius: 6px;
   text-decoration: none;
@@ -320,7 +320,7 @@
 }
 
 .linkButton:hover {
-  background-color: #1e40af;
+  background-color: #3b82f6;
 }
 
 .linkButtonSmall {
@@ -342,6 +342,23 @@
   list-style: none;
   padding-left: 0;
   margin-top: 6px;
+}
+.messageBtn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.25s ease;
+  display: inline-block;
+}
+
+.messageBtn:hover {
+  background-color: #3778e0;
 }
 
 /* small screens */

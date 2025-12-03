@@ -1,15 +1,16 @@
 import { useState, useRef } from "react";
 import styles from "./CandiateInfo.module.css";
 import { IoMdClose } from "react-icons/io";
-import { CiStar } from "react-icons/ci";
+import axios from "axios";
 import ConfirmModal from "../PromptModals/ConfirmModal";
+import { io } from "socket.io-client";
 
 const CandidateInfo = ({ candidate }) => {
   const [showConfirm, setShowConfirm] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const confirmCallbackRef = useRef(null);
 
-  console.log(candidate.skills);
+  const socket = io("http://localhost:5001");
+
   const parseList = (value) => {
     if (!value) return [];
     try {
@@ -85,20 +86,20 @@ const CandidateInfo = ({ candidate }) => {
             </h1>
 
             <div className={styles.sub}>
-              <div className={styles.company}>
+              <div className={styles.company} style={{ fontSize: "14px" }}>
                 Docelowe stanowisko:
                 <span className={styles.companyName}>
                   {candidate.target_job || "Nie podano"}
                 </span>
               </div>
-              <div className={styles.company}>
+              <div className={styles.company} style={{ fontSize: "13px" }}>
                 Obecne stanowisko:
                 <span className={styles.companyName}>
                   {candidate.present_job || "Nie podano"}
                 </span>
               </div>
 
-              <div className={styles.meta}>
+              <div className={styles.meta} style={{ fontSize: "12x" }}>
                 Lata doświadczenie:
                 <span className={styles.salary}>
                   {candidate.career_level || "Nie podano"}
@@ -118,6 +119,38 @@ const CandidateInfo = ({ candidate }) => {
                 GitHub
               </a>
             )}
+            <button
+              className={styles.messageBtn}
+              onClick={async () => {
+                try {
+                  const user = JSON.parse(sessionStorage.getItem("user-data"));
+
+                  const res = await axios.post(
+                    "http://localhost:5001/chat/create",
+                    {
+                      employer_id: user.id,
+                      candidate_id: candidate.user_id,
+                    }
+                  );
+
+                  const conversationId = res.data.id;
+
+                  document.querySelector("#chatContainer").style.display =
+                    "block";
+
+                  document.querySelector("#root").style.overflow = "hidden";
+                  window.dispatchEvent(
+                    new CustomEvent("openConversation", {
+                      detail: { conversationId },
+                    })
+                  );
+                } catch (err) {
+                  console.error("Błąd uruchamiania wiadomości:", err);
+                }
+              }}
+            >
+              Wyślij wiadomość
+            </button>
 
             {candidate.phone_number && (
               <span style={{ color: "#475569", fontSize: "14px" }}>
