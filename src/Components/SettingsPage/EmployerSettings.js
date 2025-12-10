@@ -4,6 +4,8 @@ import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
+import CandidateInfo from "../CandidateComponent/CandidateInfo";
+
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
   const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
@@ -14,6 +16,7 @@ const EmployerSettings = () => {
   const [error, setError] = useState("");
   const [offers, setOffers] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [candidate, setCandidate] = useState([]);
   const [dataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -47,7 +50,7 @@ const EmployerSettings = () => {
         employer_id: userData.id,
       })
       .then((res) => {
-        console.log()
+        console.log();
         setApplications(res.data.applications);
       })
       .catch((err) => console.error(err));
@@ -227,6 +230,7 @@ const EmployerSettings = () => {
 
   return (
     <div className={styles.container1} id="settings">
+      {candidate}
       <div className={styles.container}>
         <div className={styles.actionsBar}>
           <button
@@ -481,7 +485,19 @@ const EmployerSettings = () => {
                             📄 CV
                           </button>
 
-                          <button className={styles.smallBtnOutline}>
+                          <button
+                            className={styles.smallBtnOutline}
+                            onClick={() => {
+                              setCandidate(<CandidateInfo candidate={app} />);
+                              setTimeout(() => {
+                                document.querySelector(
+                                  `.candidate-details-container${app.user_id}`
+                                ).style.display = "flex";
+                                document.querySelector("#root").style.overflow =
+                                  "hidden";
+                              }, 50);
+                            }}
+                          >
                             👤 Profil
                           </button>
 

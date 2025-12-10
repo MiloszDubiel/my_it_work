@@ -136,7 +136,7 @@ const CandidateInfo = ({ candidate }) => {
                   const conversationId = res.data.id;
 
                   document.querySelector("#chatContainer").style.display =
-                    "block";
+                    "flex";
 
                   document.querySelector("#root").style.overflow = "hidden";
                   window.dispatchEvent(

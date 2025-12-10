@@ -178,10 +178,13 @@ router.post("/get-my-applications", async (req, res) => {
       job_applications.*,
       job_offers.title,
       job_offers.employer_id,
-      users.email, users.surname,
+      users.id AS 'user_id',
       users.name,
+      users.surname,
+      users.email,
       users.avatar,
-      candidate_info.cv
+      users.phone_number,
+      candidate_info.*
       FROM job_applications
       JOIN  job_offers ON job_applications.offer_id = job_offers.id
       JOIN users ON job_applications.user_id = users.id
