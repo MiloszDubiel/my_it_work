@@ -4,12 +4,66 @@ import { connection } from "../config/db.js";
 
 puppeteer.use(StealthPlugin());
 
+
+async function safeGoto(page, url, timeout = 5000) {
+  try {
+    await Promise.race([
+      page.goto(url, { waitUntil: "networkidle2" }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), timeout)
+      ),
+    ]);
+
+    return true;
+  } catch (e) {
+    console.warn("⚠ Timeout lub błąd ładowania:", url);
+    return false;
+  }
+}
+
+function convertPolishDate(dateStr) {
+  const months = {
+    stycznia: "01",
+    lutego: "02",
+    marca: "03",
+    kwietnia: "04",
+    maja: "05",
+    czerwca: "06",
+    lipca: "07",
+    sierpnia: "08",
+    września: "09",
+    października: "10",
+    listopada: "11",
+    grudnia: "12"
+  };
+
+
+
+  const [day, month, year] = dateStr.split(" ");
+  const mm = months[month];
+  const dd = day.padStart(2, "0");
+
+  return `${dd}.${mm}.${year}`;
+}
+
+
+  function extractDate(text) {
+  const regex = /\b(\d{2})\.(\d{2})\.(\d{4})\b/;
+  const match = text.match(regex);
+  return match ? match[0] : null;
+}
+
+
 export async function insertOffer(db, job, details) {
   try {
+
+
+
+
     const [result] = await db.execute(
       `INSERT IGNORE INTO job_offers 
-      (title, companyName, workingMode, contractType, experience, technologies, description, salary, is_active, link, img, type, source, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      (title, companyName, workingMode, contractType, experience, technologies, salary, is_active, link, img, type, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         job.title,
         job.companyName || null,
@@ -17,7 +71,6 @@ export async function insertOffer(db, job, details) {
         JSON.stringify(job.contractType || []),
         JSON.stringify(job.experience || []),
         JSON.stringify(job.technologies || []),
-        details?.description || "",
         job.salary || "",
         1,
         job.link || "",
@@ -31,19 +84,16 @@ export async function insertOffer(db, job, details) {
 
     await db.execute(
       `INSERT IGNORE job_details 
-      (job_offer_id, description, requirements, responsibilities, benefits, extra_info, technologies, locations)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (job_offer_id, description, requirements, active_to)
+      VALUES (?, ?, ?, ?)`,
       [
         jobOfferId,
         details?.description || "",
         details?.requirements || "",
-        details?.responsibilities || "",
-        details?.benefits || "",
-        details?.extra_info || "",
-        details?.technologies || "",
-        details?.locations || "",
+        details?.active_to
       ]
     );
+    
 
     console.log(`✅ Zapisano ofertę ID ${jobOfferId}: ${job.title}`);
   } catch (err) {
@@ -130,8 +180,8 @@ export async function scrapeAll() {
 
       const details = await jobPage.evaluate(() => {
         return {
-          description:
-            document.querySelector("#accordionGroup ")?.innerHTML || "",
+          description: [...document.querySelectorAll("div.bg-white.rounded-lg.px-6")].map(el=> el.innerHTML)|| "",
+          active_to: document.querySelector('aside.jsx-4039385543 div.flex p.leading-6').textContent
         };
       });
       await insertOffer(connection, job, details);
@@ -180,10 +230,11 @@ export async function scrapeAll() {
 
       const details = await jobPage.evaluate(() => {
         return {
-          description: document.querySelector(".o1r47x2m .bptj5gp .p1eexex0")
+          description: document.querySelector("#PROGRESS_AND_BENEFITS")
             ?.innerHTML,
-          requirements: document.querySelector(".o1r47x2m .bptj5gp ul")
+          requirements: document.querySelector("#REQUIREMENTS")
             ?.innerHTML,
+          active_to: convertPolishDate( document.querySelectorAll('span.t1638tgf')[1].textContent)
         };
       });
 
@@ -246,8 +297,9 @@ export async function scrapeAll() {
       return {
         description: document.querySelector("#posting-description").innerHTML,
         requirements: document.querySelector(
-          "nfj-read-more .tw-overflow-hidden ul"
+          "#posting-specs"
         ).innerHTML,
+        active_to: extractDate(document.querySelector('common-posting-time-info').textContent)
       };
     });
 
@@ -258,5 +310,6 @@ export async function scrapeAll() {
 
   await browser.close();
 
-  console.log("✅ Wszystkie oferty zostały zapisane!");
+
+  return {info: "Wszystkie oferty zostały zapisane!"}
 }

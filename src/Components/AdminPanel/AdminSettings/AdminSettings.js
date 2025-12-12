@@ -8,16 +8,7 @@ const AdminSettings = () => {
   const [lastScrap, setLastScrap] = useState(null);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/admin/scrap-info", {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => setLastScrap(res.data.lastScrap))
-      .catch((err) => console.log(err));
-  }, []);
+ 
 
   const changePassword = () => {
     setMessage("");
@@ -59,16 +50,12 @@ const AdminSettings = () => {
   const runScraper = () => {
     setMessage("Scrapowanie uruchomione…");
 
-    axios
-      .post(
-        "http://localhost:5000/admin/run-scraper",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-          },
-        }
-      )
+   axios
+      .get("http://localhost:5000/admin/scrap", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      })
       .then(() => {
         setMessage("Scrapowanie zakończone ✔");
         setLastScrap(new Date().toISOString());

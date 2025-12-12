@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { getAllOfferts } from "../services/jobOffertsService.js";
 import { getFillteredOfferts } from "../services/jobOffertsService.js";
 import { connection } from "../config/db.js";
-import { scrapeAll } from "../scrappers/jobOffertsScraper.js";
 
 const router = express.Router();
 dotenv.config();
@@ -27,13 +26,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/scrape", async (req, res) => {
-  try {
-    await scrapeAll();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+
 
 router.post("/favorites", async (req, res) => {
   const { user_id, offer_id } = req.body;

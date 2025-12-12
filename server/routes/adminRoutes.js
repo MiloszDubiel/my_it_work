@@ -2,6 +2,8 @@ import express from "express";
 import { connection } from "../config/db.js";
 import { authenticateToken, isAdmin } from "../middleware/authJwt.js";
 import bcrypt from "bcryptjs";
+import { scrapeAll } from "../scrappers/jobOffertsScraper.js";
+
 const router = express.Router();
 
 function parsePaginationParams(req) {
@@ -397,4 +399,14 @@ router.post(
     res.json({ msg: "Prośbę odrzucono." });
   }
 );
+
+router.get("/scrap", authenticateToken,
+  isAdmin, async (req, res) => {
+  try {
+    let res = await scrapeAll();
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 export default router;
