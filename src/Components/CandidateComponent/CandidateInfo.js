@@ -185,7 +185,7 @@ const CandidateInfo = ({ candidate }) => {
             {experiences.length ? (
               <ul>
                 {experiences.map((el, i) => (
-                  <li key={i}>{el}</li>
+                  <li key={i}>{el.name}, Poziom: {el.level}</li>
                 ))}
               </ul>
             ) : (
@@ -196,7 +196,7 @@ const CandidateInfo = ({ candidate }) => {
             {educations.length ? (
               <ul>
                 {educations.map((el, i) => (
-                  <li key={i}>{el}</li>
+                  <li key={i}>{el.name}, Poziom: {el.level}</li>
                 ))}
               </ul>
             ) : (
@@ -240,7 +240,7 @@ const CandidateInfo = ({ candidate }) => {
                     {skills.length ? (
                       skills.map((s, i) => (
                         <li key={i}>
-                          <strong> {s}</strong>
+                          <strong> {s.name}, Poziom: {s.level}</strong>
                         </li>
                       ))
                     ) : (
@@ -255,7 +255,7 @@ const CandidateInfo = ({ candidate }) => {
                     {languages.length ? (
                       languages.map((l, i) => (
                         <li key={i}>
-                          <strong> {l}</strong>
+                          <strong> {l.name}, Poziom {l.level}</strong>
                         </li>
                       ))
                     ) : (

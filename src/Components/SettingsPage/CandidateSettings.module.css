@@ -72,6 +72,45 @@
   flex: 1;
   overflow: hidden;
 }
+.fileInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fileInputWrapper input[type="file"] {
+  cursor: pointer;
+}
+
+.fileLink {
+  background: #3b82f6;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.fileLink:hover {
+  background: #2563eb;
+}
+
+.clearHistoryBtn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.clearHistoryBtn:hover {
+  background-color: #dc2626;
+}
 
 /* ================================
    SIDEBAR

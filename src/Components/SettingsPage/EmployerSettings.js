@@ -26,6 +26,12 @@ const EmployerSettings = () => {
   });
   const [applications, setApplications] = useState([]);
 
+const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
+const [selectedOffer, setSelectedOffer] = useState(null);
+
+
+
+
   useEffect(() => {
     axios
       .post(`http://localhost:5000/api/employers/get-company-info`, {
@@ -246,6 +252,27 @@ const EmployerSettings = () => {
     setShowCancelModal(false);
   };
 
+
+   // Funkcja do usuwania oferty
+const deleteOffer = async () => {
+  if (!selectedOffer) return;
+
+  try {
+    const res = await axios.delete(
+      `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`
+    );
+
+    if (res.data.success) {
+      setInfo("Oferta pracy została usunięta");
+      fetchOffers(); // odśwież listę ofert
+    }
+  } catch (err) {
+    console.error(err);
+    setError("Wystąpił błąd podczas usuwania oferty");
+  }
+
+  setShowDeleteOfferModal(false);
+};
   return (
     <div className={styles.container1} id="settings">
       {showCancelModal && (
@@ -446,26 +473,23 @@ const EmployerSettings = () => {
                               ✏️
                             </button>
                             <button
-                              onClick={async () => {
-                                if (
-                                  window.confirm(
-                                    `Czy napewno chcesz usunąc ofert ${offer.title} `
-                                  )
-                                ) {
-                                  let res = await axios.delete(
-                                    `http://localhost:5000/api/job-offerts/delete/${offer.id}`
-                                  );
-                                  console.log(res);
-                                  if (res.data.success) {
-                                    setRefresh(!refresh);
-                                  }
-                                }
-                              }}
+                              
+                                onClick={() => {
+              setSelectedOffer(offer.id);
+              setShowDeleteOfferModal(true);
+            }}
                             >
                               🗑️
                             </button>
                           </span>
                         </div>
+                        {showDeleteOfferModal && (
+      <ConfirmModal
+        message="Czy na pewno chcesz usunąć tę ofertę pracy?"
+        onConfirm={deleteOffer}
+        onCancel={() => setShowDeleteOfferModal(false)}
+      />
+    )}
                       </>
                     ))
                   ) : (
@@ -503,12 +527,14 @@ const EmployerSettings = () => {
 
                         <span className={styles.appActions}>
                           <CandidateInfo candidate={app} />
-                          <button
-                            onClick={() => window.open(app.cv, "_blank")}
-                            className={styles.smallBtn}
-                          >
-                            📄 CV
-                          </button>
+                          {app.cv && (
+  <button
+    onClick={() => window.open(app.cv, "_blank")}
+    className={styles.smallBtn}
+  >
+    📄 CV
+  </button>
+)}
 
                           <button
                             className={styles.smallBtnOutline}

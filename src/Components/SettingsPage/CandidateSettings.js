@@ -4,6 +4,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../OffertComponent/OfferInfo";
+import CandidateInfo from "../CandidateComponent/CandidateInfo";
 
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -21,6 +22,7 @@ const CandidateSettings = () => {
   });
   const [favorites, setFavorites] = useState([]);
   const [candidateProfile, setCandidateProfile] = useState({
+    description: "",
     location: "",
     phone_number: "",
     current_position: "",
@@ -68,6 +70,7 @@ const CandidateSettings = () => {
         if (res.data.candiate) {
           setCandidateProfile({
             ...candidateProfile,
+            description: res.data.candiate[0]?.description,
             career_level: res.data.candiate[0]?.exp,
             languages: JSON.parse(res.data.candiate[0]?.lang),
             education: JSON.parse(res.data.candiate[0]?.edu),
@@ -196,6 +199,10 @@ const CandidateSettings = () => {
       setErorr("Lokalizacja nie może być pusta.");
       return;
     }
+      if (!candidateProfile.description.trim()) {
+      setErorr("Opis nie może byc pusty.");
+      return;
+    }
     if (!candidateProfile.current_position.trim()) {
       setErorr("Aktualne stanowisko nie może być puste.");
     }
@@ -210,6 +217,7 @@ const CandidateSettings = () => {
     }
 
     const formData = new FormData();
+    formData.append("description", candidateProfile.description)
     formData.append("locations", candidateProfile.location || "");
     formData.append("skills", JSON.stringify(candidateProfile.skills || []));
     formData.append("lang", JSON.stringify(candidateProfile.languages || []));
@@ -518,6 +526,17 @@ const CandidateSettings = () => {
                   </>
                 ) : (
                   <>
+                  <label>Infofmacje o kandydacie</label>
+                    <textarea
+                      name="description"
+                      value={candidateProfile.description}
+                      onChange={handleChange}
+                      placeholder="Powiedz coś o sobie"
+                      required
+                    />
+
+
+
                     <label>Lokalizacja</label>
                     <input
                       type="text"
@@ -662,6 +681,9 @@ const CandidateSettings = () => {
                               updateLevel(index, "skills", e.target.value)
                             }
                           >
+                                       <option value="" disabled selected>
+                          Wybierz...
+                        </option>
                             <option>Brak</option>
                             <option>Podstawowy</option>
                             <option>Średni</option>
@@ -676,11 +698,12 @@ const CandidateSettings = () => {
 
                     <div className={styles.skill}>
                       <select onChange={addLanguageWithLevel}>
-                        <option>Wybierz...</option>
+                                 <option value="" disabled selected>
+                          Wybierz...
+                        </option>
                         <option>Angielski</option>
                         <option>Niemiecki</option>
                         <option>Hiszpański</option>
-                        <option>Inny</option>
                       </select>
                     </div>
 
@@ -700,6 +723,9 @@ const CandidateSettings = () => {
                               updateLevel(index, "languages", e.target.value)
                             }
                           >
+                                       <option value="" disabled selected>
+                          Wybierz...
+                        </option>
                             <option>Brak</option>
                             <option>A1</option>
                             <option>A2</option>
@@ -745,7 +771,7 @@ const CandidateSettings = () => {
                         ))}
                       </div>
 
-                      {/* INPUT DO DODAWANIA SZKOŁY */}
+                     
                       <input type="text" placeholder="Szkoła..." />
 
                       <button
@@ -758,47 +784,45 @@ const CandidateSettings = () => {
                     </div>
 
                     <label>CV</label>
-                    {cvPreviewUrl ? (
-                      <div className={styles.cvPreview}>
-                        <a
-                          href={cvPreviewUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Zobacz aktualne CV
-                        </a>
-                      </div>
-                    ) : (
-                      <p>Brak przesłanego CV</p>
-                    )}
-                    <input
-                      type="file"
-                      ref={cvInputRef}
-                      accept=".pdf"
-                      onChange={(e) => setCvFile(e.target.files[0])}
-                    />
+<div className={styles.fileInputWrapper}>
+  <input
+    type="file"
+    ref={cvInputRef}
+    accept=".pdf"
+    onChange={(e) => setCvFile(e.target.files[0])}
+  />
+  {cvPreviewUrl && (
+    <a
+      href={cvPreviewUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.fileLink}
+    >
+      Zobacz aktualne CV
+    </a>
+  )}
+</div>
 
-                    <label>Referencje</label>
-                    {referencePreviewUrl ? (
-                      <div className={styles.cvPreview}>
-                        <a
-                          href={referencePreviewUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Zobacz aktualne referencje
-                        </a>
-                      </div>
-                    ) : (
-                      <p>Brak przesłanych referencji</p>
-                    )}
+<label>Referencje</label>
+<div className={styles.fileInputWrapper}>
+  <input
+    type="file"
+    ref={referenceInputRef}
+    accept=".pdf"
+    onChange={(e) => setReferenceFile(e.target.files[0])}
+  />
+  {referencePreviewUrl && (
+    <a
+      href={referencePreviewUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.fileLink}
+    >
+      Zobacz aktualne referencje
+    </a>
+  )}
+</div>
 
-                    <input
-                      type="file"
-                      ref={referenceInputRef}
-                      accept=".pdf"
-                      onChange={(e) => setReferenceFile(e.target.files[0])}
-                    />
 
                     <label>GitHub</label>
                     <input
@@ -839,58 +863,82 @@ const CandidateSettings = () => {
               </form>
             )}
 
-            {activeTab === "applications" && (
-              <div className={styles.tableContainer}>
-                <h2>Złożone aplikacje</h2>
+           {activeTab === "applications" && (
+  <div className={styles.tableContainer}>
+    <h2>Złożone aplikacje</h2>
 
-                {applications.length === 0 ? (
-                  <p>Nie masz jeszcze żadnych aplikacji.</p>
+    {applications.length > 0 && (
+      <button
+        className={styles.clearHistoryBtn}
+        onClick={async () => {
+          if (
+            window.confirm(
+              "Czy na pewno chcesz wyczyścić całą historię aplikacji?"
+            )
+          ) {
+            try {
+              // Wywołanie endpointu API do usunięcia wszystkich aplikacji
+              await axios.delete(
+                `http://localhost:5000/api/applications/clear-history/${userData.id}`
+              );
+              // Lokalnie czyścimy listę
+              setApplications([]);
+            } catch (err) {
+              console.error(err);
+              alert("Wystąpił błąd przy czyszczeniu historii.");
+            }
+          }
+        }}
+      >
+        Czyść historię
+      </button>
+    )}
+
+    {applications.length === 0 ? (
+      <p>Nie masz jeszcze żadnych aplikacji.</p>
+    ) : (
+      <table className={styles.appTable}>
+        <thead>
+          <tr>
+            <th>Stanowisko</th>
+            <th>Firma</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Akcja</th>
+          </tr>
+        </thead>
+        <tbody>
+          {applications.map((app) => (
+            <tr key={app.id}>
+              <td>{app.title}</td>
+              <td>{app.companyName}</td>
+              <td className={styles[`status_${app.status}`]}>
+                {app.status}
+              </td>
+              <td>{new Date(app.created_at).toLocaleDateString()}</td>
+              <td>
+                {app.status !== "anulowana" && app.status !== "odrzucono" ? (
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={() => {
+                      setSelectedApp(app.id);
+                      setShowCancelModal(true);
+                    }}
+                  >
+                    Anuluj
+                  </button>
                 ) : (
-                  <table className={styles.appTable}>
-                    <thead>
-                      <tr>
-                        <th>Stanowisko</th>
-                        <th>Firma</th>
-                        <th>Status</th>
-                        <th>Data</th>
-                        <th>Akcja</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {applications.map((app) => (
-                        <tr key={app.id}>
-                          <td>{app.title}</td>
-                          <td>{app.companyName}</td>
-                          <td className={styles[`status_${app.status}`]}>
-                            {app.status}
-                          </td>
-                          <td>
-                            {new Date(app.created_at).toLocaleDateString()}
-                          </td>
-                          <td>
-                            {app.status !== "anulowana" ? (
-                              <button
-                                className={styles.cancelBtn}
-                                onClick={() => {
-                                  setSelectedApp(app.id);
-                                  setShowCancelModal(true);
-                                }}
-                              >
-                                Anuluj
-                              </button>
-                            ) : (
-                              <span className={styles.cancelledText}>
-                                Anulowano
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  ""
                 )}
-              </div>
-            )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+)}
+
 
             {activeTab === "favorites" && (
               <div className={styles.favorites}>

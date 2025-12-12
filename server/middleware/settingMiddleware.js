@@ -1,16 +1,12 @@
 import path from "path";
 import fs from "fs";
 import multer from "multer";
-
 const CvAndRefStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let dir;
 
-    if (file.fieldname === "cv") {
-      dir = "uploads/cv";
-    } else if (file.fieldname === "references") {
-      dir = "uploads/references";
-    }
+    if (file.fieldname === "cv") dir = "uploads/cv";
+    else if (file.fieldname === "references") dir = "uploads/references";
 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -19,19 +15,16 @@ const CvAndRefStorage = multer.diskStorage({
 
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-
-    if (file.fieldname === "cv") {
-      cb(null, `cv_${req.body.user_id}${ext}`);
-    } else if (file.fieldname === "references") {
-      cb(null, `ref_${req.body.user_id}${ext}`);
-    }
+    if (file.fieldname === "cv") cb(null, `cv_${req.body.user_id}${ext}`);
+    else if (file.fieldname === "references") cb(null, `ref_${req.body.user_id}${ext}`);
   },
 });
 
 export const uploadCvAndRef = multer({
-  CvAndRefStorage,
+  storage: CvAndRefStorage,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
 
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {

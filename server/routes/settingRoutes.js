@@ -133,6 +133,7 @@ router.post(
     try {
       const {
         user_id,
+        description,
         locations,
         skills,
         lang,
@@ -166,7 +167,7 @@ router.post(
 
       if (rows.length === 0) {
         await connection.query(
-          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             user_id,
             cvPath,
@@ -183,6 +184,7 @@ router.post(
             phone_number,
             access,
             career_level,
+            description
           ]
         );
 
@@ -207,6 +209,7 @@ router.post(
         "phone_number = ?",
         "access = ?",
         "career_level = ?",
+        "description = ?" 
       ];
 
       const updateValues = [
@@ -222,15 +225,13 @@ router.post(
         phone_number,
         access,
         career_level,
+        description
       ];
 
-      // TYLKO jeśli przesłano nowe CV -> aktualizuj
       if (cvPath) {
         updateFields.push("cv = ?");
         updateValues.push(cvPath);
       }
-
-      // TYLKO jeśli przesłano nowe referencje -> aktualizuj
       if (refPath) {
         updateFields.push("`references` = ?");
         updateValues.push(refPath);
