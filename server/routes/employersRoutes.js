@@ -6,6 +6,8 @@ import {
 } from "../services/employerService.js";
 import { connection } from "../config/db.js";
 import { uploadLogo } from "../middleware/settingMiddleware.js";
+import path from "path";
+import fs from "fs";
 
 const router = express.Router();
 
@@ -38,100 +40,79 @@ router.post("/get-company-info", async (req, res) => {
   return res.json({ companyInfo: await getCompanyInfo(id) });
 });
 
-router.post("/set-company-info", async (req, res) => {
-  try {
-    const { owner_id, description, link, email, phone_number } = req.body;
-
-    await connection.query(
-      "UPDATE companies SET description=?, link=?, email=?, phone_number=? WHERE owner_id=?",
-      [description, link, email, phone_number, owner_id]
-    );
-
-    return res.status(200).json({ info: "Zapisano zmiany" });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Błąd serwera" });
-  }
-});
-
 router.post(
-  "/request-company-change",
+  "/set-company-info",
   uploadLogo.single("logo"),
   async (req, res) => {
     try {
-      const { owner_id, companyName, nip, company_id } = req.body;
+      const { owner_id, description, link, email, phone_number, company_id } =
+        req.body;
 
-      // --- 1. Czy istnieje już oczekujący request? -----------------------
-      const [rows] = await connection.query(
-        `SELECT * FROM company_change_requests 
-         WHERE company_id = ? 
-         AND employer_id = ? 
-         AND status = 'pending'`,
-        [company_id, owner_id]
-      );
-
-      if (rows.length > 0) {
-        return res.status(400).json({
-          error: "Poprzednia prośba czeka na odpowiedź administratora.",
-        });
-      }
-
-      // --- 2. Zapis logo ---------------------------------------------------
       let logoPath = null;
 
       if (req.file) {
-        logoPath = `http:localhost:5000/uploads/company_logos/logo_${company_id}${path.extname(
+        logoPath = `http://localhost:5000/uploads/company_logos/logo_${company_id}${path.extname(
           req.file.originalname
         )}`;
       }
 
-      // --- 3. Zapis nowego requesta ---------------------------------------
-      const sql = `
-        INSERT INTO company_change_requests 
-        (company_id, employer_id, new_company_name, new_nip, new_logo, status)
-        VALUES (?, ?, ?, ?, ?, 'pending')
-      `;
+      await connection.query(
+        "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ? WHERE owner_id=?",
+        [description, link, email, phone_number, logoPath, owner_id]
+      );
 
-      await connection.query(sql, [
-        company_id,
-        owner_id,
-        companyName || null,
-        nip || null,
-        logoPath || null,
-      ]);
-
-      return res.status(200).json({
-        info: "Wysłano prośbę do administratora.",
-      });
-    } catch (e) {
-      console.error(e);
-      return res
-        .status(500)
-        .json({ error: "Błąd serwera", details: e.message });
+      return res.status(200).json({ info: "Zapisano zmiany" });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Błąd serwera" });
     }
   }
 );
 
-router.get("/get-company-logo/:id", async (req, res) => {
-  const owner_id = req.params.id;
+router.post("/request-company-change", async (req, res) => {
+  try {
+    const { owner_id, companyName, nip, company_id } = req.body;
 
-  const [results] = await connection.query(
-    "SELECT uploaded_image FROM companies WHERE owner_id = ?",
-    [owner_id]
-  );
+    // --- 1. Czy istnieje już oczekujący request? -----------------------
+    const [rows] = await connection.query(
+      `SELECT * FROM company_change_requests 
+         WHERE company_id = ? 
+         AND employer_id = ? 
+         AND status = 'pending'`,
+      [company_id, owner_id]
+    );
 
-  if (results.length === 0 || !results[0].uploaded_image) {
-    return res.status(404).json({ error: "Brak logo" });
+    if (rows.length > 0) {
+      return res.status(400).json({
+        error: "Poprzednia prośba czeka na odpowiedź administratora.",
+      });
+    }
+
+    // --- 3. Zapis nowego requesta ---------------------------------------
+    const sql = `
+        INSERT INTO company_change_requests 
+        (company_id, employer_id, new_company_name, new_nip, status)
+        VALUES (?, ?, ?, ?, 'pending')
+      `;
+
+    await connection.query(sql, [
+      company_id,
+      owner_id,
+      companyName || null,
+      nip || null,
+      logoPath || null,
+    ]);
+
+    return res.status(200).json({
+      info: "Wysłano prośbę do administratora.",
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "Błąd serwera", details: e.message });
   }
-
-  const filename = results[0].uploaded_image;
-  const filepath = `uploads/company_logos/${filename}`;
-
-  if (!fs.existsSync(filepath)) {
-    return res.status(404).json({ error: "Logo nie istnieje" });
-  }
-  res.sendFile(path.resolve(filepath));
 });
+
+
 
 router.post("/get-my-offers", async (req, res) => {
   try {
@@ -230,9 +211,10 @@ router.put("/revoke-application/:id", async (req, res) => {
   console.log(app_id);
 
   try {
-    await connection.query("UPDATE job_applications SET status = 'odrzucono' WHERE id = ?", [
-      app_id,
-    ]);
+    await connection.query(
+      "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
+      [app_id]
+    );
     res.json({ success: true, message: "Odrzucono aplikacje" });
   } catch (err) {
     console.error(err);

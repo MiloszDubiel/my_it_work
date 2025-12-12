@@ -199,7 +199,7 @@ const CandidateSettings = () => {
       setErorr("Lokalizacja nie może być pusta.");
       return;
     }
-      if (!candidateProfile.description.trim()) {
+    if (!candidateProfile.description.trim()) {
       setErorr("Opis nie może byc pusty.");
       return;
     }
@@ -217,7 +217,7 @@ const CandidateSettings = () => {
     }
 
     const formData = new FormData();
-    formData.append("description", candidateProfile.description)
+    formData.append("description", candidateProfile.description);
     formData.append("locations", candidateProfile.location || "");
     formData.append("skills", JSON.stringify(candidateProfile.skills || []));
     formData.append("lang", JSON.stringify(candidateProfile.languages || []));
@@ -526,7 +526,7 @@ const CandidateSettings = () => {
                   </>
                 ) : (
                   <>
-                  <label>Infofmacje o kandydacie</label>
+                    <label>Infofmacje o kandydacie</label>
                     <textarea
                       name="description"
                       value={candidateProfile.description}
@@ -534,8 +534,6 @@ const CandidateSettings = () => {
                       placeholder="Powiedz coś o sobie"
                       required
                     />
-
-
 
                     <label>Lokalizacja</label>
                     <input
@@ -681,9 +679,9 @@ const CandidateSettings = () => {
                               updateLevel(index, "skills", e.target.value)
                             }
                           >
-                                       <option value="" disabled selected>
-                          Wybierz...
-                        </option>
+                            <option value="" disabled selected>
+                              Wybierz...
+                            </option>
                             <option>Brak</option>
                             <option>Podstawowy</option>
                             <option>Średni</option>
@@ -698,7 +696,7 @@ const CandidateSettings = () => {
 
                     <div className={styles.skill}>
                       <select onChange={addLanguageWithLevel}>
-                                 <option value="" disabled selected>
+                        <option value="" disabled selected>
                           Wybierz...
                         </option>
                         <option>Angielski</option>
@@ -723,9 +721,9 @@ const CandidateSettings = () => {
                               updateLevel(index, "languages", e.target.value)
                             }
                           >
-                                       <option value="" disabled selected>
-                          Wybierz...
-                        </option>
+                            <option value="" disabled selected>
+                              Wybierz...
+                            </option>
                             <option>Brak</option>
                             <option>A1</option>
                             <option>A2</option>
@@ -738,9 +736,7 @@ const CandidateSettings = () => {
                       ))}
                     </div>
 
-                    <label>
-                      Edukacja
-                    </label>
+                    <label>Edukacja</label>
 
                     <div className={styles.skill}>
                       <div className={styles.skillsList}>
@@ -771,7 +767,6 @@ const CandidateSettings = () => {
                         ))}
                       </div>
 
-                     
                       <input type="text" placeholder="Szkoła..." />
 
                       <button
@@ -784,45 +779,44 @@ const CandidateSettings = () => {
                     </div>
 
                     <label>CV</label>
-<div className={styles.fileInputWrapper}>
-  <input
-    type="file"
-    ref={cvInputRef}
-    accept=".pdf"
-    onChange={(e) => setCvFile(e.target.files[0])}
-  />
-  {cvPreviewUrl && (
-    <a
-      href={cvPreviewUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.fileLink}
-    >
-      Zobacz aktualne CV
-    </a>
-  )}
-</div>
+                    <div className={styles.fileInputWrapper}>
+                      <input
+                        type="file"
+                        ref={cvInputRef}
+                        accept=".pdf"
+                        onChange={(e) => setCvFile(e.target.files[0])}
+                      />
+                      {cvPreviewUrl && (
+                        <a
+                          href={cvPreviewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.fileLink}
+                        >
+                          Zobacz aktualne CV
+                        </a>
+                      )}
+                    </div>
 
-<label>Referencje</label>
-<div className={styles.fileInputWrapper}>
-  <input
-    type="file"
-    ref={referenceInputRef}
-    accept=".pdf"
-    onChange={(e) => setReferenceFile(e.target.files[0])}
-  />
-  {referencePreviewUrl && (
-    <a
-      href={referencePreviewUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.fileLink}
-    >
-      Zobacz aktualne referencje
-    </a>
-  )}
-</div>
-
+                    <label>Referencje</label>
+                    <div className={styles.fileInputWrapper}>
+                      <input
+                        type="file"
+                        ref={referenceInputRef}
+                        accept=".pdf"
+                        onChange={(e) => setReferenceFile(e.target.files[0])}
+                      />
+                      {referencePreviewUrl && (
+                        <a
+                          href={referencePreviewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.fileLink}
+                        >
+                          Zobacz aktualne referencje
+                        </a>
+                      )}
+                    </div>
 
                     <label>GitHub</label>
                     <input
@@ -863,82 +857,84 @@ const CandidateSettings = () => {
               </form>
             )}
 
-           {activeTab === "applications" && (
-  <div className={styles.tableContainer}>
-    <h2>Złożone aplikacje</h2>
+            {activeTab === "applications" && (
+              <div className={styles.tableContainer}>
+                <h2>Złożone aplikacje</h2>
 
-    {applications.length > 0 && (
-      <button
-        className={styles.clearHistoryBtn}
-        onClick={async () => {
-          if (
-            window.confirm(
-              "Czy na pewno chcesz wyczyścić całą historię aplikacji?"
-            )
-          ) {
-            try {
-              // Wywołanie endpointu API do usunięcia wszystkich aplikacji
-              await axios.delete(
-                `http://localhost:5000/api/applications/clear-history/${userData.id}`
-              );
-              // Lokalnie czyścimy listę
-              setApplications([]);
-            } catch (err) {
-              console.error(err);
-              alert("Wystąpił błąd przy czyszczeniu historii.");
-            }
-          }
-        }}
-      >
-        Czyść historię
-      </button>
-    )}
-
-    {applications.length === 0 ? (
-      <p>Nie masz jeszcze żadnych aplikacji.</p>
-    ) : (
-      <table className={styles.appTable}>
-        <thead>
-          <tr>
-            <th>Stanowisko</th>
-            <th>Firma</th>
-            <th>Status</th>
-            <th>Data</th>
-            <th>Akcja</th>
-          </tr>
-        </thead>
-        <tbody>
-          {applications.map((app) => (
-            <tr key={app.id}>
-              <td>{app.title}</td>
-              <td>{app.companyName}</td>
-              <td className={styles[`status_${app.status}`]}>
-                {app.status}
-              </td>
-              <td>{new Date(app.created_at).toLocaleDateString()}</td>
-              <td>
-                {app.status !== "anulowana" && app.status !== "odrzucono" ? (
+                {applications.length > 0 && (
                   <button
-                    className={styles.cancelBtn}
-                    onClick={() => {
-                      setSelectedApp(app.id);
-                      setShowCancelModal(true);
+                    className={styles.clearHistoryBtn}
+                    onClick={async () => {
+                      if (
+                        window.confirm(
+                          "Czy na pewno chcesz wyczyścić całą historię aplikacji?"
+                        )
+                      ) {
+                        try {
+                          // Wywołanie endpointu API do usunięcia wszystkich aplikacji
+                          await axios.delete(
+                            `http://localhost:5000/api/applications/clear-history/${userData.id}`
+                          );
+                          // Lokalnie czyścimy listę
+                          setApplications([]);
+                        } catch (err) {
+                          console.error(err);
+                          alert("Wystąpił błąd przy czyszczeniu historii.");
+                        }
+                      }
                     }}
                   >
-                    Anuluj
+                    Czyść historię
                   </button>
-                ) : (
-                  ""
                 )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-  </div>
-)}
 
+                {applications.length === 0 ? (
+                  <p>Nie masz jeszcze żadnych aplikacji.</p>
+                ) : (
+                  <table className={styles.appTable}>
+                    <thead>
+                      <tr>
+                        <th>Stanowisko</th>
+                        <th>Firma</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Akcja</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {applications.map((app) => (
+                        <tr key={app.id}>
+                          <td>{app.title}</td>
+                          <td>{app.companyName}</td>
+                          <td className={styles[`status_${app.status}`]}>
+                            {app.status}
+                          </td>
+                          <td>
+                            {new Date(app.created_at).toLocaleDateString()}
+                          </td>
+                          <td>
+                            {app.status !== "anulowana" &&
+                            app.status !== "odrzucono" ? (
+                              <button
+                                className={styles.cancelBtn}
+                                onClick={() => {
+                                  setSelectedApp(app.id);
+                                  setShowCancelModal(true);
+                                }}
+                              >
+                                Anuluj
+                              </button>
+                            ) : (
+                              ""
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
 
             {activeTab === "favorites" && (
               <div className={styles.favorites}>

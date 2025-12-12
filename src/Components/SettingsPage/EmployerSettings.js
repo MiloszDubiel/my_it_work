@@ -26,11 +26,8 @@ const EmployerSettings = () => {
   });
   const [applications, setApplications] = useState([]);
 
-const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
-const [selectedOffer, setSelectedOffer] = useState(null);
-
-
-
+  const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   useEffect(() => {
     axios
@@ -43,6 +40,7 @@ const [selectedOffer, setSelectedOffer] = useState(null);
       .catch((err) => console.log(err));
   }, []);
 
+  console.log(company);
   const fetchOffers = () => {
     axios
       .post("http://localhost:5000/api/employers/get-my-offers", {
@@ -116,14 +114,23 @@ const [selectedOffer, setSelectedOffer] = useState(null);
       return setError("Telefon musi zawierać dokładnie 9 cyfr.");
     }
 
+    const formData = new FormData();
+
+    formData.append("owner_id", userData.id);
+    formData.append("company_id", company.id);
+    formData.append("description", company.description || "");
+    formData.append("link", company.link || "");
+    formData.append("phone_number", company.phone_number || "");
+    formData.append("email", company.email);
+    if (logoFile) {
+      formData.append("logo", logoFile);
+    }
+
     let res = await axios.post(
       "http://localhost:5000/api/employers/set-company-info",
+      formData,
       {
-        owner_id: userData.id,
-        description: company.description,
-        link: company.link || "",
-        email: company.email || "",
-        phone_number: company.phone_number || "",
+        headers: { "Content-Type": "multipart/form-data" },
       }
     );
 
@@ -252,27 +259,25 @@ const [selectedOffer, setSelectedOffer] = useState(null);
     setShowCancelModal(false);
   };
 
+  const deleteOffer = async () => {
+    if (!selectedOffer) return;
 
-   // Funkcja do usuwania oferty
-const deleteOffer = async () => {
-  if (!selectedOffer) return;
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`
+      );
 
-  try {
-    const res = await axios.delete(
-      `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`
-    );
-
-    if (res.data.success) {
-      setInfo("Oferta pracy została usunięta");
-      fetchOffers(); // odśwież listę ofert
+      if (res.data.success) {
+        setInfo("Oferta pracy została usunięta");
+        fetchOffers();
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Wystąpił błąd podczas usuwania oferty");
     }
-  } catch (err) {
-    console.error(err);
-    setError("Wystąpił błąd podczas usuwania oferty");
-  }
 
-  setShowDeleteOfferModal(false);
-};
+    setShowDeleteOfferModal(false);
+  };
   return (
     <div className={styles.container1} id="settings">
       {showCancelModal && (
@@ -352,27 +357,6 @@ const deleteOffer = async () => {
                     }
                   />
 
-                  <label>Logo firmy</label>
-
-                  <div className={styles.logoPreview}>
-                    <img
-                      src={
-                        logoPreviewUrl ||
-                        `http://localhost:5000/api/employers/get-company-logo/${userData.id}`
-                      }
-                      alt="Logo firmy"
-                    />
-                  </div>
-
-                  <input
-                    type="file"
-                    accept="image/png"
-                    onChange={(e) => {
-                      setLogoFile(e.target.files[0]);
-                      setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
-                    }}
-                  />
-
                   <button type="submit" className={styles.saveBtn}>
                     Zapisz
                   </button>
@@ -387,6 +371,20 @@ const deleteOffer = async () => {
                     onChange={(e) =>
                       setCompany({ ...company, description: e.target.value })
                     }
+                  />
+                  <label>Logo firmy</label>
+
+                  <div className={styles.logoPreview}>
+                    <img src={logoPreviewUrl || company.img} alt="Logo firmy" />
+                  </div>
+
+                  <input
+                    type="file"
+                    accept="image/png"
+                    onChange={(e) => {
+                      setLogoFile(e.target.files[0]);
+                      setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
+                    }}
                   />
 
                   <label>Strona internetowa</label>
@@ -473,23 +471,22 @@ const deleteOffer = async () => {
                               ✏️
                             </button>
                             <button
-                              
-                                onClick={() => {
-              setSelectedOffer(offer.id);
-              setShowDeleteOfferModal(true);
-            }}
+                              onClick={() => {
+                                setSelectedOffer(offer.id);
+                                setShowDeleteOfferModal(true);
+                              }}
                             >
                               🗑️
                             </button>
                           </span>
                         </div>
                         {showDeleteOfferModal && (
-      <ConfirmModal
-        message="Czy na pewno chcesz usunąć tę ofertę pracy?"
-        onConfirm={deleteOffer}
-        onCancel={() => setShowDeleteOfferModal(false)}
-      />
-    )}
+                          <ConfirmModal
+                            message="Czy na pewno chcesz usunąć tę ofertę pracy?"
+                            onConfirm={deleteOffer}
+                            onCancel={() => setShowDeleteOfferModal(false)}
+                          />
+                        )}
                       </>
                     ))
                   ) : (
@@ -528,13 +525,13 @@ const deleteOffer = async () => {
                         <span className={styles.appActions}>
                           <CandidateInfo candidate={app} />
                           {app.cv && (
-  <button
-    onClick={() => window.open(app.cv, "_blank")}
-    className={styles.smallBtn}
-  >
-    📄 CV
-  </button>
-)}
+                            <button
+                              onClick={() => window.open(app.cv, "_blank")}
+                              className={styles.smallBtn}
+                            >
+                              📄 CV
+                            </button>
+                          )}
 
                           <button
                             className={styles.smallBtnOutline}
