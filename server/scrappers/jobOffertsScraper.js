@@ -5,21 +5,6 @@ import { connection } from "../config/db.js";
 puppeteer.use(StealthPlugin());
 
 
-async function safeGoto(page, url, timeout = 5000) {
-  try {
-    await Promise.race([
-      page.goto(url, { waitUntil: "networkidle2" }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), timeout)
-      ),
-    ]);
-
-    return true;
-  } catch (e) {
-    console.warn("⚠ Timeout lub błąd ładowania:", url);
-    return false;
-  }
-}
 
 function convertPolishDate(dateStr) {
   const months = {
@@ -56,9 +41,6 @@ function convertPolishDate(dateStr) {
 
 export async function insertOffer(db, job, details) {
   try {
-
-
-
 
     const [result] = await db.execute(
       `INSERT IGNORE INTO job_offers 
