@@ -5,6 +5,7 @@ import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
 import CandidateInfo from "../CandidateComponent/CandidateInfo";
+import ConfirmModal from "../PromptModals/ConfirmModal";
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
@@ -16,7 +17,8 @@ const EmployerSettings = () => {
   const [error, setError] = useState("");
   const [offers, setOffers] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [candidate, setCandidate] = useState([]);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
   const [dataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -228,9 +230,31 @@ const EmployerSettings = () => {
     }
   };
 
+  const cancelApplication = async () => {
+    setInfo("");
+    if (!selectedApp) return;
+
+    const res = await axios.put(
+      `http://localhost:5000/api/employers/revoke-application/${selectedApp}`
+    );
+
+    if (res.status == 200) {
+      setInfo("Odrzucono aplikacje");
+      fetchApplications();
+    }
+
+    setShowCancelModal(false);
+  };
+
   return (
     <div className={styles.container1} id="settings">
-      {candidate}
+      {showCancelModal && (
+        <ConfirmModal
+          message="Czy na pewno chcesz odrzucić tę aplikację?"
+          onConfirm={() => cancelApplication()}
+          onCancel={() => setShowCancelModal(false)}
+        />
+      )}
       <div className={styles.container}>
         <div className={styles.actionsBar}>
           <button
@@ -425,7 +449,7 @@ const EmployerSettings = () => {
                               onClick={async () => {
                                 if (
                                   window.confirm(
-                                    `Czy napewno chcesz usunąc oferte ${offer.title} `
+                                    `Czy napewno chcesz usunąc ofert ${offer.title} `
                                   )
                                 ) {
                                   let res = await axios.delete(
@@ -478,6 +502,7 @@ const EmployerSettings = () => {
                         </span>
 
                         <span className={styles.appActions}>
+                          <CandidateInfo candidate={app} />
                           <button
                             onClick={() => window.open(app.cv, "_blank")}
                             className={styles.smallBtn}
@@ -488,14 +513,11 @@ const EmployerSettings = () => {
                           <button
                             className={styles.smallBtnOutline}
                             onClick={() => {
-                              setCandidate(<CandidateInfo candidate={app} />);
-                              setTimeout(() => {
-                                document.querySelector(
-                                  `.candidate-details-container${app.user_id}`
-                                ).style.display = "flex";
-                                document.querySelector("#root").style.overflow =
-                                  "hidden";
-                              }, 50);
+                              document.querySelector(
+                                `.candidate-details-container${app.user_id}`
+                              ).style.display = "flex";
+                              document.querySelector("#root").style.overflow =
+                                "hidden";
                             }}
                           >
                             👤 Profil
@@ -503,13 +525,9 @@ const EmployerSettings = () => {
 
                           <button
                             className={styles.deleteBtn}
-                            onClick={async () => {
-                              if (window.confirm("Usunąć tę aplikację?")) {
-                                let res = await axios.delete(
-                                  `http://localhost:5000/api/employers/delete-application/${app.id}`
-                                );
-                                if (res.data.success) setRefresh(!refresh);
-                              }
+                            onClick={() => {
+                              setSelectedApp(app.app_id);
+                              setShowCancelModal(true);
                             }}
                           >
                             🗑

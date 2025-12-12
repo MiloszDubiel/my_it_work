@@ -166,9 +166,7 @@ router.post(
 
       if (rows.length === 0) {
         await connection.query(
-          `INSERT INTO candidate_info
-            (user_id, cv, "references", locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             user_id,
             cvPath,

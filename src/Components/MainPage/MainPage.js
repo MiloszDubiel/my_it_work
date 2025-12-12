@@ -55,45 +55,22 @@ const MainPage = () => {
                   <h3>{el.title}</h3>
                   <p>{el.companyName}</p>
                   <span>{JSON.parse(el.contractType)[0]}</span>
-                  <button
-                    className={styles.detailsBtn}
-                    onClick={() => {
-                      document.querySelector(
-                        `.offer-details-container${el.id}`
-                      ).style.display = "flex";
-                    }}
-                  >
-                    Szczegóły
-                  </button>
+                  <div className={styles.divButton}>
+                    <button
+                      className={styles.detailsBtn}
+                      onClick={() => {
+                        document.querySelector(
+                          `.offer-details-container${el.id}`
+                        ).style.display = "flex";
+                      }}
+                    >
+                      Szczegóły
+                    </button>
+                  </div>
                 </div>
               </>
             );
           })}
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section className={styles.aboutSection}>
-        <h2>Dlaczego my?</h2>
-        <div className={styles.aboutGrid}>
-          <div>
-            <h3>Szybka rekrutacja</h3>
-            <p>
-              Aplikuj jednym kliknięciem, śledź statusy i komunikuj się z
-              rekruterami w prosty sposób.
-            </p>
-          </div>
-          <div>
-            <h3>Sprawdzone firmy</h3>
-            <p>Współpracujemy tylko z renomowanymi pracodawcami z branży IT.</p>
-          </div>
-          <div>
-            <h3>Personalizowane oferty</h3>
-            <p>
-              System dopasuje oferty do Twojego profilu i doświadczenia
-              zawodowego.
-            </p>
-          </div>
         </div>
       </section>
     </div>

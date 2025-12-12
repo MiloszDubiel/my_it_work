@@ -163,3 +163,113 @@
 .accountDivHide {
   display: none !important;
 }
+
+/* ============================================
+   RESPONSIVE NAVBAR
+   ============================================ */
+
+/* 📱 TELEFONY — max 600px */
+@media (max-width: 600px) {
+  .headerElement {
+    height: 60px;
+  }
+
+  .navBar {
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+
+  .header h3 {
+    font-size: 22px;
+  }
+
+  /* Ukrywamy listę linków */
+  .list ul {
+    display: none;
+  }
+
+  .account {
+    gap: 10px;
+    margin-right: 0;
+  }
+
+  .account button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Dropdown dostosowany do telefonu */
+  .accountDiv {
+    right: 0;
+    width: 150px;
+    top: 55px;
+  }
+
+  .accountDiv a {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* 📲 TABLETY — 600–900px */
+@media (min-width: 600px) and (max-width: 900px) {
+  .navBar {
+    padding: 0 1rem;
+    justify-content: space-between;
+  }
+
+  .header h3 {
+    font-size: 24px;
+  }
+
+  .list ul {
+    gap: 20px;
+  }
+
+  .account {
+    gap: 12px;
+  }
+
+  .accountDiv {
+    width: 160px;
+    top: 65px;
+  }
+}
+
+/* 💻 DUŻE EKRANY — od 1200px */
+@media (min-width: 1200px) {
+  .headerElement {
+    height: 90px;
+  }
+
+  .header h3 {
+    font-size: 32px;
+  }
+
+  .list ul {
+    gap: 40px;
+  }
+
+  .account {
+    gap: 20px;
+  }
+
+  .account button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .accountDiv {
+    top: 75px;
+  }
+}

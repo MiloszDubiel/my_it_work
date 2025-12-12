@@ -9,7 +9,8 @@ const CandidateInfo = ({ candidate }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmCallbackRef = useRef(null);
 
-  const socket = io("http://localhost:5001");
+
+
 
   const parseList = (value) => {
     if (!value) return [];
@@ -33,7 +34,9 @@ const CandidateInfo = ({ candidate }) => {
   return (
     <div
       className={
-        styles.container + " " + `candidate-details-container${candidate.id}`
+        styles.container +
+        " " +
+        `candidate-details-container${candidate.user_id || candidate.id}`
       }
     >
       {showConfirm && (

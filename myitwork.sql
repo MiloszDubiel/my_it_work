@@ -127,7 +127,7 @@ UNLOCK TABLES;
 
 --
 -- Table structure for table `company_change_requests`
---
+-- enter
 
 DROP TABLE IF EXISTS `company_change_requests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

@@ -248,76 +248,6 @@ const CandidateSettings = () => {
     }
   };
 
-  const addSkillorLanguage = (e, type) => {
-    if (type === "skill") {
-      setCandidateProfile({
-        ...candidateProfile,
-        skills: [...new Set([...candidateProfile.skills, e.target.value])],
-      });
-    } else {
-      setCandidateProfile({
-        ...candidateProfile,
-        languages: [
-          ...new Set([...candidateProfile.languages, e.target.value]),
-        ],
-      });
-    }
-  };
-
-  const deleteSkillorLanguage = (e, type) => {
-    if (type === "skill") {
-      const skills = new Set([...candidateProfile.skills]);
-      skills.delete(e.target.textContent);
-
-      setCandidateProfile({
-        ...candidateProfile,
-        skills: [...skills],
-      });
-    } else if (type === "lang") {
-      const languages = new Set([...candidateProfile.languages]);
-      languages.delete(e.target.textContent);
-
-      setCandidateProfile({
-        ...candidateProfile,
-        languages: [...languages],
-      });
-    } else {
-      const education = new Set([...candidateProfile.education]);
-      education.delete(e.target.textContent);
-
-      setCandidateProfile({
-        ...candidateProfile,
-        education: [...education],
-      });
-    }
-  };
-
-  const addSkillLanguageorSchoolFromInput = (e, type) => {
-    if (type === "skill") {
-      let input = e.target.parentElement.querySelector("input");
-      if (input.value.length === 0) return;
-
-      setCandidateProfile({
-        ...candidateProfile,
-        skills: [...new Set([...candidateProfile.skills, input.value])],
-      });
-    } else if (type === "lang") {
-      let input = e.target.parentElement.querySelector("input");
-      if (input.value.length === 0) return;
-      setCandidateProfile({
-        ...candidateProfile,
-        languages: [...new Set([...candidateProfile.languages, input.value])],
-      });
-    } else {
-      let input = e.target.parentElement.querySelector("input");
-      if (input.value.length === 0) return;
-      setCandidateProfile({
-        ...candidateProfile,
-        education: [...new Set([...candidateProfile.education, input.value])],
-      });
-    }
-  };
-
   const cancelApplication = async () => {
     setInfo("");
     if (!selectedApp) return;
@@ -333,6 +263,77 @@ const CandidateSettings = () => {
     }
 
     setShowCancelModal(false);
+  };
+
+  const addSkillWithLevel = (e) => {
+    const name = e.target.value;
+    if (!name || name === "Inna..." || name === "Inny") return;
+
+    setCandidateProfile((prev) => ({
+      ...prev,
+      skills: [...prev.skills, { name, level: "Brak" }],
+    }));
+  };
+
+  const addLanguageWithLevel = (e) => {
+    const name = e.target.value;
+    if (!name) return;
+
+    setCandidateProfile((prev) => ({
+      ...prev,
+      languages: [...prev.languages, { name, level: "Brak" }],
+    }));
+  };
+
+  const updateLevel = (index, type, level) => {
+    setCandidateProfile((prev) => ({
+      ...prev,
+      [type]: prev[type].map((item, i) =>
+        i === index ? { ...item, level } : item
+      ),
+    }));
+
+    const deleteItem = (index, type) => {
+      setCandidateProfile((prev) => ({
+        ...prev,
+        [type]: prev[type].filter((_, i) => i !== index),
+      }));
+    };
+  };
+
+  const addEducation = (e) => {
+    const name = e.target.previousSibling.value;
+
+    if (!name.trim()) return;
+
+    setCandidateProfile((prev) => ({
+      ...prev,
+      education: [...prev.education, { name, level: "Brak" }],
+    }));
+
+    e.target.previousSibling.value = "";
+  };
+
+  const updateEducationLevel = (index, level) => {
+    setCandidateProfile((prev) => ({
+      ...prev,
+      education: prev.education.map((item, i) =>
+        i === index ? { ...item, level } : item
+      ),
+    }));
+  };
+  const deleteEducation = (index) => {
+    setCandidateProfile((prev) => ({
+      ...prev,
+      education: prev.education.filter((_, i) => i !== index),
+    }));
+  };
+
+  const deleteItem = (index, type) => {
+    setCandidateProfile((prev) => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index),
+    }));
   };
 
   return (
@@ -582,147 +583,174 @@ const CandidateSettings = () => {
                       <option>4+</option>
                     </select>
 
-                    <label>
-                      Umiejętności{" "}
-                      <span className={styles.span}>
-                        Kliknij podwójnie aby usunąć
-                      </span>{" "}
-                    </label>
-                    <div className={styles.skill}>
-                      <div className={styles.skillsList}>
-                        {candidateProfile.skills?.map((el) => {
-                          return (
-                            <span
-                              style={{ cursor: "pointer" }}
-                              onDoubleClick={(e) =>
-                                deleteSkillorLanguage(e, "skill")
-                              }
-                            >
-                              {el}
-                            </span>
-                          );
-                        })}
-                      </div>
+                    <label>Umiejętności</label>
 
-                      <select
-                        name="skills"
-                        onChange={(e) => addSkillorLanguage(e, "skill")}
-                      >
+                    <div className={styles.skill}>
+                      <select onChange={addSkillWithLevel}>
+                        <option value="" disabled selected>
+                          Wybierz...
+                        </option>
+
+                        <option>HTML</option>
+                        <option>CSS</option>
                         <option>JavaScript</option>
                         <option>TypeScript</option>
-                        <option>Java</option>
-                        <option>C</option>
-                        <option>C++</option>
-                        <option>C#</option>
-                        <option>Python</option>
-                        <option>Kotlin</option>
-                        <option>Rust</option>
-                        <option>Node.js</option>
                         <option>React.js</option>
-                        <option>Angular.js</option>
+                        <option>Next.js</option>
+                        <option>Angular</option>
                         <option>Vue.js</option>
-                        <option>Inna...</option>
+                        <option>Svelte</option>
+
+                        <option>Node.js</option>
+                        <option>Express.js</option>
+                        <option>NestJS</option>
+                        <option>Python</option>
+                        <option>Django</option>
+                        <option>Flask</option>
+                        <option>FastAPI</option>
+                        <option>Java</option>
+                        <option>Spring Boot</option>
+                        <option>C#</option>
+                        <option>.NET</option>
+                        <option>PHP</option>
+                        <option>Laravel</option>
+                        <option>Ruby on Rails</option>
+                        <option>Go</option>
+                        <option>Rust</option>
+
+                        <option>MySQL</option>
+                        <option>PostgreSQL</option>
+                        <option>SQLite</option>
+                        <option>MongoDB</option>
+                        <option>Redis</option>
+                        <option>Firebase</option>
+
+                        <option>Docker</option>
+                        <option>Kubernetes</option>
+                        <option>Linux</option>
+                        <option>Nginx</option>
+                        <option>AWS</option>
+                        <option>Azure</option>
+                        <option>Google Cloud</option>
+                        <option>Git</option>
+
+                        <option>React Native</option>
+                        <option>Flutter</option>
+                        <option>Swift</option>
+                        <option>Kotlin</option>
+
+                        <option>GraphQL</option>
+                        <option>Webpack</option>
+                        <option>Vite</option>
+                        <option>Three.js</option>
                       </select>
-                      <input
-                        type="text"
-                        name="add_skill"
-                        placeholder="Inna umiejętność..."
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) =>
-                          addSkillLanguageorSchoolFromInput(e, "skill")
-                        }
-                        className={styles.saveBtn}
-                      >
-                        Dodaj
-                      </button>
                     </div>
 
-                    <label>
-                      Języki
-                      <span className={styles.span}>
-                        Kliknij podwójnie aby usunąć
-                      </span>
-                    </label>
-                    <div className={styles.skill}>
-                      <div className={styles.skillsList}>
-                        {candidateProfile.languages?.map((el) => {
-                          return (
-                            <span
-                              style={{ cursor: "pointer" }}
-                              onDoubleClick={(e) =>
-                                deleteSkillorLanguage(e, "lang")
-                              }
-                            >
-                              {el}
-                            </span>
-                          );
-                        })}
-                      </div>
+                    <div className={styles.skillsList}>
+                      {candidateProfile.skills.map((item, index) => (
+                        <div className={styles.skillItem} key={index}>
+                          <span
+                            onDoubleClick={() => deleteItem(index, "skills")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {item.name}
+                          </span>
 
-                      <select
-                        name="languages"
-                        onChange={(e) => addSkillorLanguage(e, "lang")}
-                      >
-                        <option>Angielski podstawowy</option>
-                        <option>Angielski sredniozaawansowany</option>
-                        <option>Angielski zaawansowany</option>
-                        <option>Niemieck podstawowy</option>
-                        <option>Niemiecki średniozaawansowany</option>
-                        <option>Niemiecki zaawansowany</option>
+                          <select
+                            value={item.level}
+                            onChange={(e) =>
+                              updateLevel(index, "skills", e.target.value)
+                            }
+                          >
+                            <option>Brak</option>
+                            <option>Podstawowy</option>
+                            <option>Średni</option>
+                            <option>Zaawansowany</option>
+                            <option>Ekspert</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+
+                    <label>Języki</label>
+
+                    <div className={styles.skill}>
+                      <select onChange={addLanguageWithLevel}>
+                        <option>Wybierz...</option>
+                        <option>Angielski</option>
+                        <option>Niemiecki</option>
+                        <option>Hiszpański</option>
                         <option>Inny</option>
                       </select>
-                      <input
-                        type="text"
-                        name="add_language"
-                        placeholder="Inny język..."
-                      />
+                    </div>
 
-                      <button
-                        type="button"
-                        onClick={(e) =>
-                          addSkillLanguageorSchoolFromInput(e, "lang")
-                        }
-                        className={styles.saveBtn}
-                      >
-                        Dodaj
-                      </button>
+                    <div className={styles.skillsList}>
+                      {candidateProfile.languages.map((item, index) => (
+                        <div className={styles.skillItem} key={index}>
+                          <span
+                            onDoubleClick={() => deleteItem(index, "languages")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            {item.name}
+                          </span>
+
+                          <select
+                            value={item.level}
+                            onChange={(e) =>
+                              updateLevel(index, "languages", e.target.value)
+                            }
+                          >
+                            <option>Brak</option>
+                            <option>A1</option>
+                            <option>A2</option>
+                            <option>B1</option>
+                            <option>B2</option>
+                            <option>C1</option>
+                            <option>C2</option>
+                          </select>
+                        </div>
+                      ))}
                     </div>
 
                     <label>
                       Edukacja
-                      <span className={styles.span}>
-                        Kliknij podwójnie aby usunąć
-                      </span>{" "}
                     </label>
+
                     <div className={styles.skill}>
                       <div className={styles.skillsList}>
-                        {candidateProfile.education?.map((el) => {
-                          return (
+                        {candidateProfile.education.map((item, index) => (
+                          <div key={index} className={styles.skillItem}>
                             <span
                               style={{ cursor: "pointer" }}
-                              onDoubleClick={(e) =>
-                                deleteSkillorLanguage(e, "sch")
+                              onDoubleClick={() => deleteEducation(index)}
+                            >
+                              {item.name}
+                            </span>
+
+                            <select
+                              value={item.level}
+                              onChange={(e) =>
+                                updateEducationLevel(index, e.target.value)
                               }
                             >
-                              {el}
-                            </span>
-                          );
-                        })}
+                              <option>Brak</option>
+                              <option>Podstawowe</option>
+                              <option>Średnie</option>
+                              <option>Licencjat</option>
+                              <option>Inżynier</option>
+                              <option>Magister</option>
+                              <option>Doktor</option>
+                            </select>
+                          </div>
+                        ))}
                       </div>
 
-                      <input
-                        type="text"
-                        name="add_language"
-                        placeholder="Szkoła..."
-                      />
+                      {/* INPUT DO DODAWANIA SZKOŁY */}
+                      <input type="text" placeholder="Szkoła..." />
 
                       <button
                         type="button"
-                        onClick={(e) =>
-                          addSkillLanguageorSchoolFromInput(e, "sch")
-                        }
+                        onClick={addEducation}
                         className={styles.saveBtn}
                       >
                         Dodaj

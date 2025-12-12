@@ -175,7 +175,7 @@ router.post("/get-my-applications", async (req, res) => {
   try {
     const [rows] = await connection.query(
       `SELECT
-      job_applications.*,
+      job_applications.id AS app_id,
       job_offers.title,
       job_offers.employer_id,
       users.id AS 'user_id',
@@ -221,6 +221,22 @@ router.post("/update-application-status", async (req, res) => {
     res.json({ success: true, info: "Status updated" });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.delete("/delete-application/:id", async (req, res) => {
+  const app_id = req.params.id;
+
+  console.log(app_id);
+
+  try {
+    await connection.query("DELETE FROM job_applications WHERE id = ?", [
+      app_id,
+    ]);
+    res.json({ success: true, message: "Usunięto aplikacje" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd podczas usuwania aplikacji" });
   }
 });
 
