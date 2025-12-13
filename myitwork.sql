@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
 -- Host: localhost    Database: myitwork
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.44
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -33,6 +33,15 @@ CREATE TABLE `admin_logs` (
   CONSTRAINT `admin_logs_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `admin_logs`
+--
+
+LOCK TABLES `admin_logs` WRITE;
+/*!40000 ALTER TABLE `admin_logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `admin_logs` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `candidate_info`
@@ -68,6 +77,15 @@ CREATE TABLE `candidate_info` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `candidate_info`
+--
+
+LOCK TABLES `candidate_info` WRITE;
+/*!40000 ALTER TABLE `candidate_info` DISABLE KEYS */;
+/*!40000 ALTER TABLE `candidate_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `companies`
 --
 
@@ -97,6 +115,15 @@ CREATE TABLE `companies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `companies`
+--
+
+LOCK TABLES `companies` WRITE;
+/*!40000 ALTER TABLE `companies` DISABLE KEYS */;
+/*!40000 ALTER TABLE `companies` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `company_change_requests`
 --
 
@@ -121,6 +148,15 @@ CREATE TABLE `company_change_requests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `company_change_requests`
+--
+
+LOCK TABLES `company_change_requests` WRITE;
+/*!40000 ALTER TABLE `company_change_requests` DISABLE KEYS */;
+/*!40000 ALTER TABLE `company_change_requests` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `conversations`
 --
 
@@ -135,6 +171,15 @@ CREATE TABLE `conversations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `conversations`
+--
+
+LOCK TABLES `conversations` WRITE;
+/*!40000 ALTER TABLE `conversations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `conversations` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `favorites`
@@ -155,6 +200,15 @@ CREATE TABLE `favorites` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `favorites`
+--
+
+LOCK TABLES `favorites` WRITE;
+/*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `job_applications`
 --
 
@@ -172,6 +226,15 @@ CREATE TABLE `job_applications` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `job_applications`
+--
+
+LOCK TABLES `job_applications` WRITE;
+/*!40000 ALTER TABLE `job_applications` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_applications` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `job_details`
 --
 
@@ -183,13 +246,21 @@ CREATE TABLE `job_details` (
   `job_offer_id` int NOT NULL,
   `description` longtext,
   `requirements` longtext,
-  `benefits` longtext,
-  `responsibilities` longtext,
+  `active_to` text,
   PRIMARY KEY (`id`),
   KEY `job_offer_id` (`job_offer_id`),
   CONSTRAINT `job_details_ibfk_1` FOREIGN KEY (`job_offer_id`) REFERENCES `job_offers` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1310 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1338 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `job_details`
+--
+
+LOCK TABLES `job_details` WRITE;
+/*!40000 ALTER TABLE `job_details` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_details` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `job_offers`
@@ -224,8 +295,17 @@ CREATE TABLE `job_offers` (
   CONSTRAINT `job_offers_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
   CONSTRAINT `job_offers_ibfk_2` FOREIGN KEY (`employer_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `job_offers_ibfk_3` FOREIGN KEY (`employer_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7828 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7882 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `job_offers`
+--
+
+LOCK TABLES `job_offers` WRITE;
+/*!40000 ALTER TABLE `job_offers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_offers` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `messages`
@@ -247,6 +327,15 @@ CREATE TABLE `messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `messages`
+--
+
+LOCK TABLES `messages` WRITE;
+/*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -264,6 +353,15 @@ CREATE TABLE `notifications` (
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notifications`
+--
+
+LOCK TABLES `notifications` WRITE;
+/*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `offer_details`
@@ -296,6 +394,15 @@ CREATE TABLE `offer_details` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `offer_details`
+--
+
+LOCK TABLES `offer_details` WRITE;
+/*!40000 ALTER TABLE `offer_details` DISABLE KEYS */;
+/*!40000 ALTER TABLE `offer_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -317,8 +424,18 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   KEY `idx_user_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (13,'admin@example.com','$2b$10$duBr2PJd1u7gLJ3m8lX.OuAjhrdCO.Q1ZwHEv.MkAqAELC7R7SimK',NULL,NULL,NULL,'1','admin',NULL,'2025-12-12 16:03:35','2025-12-12 16:04:10');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -329,4 +446,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-12 16:54:16
+-- Dump completed on 2025-12-13 14:17:38
