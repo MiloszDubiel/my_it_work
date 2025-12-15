@@ -400,11 +400,19 @@ router.post(
   }
 );
 
-router.get("/scrap", authenticateToken,
-  isAdmin, async (req, res) => {
+router.get("/scrap", async (req, res) => {
   try {
-    let res = await scrapeAll();
+    res.json({ message: "Scraper uruchomiony" });
 
+    scrapeAll()
+      .then(() => {
+        console.log("Zakończono scrapowanie");
+        res.json({ info: "Zakończono scrapowanie" });
+      })
+      .catch((err) => {
+        console.error("Błąd scraper", err);
+        res.status(500).json({ error: " Scraper error " + err });
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

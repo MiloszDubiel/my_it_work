@@ -55,7 +55,7 @@ const Candidate = ({ candidate, index }) => {
                 <>
                   {skills.slice(0, 3).map((skill, i) => (
                     <span key={i} className={styles.tag}>
-                      {skill}
+                      {skill.name}
                     </span>
                   ))}
                   {skills.length > 3 && (
@@ -73,7 +73,7 @@ const Candidate = ({ candidate, index }) => {
               ) : (
                 languages.map((lang, i) => (
                   <span key={i} className={styles.tag}>
-                    {lang}
+                    {lang.name}
                   </span>
                 ))
               )}

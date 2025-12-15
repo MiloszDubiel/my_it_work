@@ -9,6 +9,7 @@ const RegisterPage = () => {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [role, setRole] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [nip, setNIP] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -19,6 +20,10 @@ const RegisterPage = () => {
       return "Hasło musi mieć co najmniej 8 znaków.";
     if (password !== repeatPassword) return "Hasła są różne";
     if (role === "employer" && !companyName) return "Podaj nazwę firmy";
+    if (role === "employer" && !nip) return "Podaj NIP";
+    if (role === "employer" && !/^\d{10}$/.test(nip)) {
+      return "Niepoprawny NIP";
+    }
     return null;
   };
 
@@ -45,6 +50,7 @@ const RegisterPage = () => {
         repeatPassword,
         role,
         ...(role === "employer" ? { companyName } : {}),
+        ...(role === "employer" ? { nip } : {}),
       };
 
       const res = await axios.post(
@@ -134,17 +140,30 @@ const RegisterPage = () => {
 
           {/* Pokazuje się tylko dla pracodawcy */}
           {role === "employer" && (
-            <label className={styles.field}>
-              <span className={styles.label}>Nazwa firmy</span>
-              <input
-                className={styles.input}
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Nazwa firmy"
-                required
-              />
-            </label>
+            <>
+              <label className={styles.field}>
+                <span className={styles.label}>Nazwa firmy</span>
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder="Nazwa firmy"
+                  required
+                />
+              </label>
+              <label className={styles.field}>
+                <span className={styles.label}>NIP</span>
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={nip}
+                  onChange={(e) => setNIP(e.target.value)}
+                  placeholder="NIP"
+                  required
+                />
+              </label>
+            </>
           )}
 
           <button

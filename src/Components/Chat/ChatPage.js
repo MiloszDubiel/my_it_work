@@ -22,6 +22,8 @@ export default function ChatPage() {
     }
   };
 
+ 
+
   useEffect(() => {
     fetchConversations();
   }, []);
@@ -79,8 +81,8 @@ export default function ChatPage() {
               {conversations.map((conv) => {
                 const isEmployer = conv.employer_id === user.id;
                 const chatPartner = isEmployer
-                  ? conv.candidate_name
-                  : conv.employer_name;
+                  ? `${conv.candidate_name} ${conv.candidate_surname}`
+                  : `${conv.employer_name} ${conv.employer_surname}`;
 
                 return (
                   <div
@@ -95,7 +97,6 @@ export default function ChatPage() {
                     </div>
                     <div>
                       <h4>{chatPartner}</h4>
-                      <p>Rozmowa ID: {conv.id}</p>
                     </div>
                   </div>
                 );

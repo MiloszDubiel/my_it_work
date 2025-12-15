@@ -74,6 +74,32 @@ export function Sort(copyOfferts, option) {
         });
         return copyOfferts;
       }
+      case "newest": {
+        copyOfferts?.sort((a, b) => {
+          const toDate = (str) => {
+            if (!str) return Infinity;
+            const [dd, mm, yyyy] = str.split(".");
+            return new Date(`${yyyy}-${mm}-${dd}`).getTime();
+          };
+
+          return toDate(a.active_to) - toDate(b.active_to);
+        });
+
+        return copyOfferts;
+      }
+      case "oldest": {
+        copyOfferts?.sort((a, b) => {
+          const toDate = (str) => {
+            if (!str) return Infinity;
+            const [dd, mm, yyyy] = str.split(".");
+            return new Date(`${yyyy}-${mm}-${dd}`).getTime();
+          };
+
+          return toDate(b.active_to) - toDate(a.active_to);
+        });
+
+        return copyOfferts;
+      }
     }
   } catch (err) {
     console.error(err);

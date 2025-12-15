@@ -232,9 +232,7 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
                   )}
                 </>
               ) : (
-                <button className={styles.applyBtn}>
-                  Zaloguj się, aby aplikować
-                </button>
+                ""
               )}
             </a>
           </div>{" "}
@@ -256,11 +254,13 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
               <>
                 <div
                   className={styles.description}
-                  dangerouslySetInnerHTML={{ __html: offer.description }}
+                  dangerouslySetInnerHTML={{
+                    __html: offer.description?.replaceAll("\\n", ""),
+                  }}
                 ></div>
                 <div
                   className={styles.description}
-                  dangerouslySetInnerHTML={{ __html: offer.description }}
+                  dangerouslySetInnerHTML={{ __html: offer.requirements }}
                 ></div>
               </>
             )}

@@ -1,9 +1,9 @@
 import OfferInfo from "./OfferInfo";
 import styles from "./offer.module.css";
-import { useState } from "react";
+
 
 const Offer = ({ offer, index }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
 
   // Bezpieczne parsowanie JSON
   const parseJSON = (value) => {
@@ -32,7 +32,10 @@ const Offer = ({ offer, index }) => {
       <div className={styles.offerRow}>
         <div className={styles.logoSection}>
           <img
-            src={offer.img || "/default-company.png"}
+            src={
+              offer.img ||
+              "http://localhost:5000/uploads/offert_logo/default.jpg"
+            }
             alt={offer.companyName}
             className={styles.companyImg}
           />

@@ -43,36 +43,38 @@ const Navbar = ({ employersPage }) => {
             </h3>
           </div>
           <div className={styles.list}>
-            <ul>
-              <li>
-                {" "}
-                <Link
-                  to="/job-offers"
-                  style={{ textDecoration: "none", color: "black" }}
-                >
-                  Oferty pracy
-                </Link>
-              </li>
-              <li>
-                {" "}
-                <Link
-                  to="/employers"
-                  style={{ textDecoration: "none", color: "black" }}
-                >
-                  Pracodawcy IT
-                </Link>
-              </li>
-              {userData?.role === "employer" && (
+            {userData?.role !== "admin" && (
+              <ul>
                 <li>
+                  {" "}
                   <Link
-                    to="/candidates"
+                    to="/job-offers"
                     style={{ textDecoration: "none", color: "black" }}
                   >
-                    Kandydaci IT
+                    Oferty pracy
                   </Link>
                 </li>
-              )}
-            </ul>
+                <li>
+                  {" "}
+                  <Link
+                    to="/employers"
+                    style={{ textDecoration: "none", color: "black" }}
+                  >
+                    Pracodawcy IT
+                  </Link>
+                </li>
+                {userData?.role === "employer" && (
+                  <li>
+                    <Link
+                      to="/candidates"
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      Kandydaci IT
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            )}
           </div>
           <div className={styles.account}>
             {userData?.email ? (
@@ -91,23 +93,30 @@ const Navbar = ({ employersPage }) => {
                     <IoPersonOutline className={styles.icon} />
                   )}
                 </button>
-                <button
-                  onClick={() => {
-                    let dis =
-                      document.querySelector("#chatContainer").style.display;
-                    if (dis === "none")
-                      document.querySelector("#chatContainer").style.display =
-                        "flex";
-                    else
-                      document.querySelector("#chatContainer").style.display =
-                        "none";
-                  }}
-                >
-                  <FiMessageSquare className={styles.icon} />
-                </button>
-                <button>
-                  <IoIosNotificationsOutline className={styles.icon} />
-                </button>
+                {userData.role !== "admin" && (
+                  <>
+                    <button
+                      onClick={() => {
+                        let dis =
+                          document.querySelector("#chatContainer").style
+                            .display;
+                        if (dis === "none")
+                          document.querySelector(
+                            "#chatContainer"
+                          ).style.display = "flex";
+                        else
+                          document.querySelector(
+                            "#chatContainer"
+                          ).style.display = "none";
+                      }}
+                    >
+                      <FiMessageSquare className={styles.icon} />
+                    </button>
+                    <button>
+                      <IoIosNotificationsOutline className={styles.icon} />
+                    </button>
+                  </>
+                )}
               </>
             ) : (
               <button

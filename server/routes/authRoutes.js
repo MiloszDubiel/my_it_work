@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/registre", async (req, res) => {
-  let { email, password, repeatPassword, role, companyName } = req.body;
+  let { email, password, repeatPassword, role, companyName, nip } = req.body;
 
   if (!email || !password || !repeatPassword || !role) {
     return res.status(400).json({ error: "Puste pola" });
@@ -67,6 +67,9 @@ router.post("/registre", async (req, res) => {
 
   if (role == "employer" && !companyName) {
     return res.status(400).json({ error: "Nie podano nazwy firmy" });
+  }
+  if (role == "employer" && !nip) {
+    return res.status(400).json({ error: "Nie podano nipu" });
   }
   if (password !== repeatPassword) {
     return res.status(400).json({ error: "Hasła są rózne" });
@@ -94,8 +97,8 @@ router.post("/registre", async (req, res) => {
       const employerId = result.insertId;
 
       await connection.query(
-        "INSERT INTO companies (companyName, owner_id) VALUES (?, ?)",
-        [companyName, employerId]
+        "INSERT INTO companies (companyName, nip, owner_id) VALUES (?, ?, ?)",
+        [companyName, nip, employerId]
       );
 
       return res.json({

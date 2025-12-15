@@ -8,8 +8,6 @@ const AdminSettings = () => {
   const [lastScrap, setLastScrap] = useState(null);
   const [message, setMessage] = useState("");
 
- 
-
   const changePassword = () => {
     setMessage("");
 
@@ -47,20 +45,22 @@ const AdminSettings = () => {
       });
   };
 
-  const runScraper = () => {
+  const runScraper = async () => {
     setMessage("Scrapowanie uruchomione…");
 
-   axios
-      .get("http://localhost:5000/admin/scrap", {
+    try {
+      await axios.get("http://localhost:5000/admin/scrap", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
-      })
-      .then(() => {
-        setMessage("Scrapowanie zakończone ✔");
-        setLastScrap(new Date().toISOString());
-      })
-      .catch(() => setMessage("Błąd scrapowania ❌"));
+        timeout: 5000, 
+      });
+
+      setMessage("Scraper działa w tle 🚀");
+      setLastScrap(new Date().toISOString());
+    } catch {
+      setMessage("Nie udało się uruchomić scrapera ❌");
+    }
   };
 
   return (
