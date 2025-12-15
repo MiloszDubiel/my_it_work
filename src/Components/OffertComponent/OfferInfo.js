@@ -1,12 +1,13 @@
 import NavBar from "../NavBar/NavBar";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import styles from "./ofertinfo.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
-import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import LoadingComponent from "../Loading/LoadingComponent";
 import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import InfoModal from "../PromptModals/InfoModal";
+import EmployerInfo from "../Employers/EmployerInfo";
 
 const OfferInfo = ({ offer, id, is_favorite }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +101,6 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
       return;
     }
 
-    // 🔥 teraz confirm modal zamiast window.confirm
     setModalMessage("Czy na pewno chcesz aplikować na tę ofertę?");
     setShowConfirm(true);
 
@@ -126,6 +126,10 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
     };
   };
 
+  const open = useCallback(() => {
+    document.querySelector(`#company-info-${offer.owner_id}`).style.display =
+      "flex";
+  }, [offer.owner_id]);
   return (
     <div
       id="offer-details-container"
@@ -137,6 +141,7 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
           : `offer-details-container${offer.id}`)
       }
     >
+      <EmployerInfo companyOwner={offer.owner_id} />
       {showConfirm && (
         <ConfirmModal
           message={modalMessage}
@@ -276,7 +281,7 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
             <div className={styles.companyBox}>
               <div className={styles.companyRow}>
                 <div className={styles.companyLogoSmall}>
-                  <img src={offer?.img} alt="zdjecie" />
+                  <img src={offer?.img || ""} alt="zdjecie" />
                 </div>
                 <div>
                   <div className={styles.companyNameSmall}>
@@ -285,10 +290,49 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
                 </div>
               </div>
 
-              <div className={styles.compActions}>
-                <button className={styles.compBtn}>Zobacz profil firmy</button>
-                <button className={styles.compBtnOutline}>Kontakt</button>
-              </div>
+              {offer.source !== "scraped" && (
+                <div className={styles.compActions}>
+                  <button className={styles.compBtn} onClick={open}>
+                    Zobacz profil firmy
+                  </button>
+
+                  <button
+                    className={styles.compBtnOutline}
+                    onClick={async () => {
+                      try {
+                        const user = JSON.parse(
+                          sessionStorage.getItem("user-data")
+                        );
+
+                        const res = await axios.post(
+                          "http://localhost:5001/chat/create",
+                          {
+                            employer_id: offer.owner_id,
+                            candidate_id: user.id,
+                          }
+                        );
+
+                        const conversationId = res.data.id;
+
+                        document.querySelector("#chatContainer").style.display =
+                          "flex";
+
+                        document.querySelector("#root").style.overflow =
+                          "hidden";
+                        window.dispatchEvent(
+                          new CustomEvent("openConversation", {
+                            detail: { conversationId },
+                          })
+                        );
+                      } catch (err) {
+                        console.error("Błąd uruchamiania wiadomości:", err);
+                      }
+                    }}
+                  >
+                    Wyślij wiadomość
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className={styles.quickFacts}>

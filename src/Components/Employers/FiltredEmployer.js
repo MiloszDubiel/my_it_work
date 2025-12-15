@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "./employers.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
-import Filter from "../FilterComponent/Filter";
+import Filter from "../Filter/Filter";
 import { useLocation } from "react-router-dom";
 
 const FilltredEmployers = ({}) => {

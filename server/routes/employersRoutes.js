@@ -30,6 +30,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+
 router.post("/get-company-info", async (req, res) => {
   const { id } = req.body;
 
@@ -111,8 +113,6 @@ router.post("/request-company-change", async (req, res) => {
     return res.status(500).json({ error: "Błąd serwera", details: e.message });
   }
 });
-
-
 
 router.post("/get-my-offers", async (req, res) => {
   try {

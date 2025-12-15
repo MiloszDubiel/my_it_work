@@ -3,9 +3,9 @@ import axios from "axios";
 import styles from "./JobOffersPage.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
-import Filter from "../FilterComponent/Filter";
+import Filter from "../Filter/Filter";
 import Offer from "../OffertComponent/Offer";
-import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import LoadingComponent from "../Loading/LoadingComponent";
 
 const JobOffersPage = () => {
   const [offers, setOffers] = useState([]);
@@ -34,10 +34,7 @@ const JobOffersPage = () => {
         if (!isEmptyObject(res.data)) {
           setIsLoading(false);
           setOffers(res.data);
-        } 
-
-
-        
+        }
       } catch (err) {
         setIsLoading(false);
         setInfo("Brak ofert pracy ");

@@ -4,7 +4,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../OffertComponent/OfferInfo";
-import CandidateInfo from "../CandidateComponent/CandidateInfo";
+import CandidateInfo from "../Candidate/CandidateInfo";
 
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");

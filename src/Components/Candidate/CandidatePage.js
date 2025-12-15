@@ -3,8 +3,8 @@ import axios from "axios";
 import styles from "./CandidatePage.module.css";
 import Navbar from "../NavBar/NavBar";
 import Candidate from "./Candidate";
-import LoadingComponent from "../LoadingComponent/LoadingComponent";
-import Filter from "../FilterComponent/Filter";
+import LoadingComponent from "../Loading/LoadingComponent";
+import Filter from "../Filter/Filter";
 
 const CandidatePage = () => {
   const [candidates, setCandidates] = useState([]);

@@ -2,12 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./Components/MainPage/MainPage";
 import LoginPage from "./Components/LoginPage/LoginPage";
 import RegisterPage from "./Components/RegisterPage/RegisterPage";
-import EmployersComponent from "./Components/EmployersComponent/EmlployersComponent";
-import CandidatePage from "./Components/CandidateComponent/CandidatePage";
+import EmployersComponent from "./Components/Employers/Employers";
+import CandidatePage from "./Components/Candidate/CandidatePage";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
 import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
-import FilltredEmployers from "./Components/EmployersComponent/FiltredEmployerComponent";
+import FilltredEmployers from "./Components/Employers/FiltredEmployer";
 import AdminRoute from "./Components/AdminPanel/AdminRoute";
 
 const App = () => {

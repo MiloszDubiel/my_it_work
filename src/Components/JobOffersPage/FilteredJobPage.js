@@ -3,9 +3,9 @@ import axios from "axios";
 import styles from "./JobOffersPage.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
-import Filter from "../FilterComponent/Filter";
+import Filter from "../Filter/Filter";
 import { useLocation } from "react-router-dom";
-import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import LoadingComponent from "../Loading/LoadingComponent";
 import Offer from "../OffertComponent/Offer";
 
 const FiltredJobOffersPage = ({ offersPage }) => {

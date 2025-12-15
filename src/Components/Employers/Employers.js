@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import styles from "./employers.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
-import Filter from "../FilterComponent/Filter";
+import Filter from "../Filter/Filter";
+import EmployerInfo from "../Employers/EmployerInfo";
 
 const OFFERS_PER_PAGE = 9;
 
@@ -14,9 +15,6 @@ const EmployersComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  /* =====================
-     FETCH DATA
-  ====================== */
   useEffect(() => {
     let isMounted = true;
 
@@ -51,9 +49,6 @@ const EmployersComponent = () => {
     };
   }, []);
 
-  /* =====================
-     SORT EVENT LISTENER
-  ====================== */
   useEffect(() => {
     const handleSortChange = () => {
       const type = sessionStorage.getItem("sort-option");
@@ -68,9 +63,6 @@ const EmployersComponent = () => {
     };
   }, []);
 
-  /* =====================
-     PAGINATION (MEMO)
-  ====================== */
   const totalPages = useMemo(
     () => Math.ceil(sortedOffers.length / OFFERS_PER_PAGE),
     [sortedOffers]
@@ -89,9 +81,6 @@ const EmployersComponent = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
-  /* =====================
-     HELPERS
-  ====================== */
   const safeParse = (value) => {
     try {
       return JSON.parse(value);
@@ -100,9 +89,11 @@ const EmployersComponent = () => {
     }
   };
 
-  /* =====================
-     RENDER
-  ====================== */
+  const open = useCallback((id) => {
+    if (id)
+      document.querySelector(`#company-info-${id}`).style.display = "flex";
+  });
+
   return (
     <>
       <Navbar />
@@ -124,6 +115,7 @@ const EmployersComponent = () => {
 
                 return (
                   <div className={styles.offerRow} key={offer.id || offer._id}>
+                    <EmployerInfo companyOwner={offer.owner_id} />
                     <div className={styles.logoSection}>
                       <img
                         src={offer.img || "/default-company.png"}
@@ -165,17 +157,11 @@ const EmployersComponent = () => {
                       </div>
                     </div>
 
-                    <div className={styles.actions}>
-                      {offer.link && (
-                        <a
-                          href={offer.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={styles.detailsBtn}
-                        >
-                          Szczegóły
-                        </a>
-                      )}
+                    <div
+                      className={styles.actions + " " + styles.detailsBtn}
+                      onClick={() => open(offer.owner_id)}
+                    >
+                      Szczegóły
                     </div>
                   </div>
                 );

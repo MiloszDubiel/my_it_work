@@ -45,7 +45,8 @@ export function getAllOfferts() {
   job_details.active_to,
   job_details.requirements,
   job_offers.updated_at,
-  companies.img
+  companies.img,
+  owner_id
 FROM job_offers
 INNER JOIN job_details
   ON job_offers.id = job_details.job_offer_id

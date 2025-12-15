@@ -1,11 +1,10 @@
 import OfferInfo from "./OfferInfo";
 import styles from "./offer.module.css";
-
+import { useCallback } from "react";
+import EmployerInfo from "../Employers/EmployerInfo";
 
 const Offer = ({ offer, index }) => {
 
-
-  // Bezpieczne parsowanie JSON
   const parseJSON = (value) => {
     try {
       return JSON.parse(value) || [];
@@ -17,7 +16,6 @@ const Offer = ({ offer, index }) => {
   const technologies = parseJSON(offer.technologies);
   const firstTechnologies = technologies.slice(0, 2);
 
-  // Czyszczenie workingMode
   const workingMode = String(offer.workingMode)
     .replaceAll("[", "")
     .replaceAll("]", "")
@@ -49,7 +47,6 @@ const Offer = ({ offer, index }) => {
           )}
 
           <div className={styles.tags}>
-            {/* TECHNOLOGIE */}
             <div className={styles.technologies}>
               <span className={styles.item}>Technologie:</span>{" "}
               {technologies.length === 0 ? (
@@ -68,7 +65,6 @@ const Offer = ({ offer, index }) => {
               )}
             </div>
 
-            {/* LOKALIZACJA */}
             <div className={styles.locations}>
               <span className={styles.item}>Lokalizacja:</span>{" "}
               <span className={styles.tag}>{workingMode}</span>

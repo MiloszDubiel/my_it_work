@@ -4,7 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
-import CandidateInfo from "../CandidateComponent/CandidateInfo";
+import CandidateInfo from "../Candidate/CandidateInfo";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 
 const EmployerSettings = () => {
