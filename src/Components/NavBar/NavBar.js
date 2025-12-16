@@ -1,6 +1,6 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import EmployerSettings from "../SettingsPage/EmployerSettings";
@@ -10,10 +10,21 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import ChatPage from "../Chat/ChatPage";
 
 const Navbar = ({ employersPage }) => {
-  let account = useRef(null);
-  let userData = JSON.parse(sessionStorage.getItem("user-data"));
-  let navigate = useNavigate();
+  const account = useRef(null);
+  const navigate = useNavigate();
 
+  const [userData, setUserData] = useState(() => {
+    return JSON.parse(sessionStorage.getItem("user-data"));
+  });
+
+  useEffect(() => {
+    const handler = () => {
+      setUserData(JSON.parse(sessionStorage.getItem("user-data")));
+    };
+
+    window.addEventListener("storage-changed", handler);
+    return () => window.removeEventListener("storage-changed", handler);
+  }, []);
   return (
     <>
       {userData?.role == "employer" ? (
@@ -186,19 +197,20 @@ const Navbar = ({ employersPage }) => {
                     ""
                   )}
 
-                  <Link
+                  <button
+                    className={styles.logOut}
                     onClick={() => {
-                      sessionStorage.setItem(
-                        "user-data",
-                        JSON.stringify({ info: "Wylogowano" })
-                      );
-                      sessionStorage.removeItem("token", "");
-                      account.current.classList.toggle(styles.accountDivHide);
+                      sessionStorage.clear();
+                      setUserData(null);
+
+                      window.dispatchEvent(new Event("storage-changed"));
+
+                      account.current.classList.add(styles.accountDivHide);
                       navigate("/");
                     }}
                   >
                     Wyloguj
-                  </Link>
+                  </button>
                 </>
               ) : (
                 <>

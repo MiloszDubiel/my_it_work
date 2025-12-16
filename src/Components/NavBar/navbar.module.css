@@ -32,7 +32,7 @@
   align-items: center;
   gap: 20px;
 }
-.account button {
+.account button:not(.logOut) {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,7 +92,6 @@
   display: none !important;
 }
 
-/* --- KONTEJNER KONT BUTTONA --- */
 .account {
   position: relative;
   width: auto;
@@ -103,8 +102,7 @@
   gap: 15px;
 }
 
-/* --- PRZYCISK ACCOUNT/AVATAR --- */
-.account button:first-of-type {
+.account button:first-of-type:not(.logOut) {
   border: none;
   background-size: cover !important;
   background-position: center;
@@ -112,10 +110,9 @@
   border-radius: 50%;
 }
 
-/* --- DROPDOWN MENU --- */
 .accountDiv {
   position: absolute;
-  top: 60px; /* idealne odsunięcie od przycisku */
+  top: 60px;
   right: 0;
 
   width: 180px;
@@ -143,7 +140,8 @@
   }
 }
 
-.accountDiv a {
+.accountDiv a,
+.logOut {
   display: block;
   width: 100%;
   padding: 12px;
@@ -152,9 +150,11 @@
   font-size: 15px;
   color: #222;
   transition: 0.2s;
+  cursor: pointer;
 }
 
-.accountDiv a:hover {
+.accountDiv a:hover,
+.logOut:hover {
   background: #f5f5f5;
   color: #2563eb;
 }
@@ -164,9 +164,10 @@
   display: none !important;
 }
 
-/* ============================================
-   RESPONSIVE NAVBAR
-   ============================================ */
+.logOut {
+  border: none;
+  background-color: white;
+}
 
 /* 📱 TELEFONY — max 600px */
 @media (max-width: 600px) {
@@ -183,7 +184,7 @@
     font-size: 22px;
   }
 
-  /* Ukrywamy listę linków */
+
   .list ul {
     display: none;
   }
@@ -193,18 +194,13 @@
     margin-right: 0;
   }
 
-  .account button {
-    width: 28px;
-    height: 28px;
-  }
-
   .icon {
     width: 16px;
     height: 16px;
   }
 
   /* Dropdown dostosowany do telefonu */
-  .accountDiv {
+.accountDiv {
     right: 0;
     width: 150px;
     top: 55px;
@@ -241,35 +237,4 @@
   }
 }
 
-/* 💻 DUŻE EKRANY — od 1200px */
-@media (min-width: 1200px) {
-  .headerElement {
-    height: 90px;
-  }
 
-  .header h3 {
-    font-size: 32px;
-  }
-
-  .list ul {
-    gap: 40px;
-  }
-
-  .account {
-    gap: 20px;
-  }
-
-  .account button {
-    width: 34px;
-    height: 34px;
-  }
-
-  .icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  .accountDiv {
-    top: 75px;
-  }
-}

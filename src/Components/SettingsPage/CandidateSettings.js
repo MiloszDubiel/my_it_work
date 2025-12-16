@@ -45,6 +45,7 @@ const CandidateSettings = () => {
   const [referenceFile, setReferenceFile] = useState(null);
   const [referencePreviewUrl, setReferencePreviewUrl] = useState(null);
   const referenceInputRef = useRef();
+  const [showConfirm, setShowConfirm] = useState(false);
   const cvInputRef = useRef();
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(ProfielData.avatar);
@@ -54,6 +55,7 @@ const CandidateSettings = () => {
     setCandidateProfile({ ...candidateProfile, [name]: value });
   };
 
+  console.log(favorites);
   useEffect(() => {
     axios
       .post("http://localhost:5000/user/has-candiate-profile", {
@@ -88,6 +90,12 @@ const CandidateSettings = () => {
         }
       });
 
+    axios
+      .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+      .then((res) => {
+        setFavorites(res.data);
+      });
+
     getMyApplayings();
   }, []);
   useEffect(() => {
@@ -116,6 +124,20 @@ const CandidateSettings = () => {
     if (res.status == 200) {
       setApplications(res.data);
     }
+  };
+
+  const handleClearHistory = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/user/clear-history/${userData.id}`
+      );
+
+      getMyApplayings();
+    } catch (err) {
+      console.error(err);
+      alert("Wystąpił błąd przy czyszczeniu historii.");
+    }
+    setShowConfirm(false);
   };
 
   const handleSubmitUserInfo = async (e) => {
@@ -300,8 +322,6 @@ const CandidateSettings = () => {
         i === index ? { ...item, level } : item
       ),
     }));
-
-    
   };
 
   const addEducation = (e) => {
@@ -346,6 +366,13 @@ const CandidateSettings = () => {
           message="Czy na pewno chcesz anulować tę aplikację?"
           onConfirm={() => cancelApplication()}
           onCancel={() => setShowCancelModal(false)}
+        />
+      )}
+      {showConfirm && (
+        <ConfirmModal
+          message="Czy na pewno chcesz wyczyścić całą historię aplikacji?"
+          onConfirm={handleClearHistory}
+          onCancel={() => setShowConfirm(false)}
         />
       )}
       <div className={styles.container}>
@@ -859,25 +886,7 @@ const CandidateSettings = () => {
                 {applications.length > 0 && (
                   <button
                     className={styles.clearHistoryBtn}
-                    onClick={async () => {
-                      if (
-                        window.confirm(
-                          "Czy na pewno chcesz wyczyścić całą historię aplikacji?"
-                        )
-                      ) {
-                        try {
-                          // Wywołanie endpointu API do usunięcia wszystkich aplikacji
-                          await axios.delete(
-                            `http://localhost:5000/api/applications/clear-history/${userData.id}`
-                          );
-                          // Lokalnie czyścimy listę
-                          setApplications([]);
-                        } catch (err) {
-                          console.error(err);
-                          alert("Wystąpił błąd przy czyszczeniu historii.");
-                        }
-                      }
-                    }}
+                    onClick={() => setShowConfirm(true)}
                   >
                     Czyść historię
                   </button>

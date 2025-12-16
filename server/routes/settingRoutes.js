@@ -108,11 +108,35 @@ router.get("/favorites/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
     const [rows] = await connection.query(
-      `SELECT j.*, f.created_at AS added_at , jd.description, jd.requirements, jd.benefits, jd.responsibilities
-       FROM favorites f
-       JOIN job_offers j ON f.offer_id = j.id
-       JOIN job_details jd ON j.id = jd.job_offer_id 
-       WHERE f.user_id = ?`,
+      `
+      
+      
+      SELECT
+  job_offers.source,
+  job_offers.id,
+  job_offers.title,
+  job_offers.companyName,
+  job_offers.workingMode,
+  job_offers.contractType,
+  job_offers.experience,
+  job_offers.technologies,
+  job_offers.salary,
+  job_offers.is_active,
+  job_offers.link,
+  job_details.description,
+  job_details.active_to,
+  job_details.requirements,
+  job_offers.updated_at,
+  companies.img,
+  owner_id,
+  favorites.created_at AS added_at
+FROM job_offers
+INNER JOIN job_details
+  ON job_offers.id = job_details.job_offer_id
+LEFT JOIN companies
+  ON job_offers.company_id = companies.id
+JOIN favorites ON favorites.offer_id = job_offers.id 
+WHERE favorites.user_id = ?`,
       [user_id]
     );
 
@@ -184,7 +208,7 @@ router.post(
             phone_number,
             access,
             career_level,
-            description
+            description,
           ]
         );
 
@@ -209,7 +233,7 @@ router.post(
         "phone_number = ?",
         "access = ?",
         "career_level = ?",
-        "description = ?" 
+        "description = ?",
       ];
 
       const updateValues = [
@@ -225,7 +249,7 @@ router.post(
         phone_number,
         access,
         career_level,
-        description
+        description,
       ];
 
       if (cvPath) {
@@ -295,7 +319,6 @@ router.delete("/cancel-application/:id", async (req, res) => {
       return res.status(404).json({ error: "Aplikacja nie istnieje" });
     }
 
-    // Możesz zamiast usuwać — ustawić status = 'cancelled'
     await connection.query(
       "UPDATE job_applications SET status = 'anulowana' WHERE id = ?",
       [id]
@@ -305,6 +328,21 @@ router.delete("/cancel-application/:id", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Błąd serwera" });
+  }
+});
+
+//Usuwanie historii aplikacji
+router.delete("/clear-history/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await connection.query(
+      "DELETE FROM job_applications WHERE user_id = ? AND status IN('odrzucono', 'anulowana')",
+      [id]
+    );
+    return res.status(200).json({ info: "Usunięto" });
+  } catch (err) {
+    res.status(500).json({ error: err });
   }
 });
 
