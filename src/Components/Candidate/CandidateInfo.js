@@ -9,9 +9,6 @@ const CandidateInfo = ({ candidate }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmCallbackRef = useRef(null);
 
-
-
-
   const parseList = (value) => {
     if (!value) return [];
     try {
@@ -30,7 +27,9 @@ const CandidateInfo = ({ candidate }) => {
   const experiences = parseList(candidate.exp);
   const educations = parseList(candidate.edu);
   const references = parseList(candidate.references);
+  const cv = parseList(candidate.cv);
 
+  console.log(experiences);
   return (
     <div
       className={
@@ -167,42 +166,59 @@ const CandidateInfo = ({ candidate }) => {
         <section className={styles.contentGrid}>
           {/* LEFT COL */}
           <article className={styles.leftCol}>
+            <h3 className={styles.sectionTitle}>Opis</h3>
+            <div>
+              <p>{candidate.description}</p>
+            </div>
+            <hr />
             <h3 className={styles.sectionTitle}>CV</h3>
-            {candidate.cv ? (
-              <a
-                href={candidate.cv}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.linkButton}
-              >
-                Otwórz CV
-              </a>
+            {cv ? (
+              <ul className={styles.refList}>
+                {cv.map((el, i) =>
+                  el.startsWith("http") ? (
+                    <li key={i}>
+                      <a
+                        href={el}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.linkButtonSmall}
+                      >
+                        Otwórz CV
+                      </a>
+                    </li>
+                  ) : (
+                    <li key={i}>Brak CV</li>
+                  )
+                )}
+              </ul>
             ) : (
               <p>Brak</p>
             )}
 
-            <h3 className={styles.sectionTitle}>Doświadczenie</h3>
-            {experiences.length ? (
-              <ul>
-                {experiences.map((el, i) => (
-                  <li key={i}>{el.name}, Poziom: {el.level}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>Brak danych</p>
-            )}
+            <hr />
+            <h3 className={styles.sectionTitle}>
+              Doświadczenie w latch:{" "}
+              {experiences.length > 0 ? (
+                <span>{experiences[0]}</span>
+              ) : (
+                <span>Brak</span>
+              )}
+            </h3>
 
+            <hr />
             <h3 className={styles.sectionTitle}>Wykształcenie</h3>
             {educations.length ? (
               <ul>
                 {educations.map((el, i) => (
-                  <li key={i}>{el.name}, Poziom: {el.level}</li>
+                  <li key={i}>
+                    {el.name}, Poziom: {el.level}
+                  </li>
                 ))}
               </ul>
             ) : (
               <p>Brak danych</p>
             )}
-
+            <hr />
             <h3 className={styles.sectionTitle}>Referencje</h3>
             {references.length ? (
               <ul className={styles.refList}>
@@ -240,7 +256,10 @@ const CandidateInfo = ({ candidate }) => {
                     {skills.length ? (
                       skills.map((s, i) => (
                         <li key={i}>
-                          <strong> {s.name}, Poziom: {s.level}</strong>
+                          <strong>
+                            {" "}
+                            {s.name}, Poziom: {s.level}
+                          </strong>
                         </li>
                       ))
                     ) : (
@@ -255,7 +274,10 @@ const CandidateInfo = ({ candidate }) => {
                     {languages.length ? (
                       languages.map((l, i) => (
                         <li key={i}>
-                          <strong> {l.name}, Poziom {l.level}</strong>
+                          <strong>
+                            {" "}
+                            {l.name}, Poziom {l.level}
+                          </strong>
                         </li>
                       ))
                     ) : (

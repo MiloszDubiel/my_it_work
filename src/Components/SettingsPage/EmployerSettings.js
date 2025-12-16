@@ -377,6 +377,7 @@ const EmployerSettings = () => {
                     <img
                       src={logoPreviewUrl || company?.img}
                       alt="Logo firmy"
+                      className={styles.logo}
                     />
                   </div>
 

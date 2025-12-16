@@ -215,12 +215,9 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                               ))}
                           </div>
 
-                          {offer.updated_at && (
+                          {offer.sctive_to && (
                             <p className={styles.offerDate}>
-                              Wazne do:{" "}
-                              {new Date(offer.active_to).toLocaleDateString(
-                                "pl-PL"
-                              )}
+                              Wazne do: {offer.active_to}
                             </p>
                           )}
 

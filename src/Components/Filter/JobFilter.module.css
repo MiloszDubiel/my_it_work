@@ -67,3 +67,15 @@ select:focus {
 .resetBtn:hover {
   background: #dc2626;
 }
+
+.setBttn {
+  background: #3b82f6;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  border: none;
+  cursor: pointer;
+}

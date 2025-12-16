@@ -14,11 +14,8 @@ const FilltredEmployers = ({}) => {
   const location = useLocation();
   const { state } = location;
 
-  console.log(state);
-
   useEffect(() => {
     const fetchOffers = async () => {
-      console.log("DUPA");
       try {
         const res = await axios.post(
           `http://localhost:5000/api/employers/filltred`,
@@ -29,23 +26,12 @@ const FilltredEmployers = ({}) => {
 
         setOffers(res.data);
       } catch (err) {
-        console.error("Błąd podczas pobierania ofert:", err);
+        console.error("Błąd podczas pobierania kamdydatów:", err);
       }
     };
     fetchOffers();
   }, [state]);
-  useEffect(() => {
-    window.addEventListener("changed-sort-option", () => {
-      const copyOfOferts = [...offers];
-      console.log(copyOfOferts);
 
-      const type = sessionStorage.getItem("sort-option");
-      setOffers(Sort(copyOfOferts, type));
-      setCurrentPage(1);
-    });
-  });
-
-  // Paginacja
   const indexOfLast = currentPage * offersPerPage;
   const indexOfFirst = indexOfLast - offersPerPage;
   const currentOffers = offers?.slice(indexOfFirst, indexOfLast);

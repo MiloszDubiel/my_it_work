@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import styles from "./JobFilter.module.css";
 import { useNavigate } from "react-router-dom";
 
-const Filter = ({ cadidatePage, offersPage, employersPage }) => {
+const Filter = ({ candidatesPage, offersPage, employersPage }) => {
   const [filters, setFilters] = useState({
     title: "",
     experience: "",
     location: "",
     companyName: "",
+
+    technologia: "",
   });
 
   const navigate = useNavigate();
@@ -17,7 +19,6 @@ const Filter = ({ cadidatePage, offersPage, employersPage }) => {
     const newFilters = { ...filters, [name]: value };
     setFilters(newFilters);
   };
-
 
   const handleSearch = () => {
     if (offersPage) {
@@ -70,17 +71,17 @@ const Filter = ({ cadidatePage, offersPage, employersPage }) => {
           </div>
         )}
 
-        {/* Nazwa stanowiska */}
-        {cadidatePage && (
+        {/*Technologia */}
+        {candidatesPage && (
           <div className={styles.filterGroup}>
-            <label htmlFor="title">Nazwisko lub email</label>
+            <label htmlFor="title">Technologia</label>
             <input
               type="text"
-              id="nick"
-              name="nick"
-              value={filters.title}
+              id="technologia"
+              name="technologia"
+              value={filters.technologia}
               onChange={handleChange}
-              placeholder="np. Frontend Developer"
+              placeholder="np. JavaScript"
             />
           </div>
         )}
@@ -106,23 +107,22 @@ const Filter = ({ cadidatePage, offersPage, employersPage }) => {
         )}
 
         {/* Lokalizacja */}
-        {(offersPage || employersPage) && (
-          <div className={styles.filterGroup}>
-            <label htmlFor="location">Lokalizacja</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={filters.location}
-              onChange={handleChange}
-              placeholder="np. Warszawa, Kraków..."
-            />
-          </div>
-        )}
+
+        <div className={styles.filterGroup}>
+          <label htmlFor="location">Lokalizacja</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            value={filters.location}
+            onChange={handleChange}
+            placeholder="np. Warszawa, Kraków..."
+          />
+        </div>
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.prmButton} onClick={handleSearch}>
+        <button className={styles.setBttn} onClick={handleSearch}>
           Szukaj
         </button>
       </div>

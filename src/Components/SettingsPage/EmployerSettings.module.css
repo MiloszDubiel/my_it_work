@@ -348,10 +348,9 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow-x: auto; /* pozwala przewijać poziomo przy małych ekranach */
+  overflow-x: auto;
 }
 
-/* Nagłówki tabeli */
 .rowHeader {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -361,7 +360,6 @@ select:focus {
   border-radius: 8px 8px 0 0;
 }
 
-/* Wiersze ofert */
 .row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -375,7 +373,6 @@ select:focus {
   background: #f9f9f9;
 }
 
-/* Styl dla przycisków akcji */
 .actions button {
   background: none;
   border: none;
@@ -389,7 +386,6 @@ select:focus {
   transform: scale(1.2);
 }
 
-/* Styl dla przycisku dodawania oferty */
 .addBtn {
   background: #2563eb;
   color: white;
@@ -405,9 +401,16 @@ select:focus {
   background: #1d4ed8;
 }
 
-/* Styl dla pustej tabeli */
 .row span[colspan="4"] {
   text-align: center;
   color: #6b7280;
   padding: 1rem 0;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
 }

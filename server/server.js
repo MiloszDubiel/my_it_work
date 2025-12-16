@@ -27,6 +27,7 @@ app.use("/messager", chatRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 
+
 app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);

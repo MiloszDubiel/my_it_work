@@ -5,13 +5,17 @@ import Navbar from "../NavBar/NavBar";
 import Candidate from "./Candidate";
 import LoadingComponent from "../Loading/LoadingComponent";
 import Filter from "../Filter/Filter";
+import { useLocation } from "react-router-dom";
 
-const CandidatePage = () => {
+const FiltredCandidate = () => {
   const [candidates, setCandidates] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [info, setInfo] = useState("");
   const candidatesPerPage = 9;
+
+  const location = useLocation();
+  const { state } = location;
 
   const isEmptyObject = (obj) => {
     for (var prop in obj) {
@@ -28,21 +32,25 @@ const CandidatePage = () => {
       try {
         setIsLoading(true);
 
-        const res = await axios.get("http://localhost:5000/api/candidates");
+        const res = await axios.post(
+          "http://localhost:5000/api/candidates/filltred",
+          state
+        );
 
-        if (!isEmptyObject(res.data)) {
-          setIsLoading(false);
-          setCandidates(res.data);
-        }
+        setIsLoading(false);
+        setCandidates(res.data);
       } catch (err) {
         setIsLoading(false);
-        setInfo("Brak ofert pracy ");
+        setInfo("Brak kandydatów");
         console.error("Błąd podczas pobierania ofert:", err);
       }
+
+      setIsLoading(false);
     };
     fetchCandidates();
-  }, []);
+  }, [state]);
 
+  console.log(candidates);
   const indexOfLast = currentPage * candidatesPerPage;
   const indexOfFirst = indexOfLast - candidatesPerPage;
   const currentcandidates = candidates.slice(indexOfFirst, indexOfLast);
@@ -98,4 +106,4 @@ const CandidatePage = () => {
   );
 };
 
-export default CandidatePage;
+export default FiltredCandidate;

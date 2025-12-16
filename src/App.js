@@ -9,6 +9,7 @@ import JobOffersPage from "./Components/JobOffersPage/JobOffersPage";
 import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
 import FilltredEmployers from "./Components/Employers/FiltredEmployer";
 import AdminRoute from "./Components/AdminPanel/AdminRoute";
+import FiltredCandidate from "./Components/Candidate/FiltredCandidate";
 
 const App = () => {
   return (
@@ -29,7 +30,11 @@ const App = () => {
             path="/employers/filltred"
             element={<FilltredEmployers employerPage={true} />}
           />
-          <Route path="/candidates/filltred" element={""} />
+          <Route
+            path="/candidates/filltred"
+            candidatesPage={true}
+            element={<FiltredCandidate />}
+          />
           <Route
             path="/admin"
             element={
