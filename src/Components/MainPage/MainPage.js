@@ -3,7 +3,7 @@ import Navbar from "../NavBar/NavBar";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import OfferInfo from "../OffertComponent/OfferInfo";
+import OfferInfo from "../Offert/OfferInfo";
 
 const MainPage = () => {
   const [offers, setOffers] = useState([]);

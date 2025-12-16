@@ -1,4 +1,3 @@
-import NavBar from "../NavBar/NavBar";
 import { useEffect, useState, useRef, useCallback } from "react";
 import styles from "./ofertinfo.module.css";
 import { IoMdClose } from "react-icons/io";
@@ -6,7 +5,7 @@ import axios from "axios";
 import LoadingComponent from "../Loading/LoadingComponent";
 import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-import InfoModal from "../PromptModals/InfoModal";
+
 import EmployerInfo from "../Employers/EmployerInfo";
 
 const OfferInfo = ({ offer, id, is_favorite }) => {
@@ -157,8 +156,6 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
       <main className={styles.wrapper} aria-labelledby="job-title">
         <div className={styles.actionsBar}>
           <div style={{ display: "flex", gap: "10px" }}>
-            <button className={styles.iconBtn}>Udostępnij</button>
-
             {userData?.email && userData?.role === "candidate" && (
               <button onClick={toggleFavorite} className={styles.iconBtn}>
                 {isFavorite ? (
@@ -296,41 +293,44 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
                     Zobacz profil firmy
                   </button>
 
-                  <button
-                    className={styles.compBtnOutline}
-                    onClick={async () => {
-                      try {
-                        const user = JSON.parse(
-                          sessionStorage.getItem("user-data")
-                        );
+                  {userData?.info !== "Wylogowano" && (
+                    <button
+                      className={styles.compBtnOutline}
+                      onClick={async () => {
+                        try {
+                          const user = JSON.parse(
+                            sessionStorage.getItem("user-data")
+                          );
 
-                        const res = await axios.post(
-                          "http://localhost:5001/chat/create",
-                          {
-                            employer_id: offer.owner_id,
-                            candidate_id: user.id,
-                          }
-                        );
+                          const res = await axios.post(
+                            "http://localhost:5001/chat/create",
+                            {
+                              employer_id: offer.owner_id,
+                              candidate_id: user.id,
+                            }
+                          );
 
-                        const conversationId = res.data.id;
+                          const conversationId = res.data.id;
 
-                        document.querySelector("#chatContainer").style.display =
-                          "flex";
+                          document.querySelector(
+                            "#chatContainer"
+                          ).style.display = "flex";
 
-                        document.querySelector("#root").style.overflow =
-                          "hidden";
-                        window.dispatchEvent(
-                          new CustomEvent("openConversation", {
-                            detail: { conversationId },
-                          })
-                        );
-                      } catch (err) {
-                        console.error("Błąd uruchamiania wiadomości:", err);
-                      }
-                    }}
-                  >
-                    Wyślij wiadomość
-                  </button>
+                          document.querySelector("#root").style.overflow =
+                            "hidden";
+                          window.dispatchEvent(
+                            new CustomEvent("openConversation", {
+                              detail: { conversationId },
+                            })
+                          );
+                        } catch (err) {
+                          console.error("Błąd uruchamiania wiadomości:", err);
+                        }
+                      }}
+                    >
+                      Wyślij wiadomość
+                    </button>
+                  )}
                 </div>
               )}
             </div>

@@ -6,7 +6,7 @@ import Navbar from "../NavBar/NavBar";
 import Filter from "../Filter/Filter";
 import { useLocation } from "react-router-dom";
 import LoadingComponent from "../Loading/LoadingComponent";
-import Offer from "../OffertComponent/Offer";
+import Offer from "../Offert/Offer";
 
 const FiltredJobOffersPage = ({ offersPage }) => {
   const [offers, setOffers] = useState([]);

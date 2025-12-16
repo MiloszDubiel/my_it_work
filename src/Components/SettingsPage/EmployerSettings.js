@@ -40,7 +40,7 @@ const EmployerSettings = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  console.log(company);
+
   const fetchOffers = () => {
     axios
       .post("http://localhost:5000/api/employers/get-my-offers", {

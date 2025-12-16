@@ -1,22 +1,49 @@
 import styles from "./EmployerInfo.module.css";
 import { IoMdClose } from "react-icons/io";
-import { useEffect, useState, useRef, use, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-const EmployerInfo = ({ companyOwner, id }) => {
+import OfferInfo from "../Offert/OfferInfo";
+
+const EmployerInfo = ({ companyOwner = 0, id }) => {
   const [company, setCompany] = useState(null);
+  const [offers, setOffers] = useState([]);
 
   const fetchCompanyInfo = async () => {
-    const res = await axios.post(
-      "http://localhost:5000/api/employers/get-company-info",
-      {
-        id: companyOwner,
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/employers/get-company-info",
+        { id: companyOwner }
+      );
+
+      if (res.data?.companyInfo?.length > 0) {
+        setCompany(res.data.companyInfo[0]);
+      } else {
+        setCompany(null);
+        console.warn("Brak danych firmy dla id:", companyOwner);
       }
-    );
-    setCompany(res.data);
+    } catch (err) {
+      console.error("Błąd pobierania danych firmy:", err);
+      setCompany(null);
+    }
+  };
+  const fetchCompanyOffers = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/employers/get-my-offers",
+        { owner_id: companyOwner }
+      );
+
+      setOffers(res.data?.offers || []);
+    } catch (err) {
+      console.error("Błąd pobierania ofert firmy:", err);
+      setOffers([]);
+    }
   };
 
   useEffect(() => {
+    if (!companyOwner) return;
     fetchCompanyInfo();
+    fetchCompanyOffers();
   }, [companyOwner]);
 
   const parseList = (value) => {
@@ -27,13 +54,29 @@ const EmployerInfo = ({ companyOwner, id }) => {
       .filter(Boolean);
   };
 
+  const safeParseArray = (value) => {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    } catch {
+      return [];
+    }
+  };
+
   const close = useCallback(() => {
     document.querySelector(`#company-info-${companyOwner}`).style.display =
       "none";
   });
 
-  const technologies = parseList(company?.technologies);
-  const locations = parseList(company?.locations);
+  const openWindow = useCallback((id) => {
+    console.log(id);
+
+    document.querySelector(`.offer-details-container${id}`).style.display =
+      "flex";
+
+    document.querySelector("#root").style.overflow = "hidden";
+  });
 
   return (
     <div>
@@ -130,56 +173,71 @@ const EmployerInfo = ({ companyOwner, id }) => {
             </article>
 
             <aside className={styles.rightCol}>
-              <h3 className={styles.sectionTitle}>Informacje dodatkowe</h3>
+              <h3 className={styles.sectionTitle}>Oferty pracy</h3>
 
-              <div className={styles.quickFacts}>
-                <ul>
-                  <li>
-                    Technologie:
-                    <ul>
-                      {technologies.length ? (
-                        technologies.map((t, i) => (
-                          <li key={i}>
-                            <strong>{t}</strong>
-                          </li>
-                        ))
-                      ) : (
-                        <li>Brak</li>
-                      )}
-                    </ul>
-                  </li>
+              <div className={styles.offersGrid}>
+                {offers.length ? (
+                  offers.map((offer, index) => {
+                    const id = offer.id;
 
-                  <li>
-                    Lokalizacje:
-                    <ul>
-                      {locations.length ? (
-                        locations.map((l, i) => (
-                          <li key={i}>
-                            <strong>{l}</strong>
-                          </li>
-                        ))
-                      ) : (
-                        <li>Brak</li>
-                      )}
-                    </ul>
-                  </li>
+                    return (
+                      <>
+                        <OfferInfo
+                          offer={offer}
+                          id={index}
+                          is_favorite={false}
+                        />
+                        <div key={offer.id} className={styles.offerCard}>
+                          <h4 className={styles.offerTitle}>{offer.title}</h4>
 
-                  <li>
-                    Utworzono:
-                    <strong>
-                      {" "}
-                      {new Date(company?.created_at).toLocaleDateString()}
-                    </strong>
-                  </li>
+                          {offer.salary && (
+                            <p className={styles.offerSalary}>
+                              💰 {offer.salary} PLN
+                            </p>
+                          )}
 
-                  <li>
-                    Ostatnia aktualizacja:
-                    <strong>
-                      {" "}
-                      {new Date(company?.updated_at).toLocaleDateString()}
-                    </strong>
-                  </li>
-                </ul>
+                          <p className={styles.offerMeta}>
+                            {safeParseArray(offer.contractType).join(", ")}
+                          </p>
+
+                          <p className={styles.offerMeta}>
+                            {safeParseArray(offer.workingMode).join(", ")}
+                          </p>
+
+                          <div className={styles.offerTech}>
+                            {safeParseArray(offer.technologies)
+                              .slice(0, 3)
+                              .map((tech, i) => (
+                                <span key={i} className={styles.techTag}>
+                                  {tech}
+                                </span>
+                              ))}
+                          </div>
+
+                          {offer.updated_at && (
+                            <p className={styles.offerDate}>
+                              Wazne do:{" "}
+                              {new Date(offer.active_to).toLocaleDateString(
+                                "pl-PL"
+                              )}
+                            </p>
+                          )}
+
+                          <a
+                            className={styles.offerBtn}
+                            onClick={() => openWindow(id)}
+                          >
+                            Przejdź do oferty
+                          </a>
+                        </div>
+                      </>
+                    );
+                  })
+                ) : (
+                  <p style={{ fontSize: 13, color: "#6b7280" }}>
+                    Brak aktywnych ofert pracy
+                  </p>
+                )}
               </div>
             </aside>
           </section>

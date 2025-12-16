@@ -114,56 +114,61 @@ const EmployersComponent = () => {
                 const locations = safeParse(offer.locations)?.[0];
 
                 return (
-                  <div className={styles.offerRow} key={offer.id || offer._id}>
+                  <>
                     <EmployerInfo companyOwner={offer.owner_id} />
-                    <div className={styles.logoSection}>
-                      <img
-                        src={offer.img || "/default-company.png"}
-                        alt={offer.companyName || "Firma"}
-                        className={styles.companyImg}
-                        onError={(e) =>
-                          (e.currentTarget.src = "/default-company.png")
-                        }
-                      />
-                    </div>
+                    <div
+                      className={styles.offerRow}
+                      key={offer.id || offer._id}
+                    >
+                      <div className={styles.logoSection}>
+                        <img
+                          src={offer.img || "/default-company.png"}
+                          alt={offer.companyName || "Firma"}
+                          className={styles.companyImg}
+                          onError={(e) =>
+                            (e.currentTarget.src = "/default-company.png")
+                          }
+                        />
+                      </div>
 
-                    <div className={styles.infoSection}>
-                      <h3>{offer.title || "Brak tytułu"}</h3>
-                      <p className={styles.company}>{offer.companyName}</p>
+                      <div className={styles.infoSection}>
+                        <h3>{offer.title || "Brak tytułu"}</h3>
+                        <p className={styles.company}>{offer.companyName}</p>
 
-                      {offer.location && (
-                        <p className={styles.location}>{offer.location}</p>
-                      )}
+                        {offer.location && (
+                          <p className={styles.location}>{offer.location}</p>
+                        )}
 
-                      <div className={styles.tags}>
-                        <div className={styles.technologies}>
-                          {technologies.slice(0, 2).map((tech, i) => (
-                            <span key={i} className={styles.tag}>
-                              {tech}
-                            </span>
-                          ))}
+                        <div className={styles.tags}>
+                          <div className={styles.technologies}>
+                            {technologies.slice(0, 2).map((tech, i) => (
+                              <span key={i} className={styles.tag}>
+                                {tech}
+                              </span>
+                            ))}
 
-                          {technologies.length > 2 && (
-                            <p className={styles.item}>i więcej…</p>
+                            {technologies.length > 2 && (
+                              <p className={styles.item}>i więcej…</p>
+                            )}
+                          </div>
+
+                          {locations && (
+                            <div className={styles.locations}>
+                              <p className={styles.item}>Lokalizacje:</p>
+                              <span className={styles.tag}>{locations}</span>
+                            </div>
                           )}
                         </div>
+                      </div>
 
-                        {locations && (
-                          <div className={styles.locations}>
-                            <p className={styles.item}>Lokalizacje:</p>
-                            <span className={styles.tag}>{locations}</span>
-                          </div>
-                        )}
+                      <div
+                        className={styles.actions + " " + styles.detailsBtn}
+                        onClick={() => open(offer.owner_id)}
+                      >
+                        Szczegóły
                       </div>
                     </div>
-
-                    <div
-                      className={styles.actions + " " + styles.detailsBtn}
-                      onClick={() => open(offer.owner_id)}
-                    >
-                      Szczegóły
-                    </div>
-                  </div>
+                  </>
                 );
               })
             ) : (

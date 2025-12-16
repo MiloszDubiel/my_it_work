@@ -3,7 +3,7 @@ import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-import OfferInfo from "../OffertComponent/OfferInfo";
+import OfferInfo from "../Offert/OfferInfo";
 import CandidateInfo from "../Candidate/CandidateInfo";
 
 const CandidateSettings = () => {
@@ -301,12 +301,7 @@ const CandidateSettings = () => {
       ),
     }));
 
-    const deleteItem = (index, type) => {
-      setCandidateProfile((prev) => ({
-        ...prev,
-        [type]: prev[type].filter((_, i) => i !== index),
-      }));
-    };
+    
   };
 
   const addEducation = (e) => {

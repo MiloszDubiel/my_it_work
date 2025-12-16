@@ -4,7 +4,7 @@ import styles from "./JobOffersPage.module.css";
 import SortButton, { Sort } from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
 import Filter from "../Filter/Filter";
-import Offer from "../OffertComponent/Offer";
+import Offer from "../Offert/Offer";
 import LoadingComponent from "../Loading/LoadingComponent";
 
 const JobOffersPage = () => {

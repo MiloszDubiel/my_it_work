@@ -4,7 +4,6 @@ import { useCallback } from "react";
 import EmployerInfo from "../Employers/EmployerInfo";
 
 const Offer = ({ offer, index }) => {
-
   const parseJSON = (value) => {
     try {
       return JSON.parse(value) || [];
