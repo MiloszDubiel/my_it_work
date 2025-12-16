@@ -30,8 +30,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-
-
 router.post("/get-company-info", async (req, res) => {
   const { id } = req.body;
 
@@ -136,7 +134,29 @@ router.post("/get-my-offers", async (req, res) => {
     const company_id = companyResult[0].id;
 
     const [offers] = await connection.query(
-      "SELECT  job_offers.companyName, job_offers.contractType, job_offers.workingMode, job_offers.title, job_offers.id, job_offers.updated_at, job_offers.is_active,   job_offers.salary, job_offers.experience, job_offers.technologies, job_details.description, job_details.requirements, job_details.benefits, job_details.responsibilities FROM job_offers INNER JOIN job_details ON job_offers.id = job_details.job_offer_id WHERE company_id = ?",
+      `SELECT  
+    job_offers.companyName,
+    job_offers.contractType,
+    job_offers.workingMode,
+    job_offers.title,
+    job_offers.id,
+    job_offers.updated_at,
+    job_offers.is_active,
+    companies.owner_id,  
+    job_offers.salary,
+    job_offers.experience,
+    job_offers.technologies,
+    job_details.description,
+    job_details.requirements,
+    job_details.benefits,
+    job_details.responsibilities
+FROM job_offers
+INNER JOIN job_details 
+    ON job_offers.id = job_details.job_offer_id
+INNER JOIN companies 
+    ON job_offers.company_id = companies.id
+WHERE company_id = ?
+`,
       [company_id]
     );
 

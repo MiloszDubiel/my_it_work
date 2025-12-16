@@ -186,6 +186,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                           offer={offer}
                           id={index}
                           is_favorite={false}
+                          in_company_info={true}
                         />
                         <div key={offer.id} className={styles.offerCard}>
                           <h4 className={styles.offerTitle}>{offer.title}</h4>

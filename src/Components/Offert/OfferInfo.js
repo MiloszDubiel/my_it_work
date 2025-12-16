@@ -8,7 +8,7 @@ import ConfirmModal from "../PromptModals/ConfirmModal";
 
 import EmployerInfo from "../Employers/EmployerInfo";
 
-const OfferInfo = ({ offer, id, is_favorite }) => {
+const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -140,7 +140,7 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
           : `offer-details-container${offer.id}`)
       }
     >
-      <EmployerInfo companyOwner={offer.owner_id} />
+      {!in_company_info && <EmployerInfo companyOwner={offer.owner_id} />}
       {showConfirm && (
         <ConfirmModal
           message={modalMessage}
@@ -289,48 +289,51 @@ const OfferInfo = ({ offer, id, is_favorite }) => {
 
               {offer.source !== "scraped" && (
                 <div className={styles.compActions}>
-                  <button className={styles.compBtn} onClick={open}>
-                    Zobacz profil firmy
-                  </button>
-
-                  {userData?.info !== "Wylogowano" && (
-                    <button
-                      className={styles.compBtnOutline}
-                      onClick={async () => {
-                        try {
-                          const user = JSON.parse(
-                            sessionStorage.getItem("user-data")
-                          );
-
-                          const res = await axios.post(
-                            "http://localhost:5001/chat/create",
-                            {
-                              employer_id: offer.owner_id,
-                              candidate_id: user.id,
-                            }
-                          );
-
-                          const conversationId = res.data.id;
-
-                          document.querySelector(
-                            "#chatContainer"
-                          ).style.display = "flex";
-
-                          document.querySelector("#root").style.overflow =
-                            "hidden";
-                          window.dispatchEvent(
-                            new CustomEvent("openConversation", {
-                              detail: { conversationId },
-                            })
-                          );
-                        } catch (err) {
-                          console.error("Błąd uruchamiania wiadomości:", err);
-                        }
-                      }}
-                    >
-                      Wyślij wiadomość
+                  {!in_company_info && (
+                    <button className={styles.compBtn} onClick={open}>
+                      Zobacz profil firmy
                     </button>
                   )}
+
+                  {userData?.info !== "Wylogowano" &&
+                    userData?.role !== "employer" && (
+                      <button
+                        className={styles.compBtnOutline}
+                        onClick={async () => {
+                          try {
+                            const user = JSON.parse(
+                              sessionStorage.getItem("user-data")
+                            );
+
+                            const res = await axios.post(
+                              "http://localhost:5001/chat/create",
+                              {
+                                employer_id: offer.owner_id,
+                                candidate_id: user.id,
+                              }
+                            );
+
+                            const conversationId = res.data.id;
+
+                            document.querySelector(
+                              "#chatContainer"
+                            ).style.display = "flex";
+
+                            document.querySelector("#root").style.overflow =
+                              "hidden";
+                            window.dispatchEvent(
+                              new CustomEvent("openConversation", {
+                                detail: { conversationId },
+                              })
+                            );
+                          } catch (err) {
+                            console.error("Błąd uruchamiania wiadomości:", err);
+                          }
+                        }}
+                      >
+                        Wyślij wiadomość
+                      </button>
+                    )}
                 </div>
               )}
             </div>

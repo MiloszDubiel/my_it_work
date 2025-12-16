@@ -58,6 +58,19 @@ const AddJobOffer = ({ onOfferAdded }) => {
       +offer.salary_min > +offer.salary_max
     )
       return "Minimalne wynagrodzenie nie może być większe niż maksymalne";
+    if (!offer.date) {
+      return "Data wazności oferty jest wymagany";
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selected = new Date(offer.date);
+
+    if (selected < today) {
+      return "Data nie może być wcześniejsza niż dzisiaj";
+    }
+
     return null;
   };
 
@@ -99,6 +112,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
           benefits: "",
           company_id: "",
           employer_id: userData.id,
+          date: "",
         });
       }
     } catch (err) {
@@ -165,6 +179,13 @@ const AddJobOffer = ({ onOfferAdded }) => {
             value={offer.location}
             onChange={(e) => setOffer({ ...offer, location: e.target.value })}
             placeholder="Np. Warszawa / Zdalnie"
+          />
+
+          <label>Ważne do*</label>
+          <input
+            type="date"
+            value={offer.date}
+            onChange={(e) => setOffer({ ...offer, date: e.target.value })}
           />
 
           <label>Rodzaj umowy</label>

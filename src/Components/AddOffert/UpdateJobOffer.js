@@ -4,24 +4,53 @@ import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
 
 const UpdateJobOffer = ({ offer, onOfferAdded }) => {
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const safeArray = (value) => {
+    if (!value) return [];
+
+    if (Array.isArray(value)) return value;
+
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const getSalaryRange = (salary) => {
+    if (!salary) return null;
+
+    const nums = salary.match(/\d+/g)?.map(Number);
+
+    if (!nums || nums.length < 2) return null;
+
+    return {
+      salaryMin: nums[0],
+      salaryMax: nums[1],
+    };
+  };
+
+  const salary = getSalaryRange(offer.salary);
+
   const [updateOffer, setUpdateOffer] = useState({
     title: offer.title,
     company: offer.companyName,
-    location: JSON.parse(offer.workingMode),
-    salary_min: "",
-    salary_max: "",
-    experience: JSON.parse(offer.experience),
-    technologies: JSON.parse(offer.technologies),
-    contract_type: JSON.parse(offer.contractType),
+    location: safeArray(offer.workingMode),
+    experience: safeArray(offer.experience),
+    technologies: safeArray(offer.technologies),
+    contract_type: safeArray(offer.contractType),
     description: offer.description,
     requirements: offer.requirements,
     responsibilities: offer.responsibilities,
     benefits: offer.benefits,
     offer_id: offer.id,
+    date: offer.date,
+    salary_min: salary?.salaryMin ?? "",
+    salary_max: salary?.salaryMax ?? "",
   });
-
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const validate = () => {
     if (!updateOffer.title?.trim()) return "Tytuł oferty jest wymagany";
@@ -34,6 +63,20 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
       +updateOffer.salary_min > +offer.salary_max
     )
       return "Minimalne wynagrodzenie nie może być większe niż maksymalne";
+
+    if (!updateOffer.date) {
+      return "Data wazności oferty jest wymagany";
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selected = new Date(updateOffer.date);
+
+    if (selected < today) {
+      return "Data nie może być wcześniejsza niż dzisiaj";
+    }
+
     return null;
   };
 
@@ -85,12 +128,13 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
   };
 
   const deleteSkillorLanguage = (e) => {
-    const skills = new Set([...offer.technologies]);
-    skills.delete(e.target.textContent);
+    const skills = updateOffer.technologies.filter(
+      (skill) => skill !== e.target.textContent
+    );
 
     setUpdateOffer({
       ...updateOffer,
-      technologies: [...skills],
+      technologies: skills,
     });
   };
   return (
@@ -134,6 +178,14 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
               setUpdateOffer({ ...updateOffer, location: e.target.value })
             }
             placeholder="Np. Warszawa / Zdalnie"
+          />
+          <label>Ważne do*</label>
+          <input
+            type="date"
+            value={updateOffer.date}
+            onChange={(e) =>
+              setUpdateOffer({ ...updateOffer, date: e.target.value })
+            }
           />
 
           <label>Rodzaj umowy</label>
@@ -198,16 +250,16 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
           </label>
           <div className={styles.skill}>
             <div className={styles.skillsList}>
-              {updateOffer.technologies?.map((el) => {
-                return (
+              {Array.isArray(updateOffer.technologies) &&
+                updateOffer.technologies.map((el, i) => (
                   <span
+                    key={i}
                     style={{ cursor: "pointer" }}
-                    onDoubleClick={(e) => deleteSkillorLanguage(e, "skill")}
+                    onDoubleClick={deleteSkillorLanguage}
                   >
                     {el}
                   </span>
-                );
-              })}
+                ))}
             </div>
 
             <select name="skills" onChange={(e) => addSkillorLanguage(e)}>

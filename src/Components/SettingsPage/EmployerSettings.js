@@ -40,7 +40,6 @@ const EmployerSettings = () => {
       .catch((err) => console.log(err));
   }, []);
 
-
   const fetchOffers = () => {
     axios
       .post("http://localhost:5000/api/employers/get-my-offers", {
@@ -375,7 +374,10 @@ const EmployerSettings = () => {
                   <label>Logo firmy</label>
 
                   <div className={styles.logoPreview}>
-                    <img src={logoPreviewUrl || company.img} alt="Logo firmy" />
+                    <img
+                      src={logoPreviewUrl || company?.img}
+                      alt="Logo firmy"
+                    />
                   </div>
 
                   <input

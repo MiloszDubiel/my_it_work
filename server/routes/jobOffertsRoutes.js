@@ -26,8 +26,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-
-
 router.post("/favorites", async (req, res) => {
   const { user_id, offer_id } = req.body;
 
@@ -90,9 +88,10 @@ router.post("/add", async (req, res) => {
     company_id,
     technologies,
     experience,
+    date,
   } = req.body;
 
-  if (!employer_id || !title) {
+  if (!employer_id || !title || !date) {
     return res.status(400).json({ error: "Brak wymaganych pól!" });
   }
 
@@ -103,8 +102,8 @@ router.post("/add", async (req, res) => {
     const [jobOfferResult] = await conn.query(
       `
       INSERT INTO job_offers 
-      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?)
+      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id, date)
+      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?, ?)
       `,
       [
         title,
@@ -119,6 +118,7 @@ router.post("/add", async (req, res) => {
         "own",
         "user",
         employer_id,
+        date,
       ]
     );
 
@@ -204,9 +204,10 @@ router.post("/update", async (req, res) => {
     company_id,
     technologies,
     experience,
+    date,
   } = req.body;
 
-  if (!offer_id || !title) {
+  if (!offer_id || !title || !date) {
     return res.status(400).json({ error: "Brak wymaganych pól!" });
   }
 
@@ -216,7 +217,7 @@ router.post("/update", async (req, res) => {
   try {
     const [jobOfferResult] = await conn.query(
       `
-      UPDATE job_offers SET title = ?, companyName = ?, workingMode = ?, contractType= ?, experience = ? , technologies = ?, salary = ? WHERE id = ? 
+      UPDATE job_offers SET title = ?, companyName = ?, workingMode = ?, contractType= ?, experience = ? , technologies = ?, salary = ?, is_active = 0, date = ? WHERE id = ? 
       `,
       [
         title,
@@ -226,6 +227,7 @@ router.post("/update", async (req, res) => {
         JSON.stringify([experience ? experience : ""]),
         JSON.stringify(technologies || []),
         `${salary_min} - ${salary_max}`,
+        date,
         offer_id,
       ]
     );

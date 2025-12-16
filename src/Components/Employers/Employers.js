@@ -110,6 +110,7 @@ const EmployersComponent = () => {
           <div className={styles.offersList}>
             {currentOffers.length > 0 ? (
               currentOffers.map((offer) => {
+                console.log(offer);
                 const technologies = safeParse(offer.technologies)?.[0] || [];
                 const locations = safeParse(offer.locations)?.[0];
 
@@ -132,32 +133,23 @@ const EmployersComponent = () => {
                       </div>
 
                       <div className={styles.infoSection}>
-                        <h3>{offer.title || "Brak tytułu"}</h3>
-                        <p className={styles.company}>{offer.companyName}</p>
+                        <h3>{offer.companyName}</h3>
+                        <p className={styles.company}>{offer.link}</p>
 
                         {offer.location && (
                           <p className={styles.location}>{offer.location}</p>
                         )}
 
                         <div className={styles.tags}>
-                          <div className={styles.technologies}>
-                            {technologies.slice(0, 2).map((tech, i) => (
-                              <span key={i} className={styles.tag}>
-                                {tech}
-                              </span>
-                            ))}
-
-                            {technologies.length > 2 && (
-                              <p className={styles.item}>i więcej…</p>
-                            )}
-                          </div>
-
-                          {locations && (
-                            <div className={styles.locations}>
-                              <p className={styles.item}>Lokalizacje:</p>
-                              <span className={styles.tag}>{locations}</span>
-                            </div>
-                          )}
+                          <span className={styles.tag}>
+                            {"Kontakt: " +
+                              offer.email +
+                              ", " +
+                              offer.phone_number}
+                          </span>
+                          <span className={styles.tag}>
+                            {"NIP: " + offer.nip}
+                          </span>
                         </div>
                       </div>
 
