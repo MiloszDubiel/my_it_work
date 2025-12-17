@@ -5,12 +5,11 @@ import { io } from "socket.io-client";
 
 const socket = io("http://localhost:5001");
 
-export default function Chat({ conversationId, userId }) {
+export default function Chat({ conversationId, userId, message }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // ✅ Dołączenie do pokoju po wejściu w konwersację
   useEffect(() => {
     if (conversationId) {
       socket.emit("join_conversation", conversationId);
@@ -18,7 +17,6 @@ export default function Chat({ conversationId, userId }) {
     }
   }, [conversationId]);
 
-  // ✅ Pobranie historii wiadomości
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
@@ -32,7 +30,6 @@ export default function Chat({ conversationId, userId }) {
     }
   };
 
-  // ✅ Nasłuchiwanie wiadomości w czasie rzeczywistym
   useEffect(() => {
     socket.on("receive_message", (message) => {
       if (message.conversation_id === conversationId) {
@@ -45,12 +42,10 @@ export default function Chat({ conversationId, userId }) {
     };
   }, [conversationId]);
 
-  // ✅ Auto-scroll do dołu
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ✅ Wysyłanie wiadomości
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -91,7 +86,7 @@ export default function Chat({ conversationId, userId }) {
         <input
           type="text"
           placeholder="Napisz wiadomość..."
-          value={newMessage}
+          value={message || newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
         <button type="submit">Wyślij</button>

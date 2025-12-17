@@ -7,10 +7,10 @@ import { IoMdClose } from "react-icons/io";
 export default function ChatPage() {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const [message, setMessage] = useState("");
 
   const user = JSON.parse(sessionStorage.getItem("user-data"));
 
-  // 🔥 Pobranie rozmów użytkownika
   const fetchConversations = async () => {
     try {
       const res = await axios.get(
@@ -22,18 +22,16 @@ export default function ChatPage() {
     }
   };
 
- 
-
   useEffect(() => {
     fetchConversations();
   }, []);
 
-  // 🔥 Obsługa otwarcia rozmowy po kliknięciu w CandidateInfo
   useEffect(() => {
     const handleOpen = async (e) => {
       const convId = e.detail.conversationId;
 
-      // Jeśli konwersacja nie istnieje na liście → pobierz jeszcze raz
+      setMessage(e.detail.message);
+
       if (!conversations.find((c) => c.id == convId)) {
         await fetchConversations();
       }
@@ -96,7 +94,14 @@ export default function ChatPage() {
                       {chatPartner?.[0]?.toUpperCase()}
                     </div>
                     <div>
-                      <h4>{chatPartner}</h4>
+                      <h4>
+                        {conv.companyName && (
+                          <span className={styles.companyName}>
+                            {conv.companyName + ", "}
+                          </span>
+                        )}
+                        <span className={styles.name}>{chatPartner}</span>
+                      </h4>
                     </div>
                   </div>
                 );
@@ -111,6 +116,7 @@ export default function ChatPage() {
                   conversationId={selectedConversation.id}
                   userId={user.id}
                   key={selectedConversation.id}
+                  message={message}
                 />
               ) : (
                 <div className={styles.placeholder}>

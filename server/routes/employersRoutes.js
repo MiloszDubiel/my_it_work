@@ -190,7 +190,7 @@ router.post("/get-my-applications", async (req, res) => {
       JOIN  job_offers ON job_applications.offer_id = job_offers.id
       JOIN users ON job_applications.user_id = users.id
       JOIN candidate_info ON users.id = candidate_info.user_id
-      WHERE job_offers.employer_id = ? AND  job_applications.status NOT IN('odrzucono', 'anulowana')
+      WHERE job_offers.employer_id = ? AND  job_applications.status NOT IN('odrzucono', 'anulowana', 'zaakceptowana')
       ORDER BY job_applications.created_at DESC`,
       [employer_id]
     );
@@ -228,8 +228,6 @@ router.post("/update-application-status", async (req, res) => {
 router.put("/revoke-application/:id", async (req, res) => {
   const app_id = req.params.id;
 
-  console.log(app_id);
-
   try {
     await connection.query(
       "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
@@ -239,6 +237,21 @@ router.put("/revoke-application/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Błąd podczas odrzucania aplikacji" });
+  }
+});
+
+router.put("/accept-application/:id", async (req, res) => {
+  const app_id = req.params.id;
+
+  try {
+    await connection.query(
+      "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
+      [app_id]
+    );
+    res.json({ success: true, message: "Przyjęto aplikacje" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Błąd podczas przyjmowania aplikacji" });
   }
 });
 

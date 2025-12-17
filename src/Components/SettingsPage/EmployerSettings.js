@@ -18,7 +18,8 @@ const EmployerSettings = () => {
   const [offers, setOffers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [selectedApp, setSelectedApp] = useState(null);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [selectedApp, setSelectedApp] = useState([]);
   const [dataToChange, setDataToChange] = useState({
     ...userData,
     newPassword: "",
@@ -244,10 +245,10 @@ const EmployerSettings = () => {
 
   const cancelApplication = async () => {
     setInfo("");
-    if (!selectedApp) return;
+    if (!selectedApp.length) return;
 
     const res = await axios.put(
-      `http://localhost:5000/api/employers/revoke-application/${selectedApp}`
+      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`
     );
 
     if (res.status == 200) {
@@ -255,7 +256,73 @@ const EmployerSettings = () => {
       fetchApplications();
     }
 
+    try {
+      const user = JSON.parse(sessionStorage.getItem("user-data"));
+
+      const res = await axios.post("http://localhost:5001/chat/create", {
+        employer_id: user.id,
+        candidate_id: selectedApp[1],
+      });
+
+      const conversationId = res.data.id;
+
+      document.querySelector("#chatContainer").style.display = "flex";
+
+      document.querySelector("#root").style.overflow = "hidden";
+      window.dispatchEvent(
+        new CustomEvent("openConversation", {
+          detail: {
+            conversationId,
+            message: "Witam, niestety Twoja aplikacja została odrzucona.",
+          },
+        })
+      );
+    } catch (err) {
+      console.error("Błąd uruchamiania wiadomości:", err);
+    }
+
     setShowCancelModal(false);
+  };
+  const acceptApplication = async () => {
+    setInfo("");
+    if (!selectedApp.length) return;
+
+    const res = await axios.put(
+      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`
+    );
+
+    if (res.status == 200) {
+      setInfo("Przyjęto aplikacje");
+      fetchApplications();
+    }
+
+    try {
+      const user = JSON.parse(sessionStorage.getItem("user-data"));
+
+      const res = await axios.post("http://localhost:5001/chat/create", {
+        employer_id: user.id,
+        candidate_id: selectedApp[1],
+      });
+
+      const conversationId = res.data.id;
+
+      document.querySelector("#chatContainer").style.display = "flex";
+
+      document.querySelector("#root").style.overflow = "hidden";
+      window.dispatchEvent(
+        new CustomEvent("openConversation", {
+          detail: {
+            conversationId,
+            message:
+              "Witam, jestem zainteresowany Twoją aplikacją. Proszę o kontakt.",
+          },
+        })
+      );
+    } catch (err) {
+      console.error("Błąd uruchamiania wiadomości:", err);
+    }
+
+    setShowAcceptModal(false);
   };
 
   const deleteOffer = async () => {
@@ -284,6 +351,14 @@ const EmployerSettings = () => {
           message="Czy na pewno chcesz odrzucić tę aplikację?"
           onConfirm={() => cancelApplication()}
           onCancel={() => setShowCancelModal(false)}
+        />
+      )}
+
+      {showAcceptModal && (
+        <ConfirmModal
+          message="Czy na pewno chcesz zaakceptować i wysłać odpowiedź na tę aplikację?"
+          onConfirm={() => acceptApplication()}
+          onCancel={() => setShowAcceptModal(false)}
         />
       )}
       <div className={styles.container}>
@@ -527,6 +602,7 @@ const EmployerSettings = () => {
 
                         <span className={styles.appActions}>
                           <CandidateInfo candidate={app} />
+                          {console.log(app)}
                           {app.cv && (
                             <button
                               onClick={() => window.open(app.cv, "_blank")}
@@ -552,8 +628,18 @@ const EmployerSettings = () => {
                           <button
                             className={styles.deleteBtn}
                             onClick={() => {
-                              setSelectedApp(app.app_id);
+                              setSelectedApp([app.app_id, app.user_id]);
                               setShowCancelModal(true);
+                            }}
+                          >
+                            🗑
+                          </button>
+
+                          <button
+                            className={styles.acceptBtn}
+                            onClick={() => {
+                              setSelectedApp([app.app_id, app.user_id]);
+                              setShowAcceptModal(true);
                             }}
                           >
                             🗑

@@ -55,7 +55,6 @@ const CandidateSettings = () => {
     setCandidateProfile({ ...candidateProfile, [name]: value });
   };
 
-  console.log(favorites);
   useEffect(() => {
     axios
       .post("http://localhost:5000/user/has-candiate-profile", {
@@ -918,7 +917,8 @@ const CandidateSettings = () => {
                           </td>
                           <td>
                             {app.status !== "anulowana" &&
-                            app.status !== "odrzucono" ? (
+                            app.status !== "odrzucono" &&
+                            app.status !== "zaakceptowana" ? (
                               <button
                                 className={styles.cancelBtn}
                                 onClick={() => {
@@ -929,7 +929,47 @@ const CandidateSettings = () => {
                                 Anuluj
                               </button>
                             ) : (
-                              ""
+                              <button
+                                className={styles.confirmBtn}
+                                onClick={async () => {
+                                  console.log(app);
+                                  try {
+                                    const user = JSON.parse(
+                                      sessionStorage.getItem("user-data")
+                                    );
+
+                                    const res = await axios.post(
+                                      "http://localhost:5001/chat/create",
+                                      {
+                                        employer_id: app.owner_id,
+                                        candidate_id: user.id,
+                                      }
+                                    );
+
+                                    const conversationId = res.data.id;
+
+                                    document.querySelector(
+                                      "#chatContainer"
+                                    ).style.display = "flex";
+
+                                    document.querySelector(
+                                      "#root"
+                                    ).style.overflow = "hidden";
+                                    window.dispatchEvent(
+                                      new CustomEvent("openConversation", {
+                                        detail: { conversationId },
+                                      })
+                                    );
+                                  } catch (err) {
+                                    console.error(
+                                      "Błąd uruchamiania wiadomości:",
+                                      err
+                                    );
+                                  }
+                                }}
+                              >
+                                Otwórz wiadomości
+                              </button>
                             )}
                           </td>
                         </tr>

@@ -32,6 +32,10 @@
   align-items: center;
   margin-bottom: 14px;
 }
+.name{
+  font-size: 14px;
+  font-weight: 450;
+}
 
 .rightActions {
   display: flex;

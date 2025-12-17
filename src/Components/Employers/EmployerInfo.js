@@ -215,7 +215,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                               ))}
                           </div>
 
-                          {offer.sctive_to && (
+                          {offer.active_to && (
                             <p className={styles.offerDate}>
                               Wazne do: {offer.active_to}
                             </p>

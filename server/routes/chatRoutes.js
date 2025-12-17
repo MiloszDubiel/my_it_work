@@ -25,10 +25,12 @@ router.get("/conversations/:userId", async (req, res) => {
             u1.name AS employer_name, 
             u2.name AS candidate_name,
             u1.surname AS employer_surname,
-            u2.surname AS candidate_surname
+            u2.surname AS candidate_surname,
+            com.companyName
       FROM conversations c
       JOIN users u1 ON u1.id = c.employer_id
       JOIN users u2 ON u2.id = c.candidate_id
+      LEFT JOIN companies com ON com.owner_id = u1.id
       WHERE c.employer_id = ? OR c.candidate_id = ?
       ORDER BY c.created_at DESC
       `,

@@ -295,45 +295,44 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                     </button>
                   )}
 
-                  {userData?.info !== "Wylogowano" &&
-                    userData?.role !== "employer" && (
-                      <button
-                        className={styles.compBtnOutline}
-                        onClick={async () => {
-                          try {
-                            const user = JSON.parse(
-                              sessionStorage.getItem("user-data")
-                            );
+                  {userData && userData?.role !== "employer" && (
+                    <button
+                      className={styles.compBtnOutline}
+                      onClick={async () => {
+                        try {
+                          const user = JSON.parse(
+                            sessionStorage.getItem("user-data")
+                          );
 
-                            const res = await axios.post(
-                              "http://localhost:5001/chat/create",
-                              {
-                                employer_id: offer.owner_id,
-                                candidate_id: user.id,
-                              }
-                            );
+                          const res = await axios.post(
+                            "http://localhost:5001/chat/create",
+                            {
+                              employer_id: offer.owner_id,
+                              candidate_id: user.id,
+                            }
+                          );
 
-                            const conversationId = res.data.id;
+                          const conversationId = res.data.id;
 
-                            document.querySelector(
-                              "#chatContainer"
-                            ).style.display = "flex";
+                          document.querySelector(
+                            "#chatContainer"
+                          ).style.display = "flex";
 
-                            document.querySelector("#root").style.overflow =
-                              "hidden";
-                            window.dispatchEvent(
-                              new CustomEvent("openConversation", {
-                                detail: { conversationId },
-                              })
-                            );
-                          } catch (err) {
-                            console.error("Błąd uruchamiania wiadomości:", err);
-                          }
-                        }}
-                      >
-                        Wyślij wiadomość
-                      </button>
-                    )}
+                          document.querySelector("#root").style.overflow =
+                            "hidden";
+                          window.dispatchEvent(
+                            new CustomEvent("openConversation", {
+                              detail: { conversationId },
+                            })
+                          );
+                        } catch (err) {
+                          console.error("Błąd uruchamiania wiadomości:", err);
+                        }
+                      }}
+                    >
+                      Wyślij wiadomość
+                    </button>
+                  )}
                 </div>
               )}
             </div>

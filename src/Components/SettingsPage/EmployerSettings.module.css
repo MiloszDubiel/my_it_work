@@ -321,6 +321,15 @@ select:focus {
   border: none;
   cursor: pointer;
 }
+.acceptBtn {
+  background: #32a110;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
 
 .deleteBtn:hover {
   background: #b91c1c;

@@ -288,9 +288,10 @@ router.post("/get-user-applications", async (req, res) => {
     const { user_id } = req.body;
 
     const [rows] = await connection.query(
-      `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status
+      `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status, companies.owner_id
        FROM job_applications
        JOIN job_offers ON job_applications.offer_id = job_offers.id
+       JOIN companies ON job_offers.company_id = companies.id
        WHERE job_applications.user_id = ?
        ORDER BY created_at DESC`,
       [user_id]

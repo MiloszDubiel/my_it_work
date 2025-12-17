@@ -32,7 +32,7 @@ app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);
 
-// ✅ Konfiguracja Socket.IO
+// Konfiguracja Socket.IO
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",

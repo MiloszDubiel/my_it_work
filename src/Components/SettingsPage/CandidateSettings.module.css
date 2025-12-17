@@ -354,9 +354,7 @@ select:focus {
   font-weight: 600;
 }
 
-/* ================================
-   CANCEL BUTTONS
-================================ */
+
 .cancelBtn {
   background: #e11d48;
   color: white;
@@ -365,6 +363,7 @@ select:focus {
   border-radius: 6px;
   cursor: pointer;
 }
+
 
 .cancelBtn:hover {
   background: #be123c;
@@ -383,9 +382,6 @@ select:focus {
   background: #4b5563;
 }
 
-/* ================================
-   MODAL
-================================ */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -422,7 +418,6 @@ select:focus {
 .confirmBtn:hover {
   background: #15803d;
 }
-
 
 @media (max-width: 768px) {
   .container1 {
