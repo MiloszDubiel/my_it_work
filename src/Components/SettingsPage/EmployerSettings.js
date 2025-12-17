@@ -582,8 +582,8 @@ const EmployerSettings = () => {
                 <div className={styles.appTable}>
                   <div className={styles.appHeader}>
                     <span>Kandydat</span>
-                    <span>Stanowisko</span>
-                    <span>Data aplikacji</span>
+                    <span>Stanowisko </span>
+                    <span>Data aplikacji </span>
                     <span>Akcje</span>
                   </div>
 

@@ -90,7 +90,10 @@ const Navbar = ({ employersPage }) => {
           <div className={styles.account}>
             {userData?.email ? (
               <>
-                Witaj, {userData.name || "Użytkowniku"} {userData.surname || ""}
+                {userData?.role != "admin" &&
+                  `Witaj, ${userData.name || "Użytkowniku"} ${
+                    userData.surname || ""
+                  }`}
                 <button
                   onClick={() => {
                     account.current.classList.toggle(styles.accountDivHide);
@@ -122,9 +125,6 @@ const Navbar = ({ employersPage }) => {
                       }}
                     >
                       <FiMessageSquare className={styles.icon} />
-                    </button>
-                    <button>
-                      <IoIosNotificationsOutline className={styles.icon} />
                     </button>
                   </>
                 )}
