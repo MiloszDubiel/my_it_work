@@ -90,10 +90,11 @@ const Navbar = ({ employersPage }) => {
           <div className={styles.account}>
             {userData?.email ? (
               <>
-                {userData?.role != "admin" &&
-                  `Witaj, ${userData.name || "Użytkowniku"} ${
-                    userData.surname || ""
-                  }`}
+                {userData?.role != "admin" && (
+                  <span className={styles.name}>
+                    {userData.name || "Użytkowniku" || userData.surname || ""}
+                  </span>
+                )}
                 <button
                   onClick={() => {
                     account.current.classList.toggle(styles.accountDivHide);

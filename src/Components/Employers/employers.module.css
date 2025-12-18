@@ -112,7 +112,6 @@ h1 {
 }
 
 .actions {
-  flex: 0 0 150px;
   display: flex;
   justify-content: center;
 }
@@ -164,4 +163,64 @@ h1 {
 
 .pageBtn:hover:not(:disabled) {
   background: #2563eb;
+}
+@media (max-width: 1500px) {
+  .offerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    height: 300px;
+    width: 100%;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .logoSection {
+    flex: none;
+  }
+  h3,
+  .company {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    height: 1.2em;
+    white-space: nowrap;
+  }
+  .infoSection {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .tags {
+    flex-wrap: wrap;
+  }
+
+  .technologies,
+  .locations {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .actions {
+    z-index: 0;
+    display: flex;
+    justify-content: left;
+  }
+
+  .detailsBtn {
+    width: 200px;
+    text-align: center;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+@media (max-width: 1024px) {
+  .offersList {
+    width: 100%;
+  }
+
+  .offerRow {
+    width: 100%;
+  }
 }

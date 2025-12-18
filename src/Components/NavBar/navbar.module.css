@@ -180,13 +180,17 @@
     padding: 0 1rem;
   }
 
-  .header h3 {
-    font-size: 22px;
+  .header {
+    display: none;
+  }
+  .name {
+    display: none;
   }
 
-
   .list ul {
-    display: none;
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
   }
 
   .account {
@@ -200,7 +204,7 @@
   }
 
   /* Dropdown dostosowany do telefonu */
-.accountDiv {
+  .accountDiv {
     right: 0;
     width: 150px;
     top: 55px;
@@ -236,5 +240,3 @@
     top: 65px;
   }
 }
-
-

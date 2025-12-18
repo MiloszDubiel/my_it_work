@@ -85,3 +85,27 @@
 .inputArea button:hover {
   background: #0056b3;
 }
+@media (max-width: 1000px) {
+  .chatContainer {
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .messagesContainer {
+    padding: 12px;
+  }
+
+  .message {
+    max-width: 85%;
+    font-size: 14px;
+  }
+
+  .inputArea input {
+    font-size: 16px; /* iOS zoom fix */
+  }
+
+  .inputArea button {
+    padding: 10px 14px;
+  }
+}
