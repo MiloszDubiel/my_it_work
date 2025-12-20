@@ -181,7 +181,7 @@
   }
 
   .jobsGrid {
-    grid-template-columns: 1fr; /* jedna kolumna */
+    grid-template-columns: 1fr;
   }
 
   .jobCard {
@@ -204,11 +204,11 @@
   }
 
   .jobsGrid {
-    grid-template-columns: repeat(2, 1fr); /* 2 kolumny */
+    grid-template-columns: repeat(1, 1fr); /* 2 kolumny */
   }
 
   .aboutGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 

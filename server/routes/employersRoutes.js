@@ -7,7 +7,7 @@ import {
 import { connection } from "../config/db.js";
 import { uploadLogo } from "../middleware/settingMiddleware.js";
 import path from "path";
-import fs from "fs";
+
 
 const router = express.Router();
 
@@ -73,7 +73,6 @@ router.post("/request-company-change", async (req, res) => {
   try {
     const { owner_id, companyName, nip, company_id } = req.body;
 
-    // --- 1. Czy istnieje już oczekujący request? -----------------------
     const [rows] = await connection.query(
       `SELECT * FROM company_change_requests 
          WHERE company_id = ? 
@@ -88,7 +87,7 @@ router.post("/request-company-change", async (req, res) => {
       });
     }
 
-    // --- 3. Zapis nowego requesta ---------------------------------------
+  
     const sql = `
         INSERT INTO company_change_requests 
         (company_id, employer_id, new_company_name, new_nip, status)
@@ -100,7 +99,6 @@ router.post("/request-company-change", async (req, res) => {
       owner_id,
       companyName || null,
       nip || null,
-      logoPath || null,
     ]);
 
     return res.status(200).json({

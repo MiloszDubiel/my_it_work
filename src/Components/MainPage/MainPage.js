@@ -7,6 +7,7 @@ import OfferInfo from "../Offert/OfferInfo";
 
 const MainPage = () => {
   const [offers, setOffers] = useState([]);
+  const userData = JSON.parse(sessionStorage.getItem("user-data"));
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -36,9 +37,12 @@ const MainPage = () => {
             <Link to="/job-offers" className={styles.btnPrimary}>
               Przeglądaj oferty
             </Link>
-            <Link to="/register" className={styles.btnSecondary}>
-              Dołącz teraz
-            </Link>
+
+            {!userData && (
+              <Link to="/register" className={styles.btnSecondary}>
+                Dołącz teraz
+              </Link>
+            )}
           </div>
         </div>
       </section>

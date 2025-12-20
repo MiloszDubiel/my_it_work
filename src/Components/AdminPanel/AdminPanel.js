@@ -243,7 +243,7 @@ const AdminPanel = () => {
   return (
     <div className={styles.adminContainer}>
       <Navbar />
-      <div style={{ display: "flex", height: "calc(100% - 80px)" }}>
+      <div className={styles.layout}>
         <aside className={styles.sidebar}>
           <h2>Panel Administratora</h2>
           <ul>
@@ -369,6 +369,54 @@ const AdminPanel = () => {
                     ))}
                   </tbody>
                 </table>
+                <div className={styles.cards}>
+                  {users.map((u) => (
+                    <div key={u.id} className={styles.card}>
+                      <div className={styles.cardRow}>
+                        <span>Email</span>
+                        <b>{u.email}</b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>Imię</span>
+                        <b>
+                          {u.name} {u.surname}
+                        </b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>Typ</span>
+                        <b>{u.role}</b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>Aktywny</span>
+                        <b>{u.is_active === "1" ? "Tak" : "Nie"}</b>
+                      </div>
+
+                      <div className={styles.cardActions}>
+                        <button
+                          className={styles.editBtn}
+                          onClick={() => {
+                            setSelectedUser(u);
+                            setIsEditing(true);
+                          }}
+                        >
+                          ✏️ Edytuj
+                        </button>
+
+                        {u.role !== "admin" && (
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => askDeleteUser(u.id)}
+                          >
+                            🗑 Usuń
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <div className={styles.pagination}>
                   <button
                     disabled={page === 1}
@@ -419,7 +467,6 @@ const AdminPanel = () => {
                     <tr>
                       <th>Nazwa</th>
                       <th>NIP</th>
-
                       <th>Akcje</th>
                     </tr>
                   </thead>
@@ -453,6 +500,40 @@ const AdminPanel = () => {
                     ))}
                   </tbody>
                 </table>
+                <div className={styles.cards}>
+                  {companies.map((c) => (
+                    <div key={c.id} className={styles.card}>
+                      <div className={styles.cardRow}>
+                        <span>Nazwa</span>
+                        <b>{c.companyName}</b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>NIP</span>
+                        <b>{c.nip}</b>
+                      </div>
+
+                      <div className={styles.cardActions}>
+                        <button
+                          className={styles.editBtn}
+                          onClick={() => {
+                            setSelectedCompany(c);
+                            setIsEditingCompany(true);
+                          }}
+                        >
+                          ✏️ Edytuj
+                        </button>
+
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => askDeleteCompany(c.id)}
+                        >
+                          🗑 Usuń
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
                 <div className={styles.pagination}>
                   <button
@@ -517,6 +598,41 @@ const AdminPanel = () => {
                       ))}
                     </tbody>
                   </table>
+                  <div className={styles.cards}>
+                    {requests.map((r) => (
+                      <div key={r.id} className={styles.card}>
+                        <div className={styles.cardRow}>
+                          <span>Firma</span>
+                          <b>
+                            {r.old_name} → {r.new_company_name}
+                          </b>
+                        </div>
+
+                        <div className={styles.cardRow}>
+                          <span>NIP</span>
+                          <b>
+                            {r.old_nip} → {r.new_nip}
+                          </b>
+                        </div>
+
+                        <div className={styles.cardActions}>
+                          <button
+                            className={styles.editBtn}
+                            onClick={() => askApprove(r.id)}
+                          >
+                            ✔ Akceptuj
+                          </button>
+
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => askReject(r.id)}
+                          >
+                            ✖ Odrzuć
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
@@ -598,6 +714,45 @@ const AdminPanel = () => {
                     ))}
                   </tbody>
                 </table>
+                <div className={styles.cards}>
+                  {offers.map((o) => (
+                    <div key={o.id} className={styles.card}>
+                      <div className={styles.cardRow}>
+                        <span>Stanowisko</span>
+                        <b>{o.title}</b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>Firma</span>
+                        <b>{o.companyName}</b>
+                      </div>
+
+                      <div className={styles.cardRow}>
+                        <span>Status</span>
+                        <b>{o.is_active === 1 ? "Aktywna" : "Nieaktywna"}</b>
+                      </div>
+
+                      <div className={styles.cardActions}>
+                        <button
+                          className={styles.editBtn}
+                          onClick={() => {
+                            setSelectedOffer(o);
+                            setIsEditingOffer(true);
+                          }}
+                        >
+                          ✏️ Edytuj
+                        </button>
+
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => askDeleteOffer(o.id)}
+                        >
+                          🗑 Usuń
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className={styles.pagination}>
                 <button

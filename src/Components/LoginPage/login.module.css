@@ -181,11 +181,83 @@
   }
 }
 
-/* responsive */
+
 @media (max-width: 480px) {
   .container {
-    margin: 12px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .container1 {
+    max-width: 100%;
     padding: 16px;
-    max-width: calc(100% - 24px);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .form {
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .input {
+    height: 42px;
+    font-size: 16px; /* zapobiega zoomowaniu w iOS */
+  }
+
+  .btnPrimary {
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .footer {
+    font-size: 12px;
+  }
+
+  .togglePwd {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .container1 {
+    max-width: 380px;
+  }
+
+  .title {
+    font-size: 19px;
+  }
+
+  .input {
+    font-size: 15px;
+  }
+
+  .btnPrimary {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container1 {
+    max-width: 420px;
+  }
+
+  .title {
+    font-size: 21px;
+  }
+
+  .input {
+    font-size: 15px;
+  }
+
+  .btnPrimary {
+    font-size: 15px;
   }
 }

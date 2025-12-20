@@ -216,22 +216,15 @@ const EmployerSettings = () => {
       return false;
     }
 
-    const formData = new FormData();
-    formData.append("owner_id", userData.id);
-    formData.append("companyName", company.companyName);
-    formData.append("nip", company.nip);
-    formData.append("company_id", company.id);
-
-    if (logoFile) {
-      formData.append("logo", logoFile);
-    }
-
+ 
     try {
       let res = await axios.post(
         "http://localhost:5000/api/employers/request-company-change",
-        formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          owner_id: userData.id,
+          companyName: company.companyName,
+          nip: company.nip,
+          company_id: company.id,
         }
       );
 

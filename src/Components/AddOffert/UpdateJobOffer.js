@@ -143,205 +143,221 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
       id="update-job-offer"
     >
       <div className={styles.container}>
-        <IoMdClose
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            document.querySelector(
-              `.update-job-offer${offer.id}`
-            ).style.display = "none";
-            document.querySelector("#root").style.overflow = "auto";
-            setError("");
-            setMessage("");
-          }}
-        />
-        <h2>Aktualizuj oferte pracy</h2>
-
-        {error && <p className={styles.error}>{error}</p>}
-        {message && <p className={styles.success}>{message}</p>}
-
-        <form className={styles.form}>
-          <label>Tytuł oferty*</label>
-          <input
-            type="text"
-            value={updateOffer.title}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, title: e.target.value })
-            }
-            placeholder="Np. Frontend Developer"
-          />
-
-          <label>Lokalizacja*</label>
-          <input
-            type="text"
-            value={updateOffer.location}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, location: e.target.value })
-            }
-            placeholder="Np. Warszawa / Zdalnie"
-          />
-          <label>Ważne do*</label>
-          <input
-            type="date"
-            value={updateOffer.date}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, date: e.target.value })
-            }
-          />
-
-          <label>Rodzaj umowy</label>
-          <select
-            value={updateOffer.contract_type}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, contract_type: e.target.value })
-            }
+        <div className={styles.actionsBar}>
+          <button
+            className={styles.closeBtn}
+            onClick={() => {
+              document.querySelector(
+                `.update-job-offer${offer.id}`
+              ).style.display = "none";
+              document.querySelector("#root").style.overflow = "auto";
+              setError("");
+              setMessage("");
+            }}
           >
-            <option value="">Wybierz...</option>
-            <option value="Umowa o pracę">Umowa o pracę</option>
-            <option value="B2B">B2B</option>
-            <option value="Umowa zlecenie">Umowa zlecenie</option>
-            <option value="Inne">Inne</option>
-          </select>
+            <IoMdClose />
+          </button>
+        </div>
 
-          <div className={styles.salaryGroup}>
-            <div>
-              <label>Wynagrodzenie min.</label>
-              <input
-                type="number"
-                value={updateOffer.salary_min}
-                onChange={(e) =>
-                  setUpdateOffer({ ...updateOffer, salary_min: e.target.value })
-                }
-                placeholder="np. 8000"
-              />
-            </div>
+        <div className={styles.content}>
+          {error && <p className={styles.error}>{error}</p>}
+          {message && <p className={styles.info}>{message}</p>}
 
-            <div>
-              <label>Wynagrodzenie max.</label>
-              <input
-                type="number"
-                value={updateOffer.salary_max}
-                onChange={(e) =>
-                  setUpdateOffer({ ...updateOffer, salary_max: e.target.value })
-                }
-                placeholder="np. 15000"
-              />
-            </div>
-          </div>
-
-          <label>Doświadczenie</label>
-
-          <select
-            name="career_level"
-            value={updateOffer.experience}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, experience: e.target.value })
-            }
-          >
-            <option value="Intern">Intern</option>
-            <option value="Junior">Junior</option>
-            <option value="Mid">Mid / Regular</option>
-            <option value="Senior">Senior</option>
-            <option value="Lead / Principal">Lead / Principa</option>
-          </select>
-
-          <label>
-            Technologie{" "}
-            <span className={styles.span}>Kliknij podwójnie aby usunąć</span>{" "}
-          </label>
-          <div className={styles.skill}>
-            <div className={styles.skillsList}>
-              {Array.isArray(updateOffer.technologies) &&
-                updateOffer.technologies.map((el, i) => (
-                  <span
-                    key={i}
-                    style={{ cursor: "pointer" }}
-                    onDoubleClick={deleteSkillorLanguage}
-                  >
-                    {el}
-                  </span>
-                ))}
-            </div>
-
-            <select name="skills" onChange={(e) => addSkillorLanguage(e)}>
-              <option>JavaScript</option>
-              <option>TypeScript</option>
-              <option>Java</option>
-              <option>C</option>
-              <option>C++</option>
-              <option>C#</option>
-              <option>Python</option>
-              <option>Kotlin</option>
-              <option>Rust</option>
-              <option>Node.js</option>
-              <option>React.js</option>
-              <option>Angular.js</option>
-              <option>Vue.js</option>
-              <option>Inna...</option>
-            </select>
+          <form className={styles.form}>
+            <h2>Edytuj ofertę pracy</h2>
+            <label>Tytuł oferty*</label>
             <input
               type="text"
-              name="add_skill"
-              placeholder="Inna technologia..."
+              value={updateOffer.title}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, title: e.target.value })
+              }
+              placeholder="Np. Frontend Developer"
             />
-            <button
-              type="button"
-              onClick={(e) => addSkillLanguageorSchoolFromInput(e)}
-              className={styles.saveBtn}
+
+            <label>Lokalizacja*</label>
+            <input
+              type="text"
+              value={updateOffer.location}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, location: e.target.value })
+              }
+              placeholder="Np. Warszawa / Zdalnie"
+            />
+            <label>Ważne do*</label>
+            <input
+              type="date"
+              value={updateOffer.date}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, date: e.target.value })
+              }
+            />
+
+            <label>Rodzaj umowy</label>
+            <select
+              value={updateOffer.contract_type}
+              onChange={(e) =>
+                setUpdateOffer({
+                  ...updateOffer,
+                  contract_type: e.target.value,
+                })
+              }
             >
-              Dodaj
+              <option value="">Wybierz...</option>
+              <option value="Umowa o pracę">Umowa o pracę</option>
+              <option value="B2B">B2B</option>
+              <option value="Umowa zlecenie">Umowa zlecenie</option>
+              <option value="Inne">Inne</option>
+            </select>
+
+            <div className={styles.salaryGroup}>
+              <div>
+                <label>Wynagrodzenie min.</label>
+                <input
+                  type="number"
+                  value={updateOffer.salary_min}
+                  onChange={(e) =>
+                    setUpdateOffer({
+                      ...updateOffer,
+                      salary_min: e.target.value,
+                    })
+                  }
+                  placeholder="np. 8000"
+                />
+              </div>
+
+              <div>
+                <label>Wynagrodzenie max.</label>
+                <input
+                  type="number"
+                  value={updateOffer.salary_max}
+                  onChange={(e) =>
+                    setUpdateOffer({
+                      ...updateOffer,
+                      salary_max: e.target.value,
+                    })
+                  }
+                  placeholder="np. 15000"
+                />
+              </div>
+            </div>
+
+            <label>Doświadczenie</label>
+
+            <select
+              name="career_level"
+              value={updateOffer.experience}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, experience: e.target.value })
+              }
+            >
+              <option value="Intern">Intern</option>
+              <option value="Junior">Junior</option>
+              <option value="Mid">Mid / Regular</option>
+              <option value="Senior">Senior</option>
+              <option value="Lead / Principal">Lead / Principa</option>
+            </select>
+
+            <label>
+              Technologie{" "}
+              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>{" "}
+            </label>
+            <div className={styles.skill}>
+              <div className={styles.skillsList}>
+                {Array.isArray(updateOffer.technologies) &&
+                  updateOffer.technologies.map((el, i) => (
+                    <span
+                      key={i}
+                      style={{ cursor: "pointer" }}
+                      onDoubleClick={deleteSkillorLanguage}
+                    >
+                      {el}
+                    </span>
+                  ))}
+              </div>
+
+              <select name="skills" onChange={(e) => addSkillorLanguage(e)}>
+                <option>JavaScript</option>
+                <option>TypeScript</option>
+                <option>Java</option>
+                <option>C</option>
+                <option>C++</option>
+                <option>C#</option>
+                <option>Python</option>
+                <option>Kotlin</option>
+                <option>Rust</option>
+                <option>Node.js</option>
+                <option>React.js</option>
+                <option>Angular.js</option>
+                <option>Vue.js</option>
+                <option>Inna...</option>
+              </select>
+              <input
+                type="text"
+                name="add_skill"
+                placeholder="Inna technologia..."
+              />
+              <button
+                type="button"
+                onClick={(e) => addSkillLanguageorSchoolFromInput(e)}
+                className={styles.saveBtn}
+              >
+                Dodaj
+              </button>
+            </div>
+
+            <label>Opis stanowiska*</label>
+            <textarea
+              value={updateOffer.description}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, description: e.target.value })
+              }
+              placeholder="Wprowadź pełny opis stanowiska..."
+            />
+
+            <label>Wymagania</label>
+            <textarea
+              value={updateOffer.requirements}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, requirements: e.target.value })
+              }
+              placeholder="Wymagania dla kandydata..."
+            />
+
+            <label>Zakres obowiązków</label>
+            <textarea
+              value={updateOffer.responsibilities}
+              onChange={(e) =>
+                setUpdateOffer({
+                  ...updateOffer,
+                  responsibilities: e.target.value,
+                })
+              }
+              placeholder="Czym będziesz się zajmować..."
+            />
+
+            <label>Benefity</label>
+            <textarea
+              value={updateOffer.benefits}
+              onChange={(e) =>
+                setUpdateOffer({ ...updateOffer, benefits: e.target.value })
+              }
+              placeholder="Co oferuje firma..."
+            />
+
+            <button
+              type="submit"
+              className={styles.submitBtn}
+              onClick={handleSubmit}
+            >
+              Dodaj ofertę
             </button>
-          </div>
-
-          <label>Opis stanowiska*</label>
-          <textarea
-            value={updateOffer.description}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, description: e.target.value })
-            }
-            placeholder="Wprowadź pełny opis stanowiska..."
-          />
-
-          <label>Wymagania</label>
-          <textarea
-            value={updateOffer.requirements}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, requirements: e.target.value })
-            }
-            placeholder="Wymagania dla kandydata..."
-          />
-
-          <label>Zakres obowiązków</label>
-          <textarea
-            value={updateOffer.responsibilities}
-            onChange={(e) =>
-              setUpdateOffer({
-                ...updateOffer,
-                responsibilities: e.target.value,
-              })
-            }
-            placeholder="Czym będziesz się zajmować..."
-          />
-
-          <label>Benefity</label>
-          <textarea
-            value={updateOffer.benefits}
-            onChange={(e) =>
-              setUpdateOffer({ ...updateOffer, benefits: e.target.value })
-            }
-            placeholder="Co oferuje firma..."
-          />
-
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            onClick={handleSubmit}
-          >
-            Dodaj ofertę
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
 
 export default UpdateJobOffer;
+

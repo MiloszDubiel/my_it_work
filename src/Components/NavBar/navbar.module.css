@@ -223,13 +223,13 @@
     justify-content: space-between;
   }
 
-  .header h3 {
-    font-size: 24px;
+  .header {
+    display: none;
   }
-
-  .list ul {
-    gap: 20px;
+  .name {
+    display: none;
   }
+  
 
   .account {
     gap: 12px;

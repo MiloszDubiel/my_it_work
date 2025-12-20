@@ -630,7 +630,7 @@ td {
     padding: 6px 10px;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 1040px) {
   .rowHeader {
     display: none;
   }
