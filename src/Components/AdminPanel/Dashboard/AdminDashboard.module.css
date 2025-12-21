@@ -1,14 +1,52 @@
 .dashboard {
-  padding: 20px;
-  display: flex;
- flex-direction: column;
- width: 100%;
- align-items: center;
+  padding: 30px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.chartContainer {
-  margin: 30px 0;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 8px;
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+}
+
+.matchRow {
+  display: grid;
+  grid-template-columns: 1fr 2fr 60px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.bar {
+  background: #e5e7eb;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  background: #3b82f6;
+  height: 100%;
+}
+@media (max-width: 768px) {
+  .card {
+    padding: 12px;
+  }
+
+  .card h2 {
+    font-size: 16px;
+    text-align: center;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    padding: 10px;
+  }
+
+  .card p {
+    font-size: 13px;
+    text-align: center;
+  }
 }

@@ -245,55 +245,6 @@ router.put("/update-offer", authenticateToken, isAdmin, async (req, res) => {
 
 //STATYSTYKI
 
-router.get("/stats", async (req, res) => {
-  try {
-    // Nowi użytkownicy w czasie (tygodniowo)
-    const [users] = await connection.query(`
-      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count
-      FROM users
-      GROUP BY month
-      ORDER BY month ASC
-    `);
-
-    // Nowe oferty w czasie
-    const [offers] = await connection.query(`
-      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count
-      FROM job_offers
-      GROUP BY month
-      ORDER BY month ASC
-    `);
-
-    // Popularność firm wg liczby ofert
-    const [companies] = await connection.query(`
-      SELECT c.companyName, COUNT(j.id) AS offersCount
-      FROM companies c
-      LEFT JOIN job_offers j ON j.company_id = c.id
-      GROUP BY c.id
-      ORDER BY offersCount DESC
-      LIMIT 10
-    `);
-
-    const [categories] = await connection.query(`
-  SELECT 
-    CASE
-      WHEN title LIKE '%Frontend%' THEN 'Frontend'
-      WHEN title LIKE '%Backend%' THEN 'Backend'
-      WHEN title LIKE '%Fullstack%' THEN 'Fullstack'
-      ELSE 'Inne'
-    END AS category,
-    COUNT(*) AS count
-  FROM job_offers
-  GROUP BY category
-  ORDER BY count DESC
-`);
-
-    res.json({ users, offers, companies, categories });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd serwera" });
-  }
-});
-
 //Hasło
 router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -304,15 +255,10 @@ router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
     [adminId]
   );
 
-  console.log("Old password:", oldPassword);
-  console.log("Hash from DB:", rows[0].password);
-  console.log("Compare:", await bcrypt.compare(oldPassword, rows[0].password));
-  console.log("Admin ID:", adminId);
-
   const match = await bcrypt.compare(oldPassword, rows[0].password);
 
   if (!match) {
-    return res.status(400).json({ msg: "Wrong password" });
+    return res.status(400).json({ msg: "Złe hasło" });
   }
 
   const newHash = await bcrypt.hash(newPassword, 10);
@@ -322,7 +268,7 @@ router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
     adminId,
   ]);
 
-  res.json({ msg: "Password updated" });
+  res.json({ msg: "Hasło zaaktualizowane" });
 });
 
 //Zmiana danych firmy

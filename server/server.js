@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import settingRoute from "./routes/settingRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import candidateRoutes from "./routes/candidateRoutes.js";
+import statsRoutes from './routes/statsRoutes.js'
 import adminRoutes from "./routes/adminRoutes.js";
 import http from "http";
 import { connection } from "./config/db.js";
@@ -26,7 +27,7 @@ app.use("/user", settingRoute);
 app.use("/messager", chatRoutes);
 app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
-
+app.use("/api/stats", statsRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
