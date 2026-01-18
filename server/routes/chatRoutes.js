@@ -2,7 +2,7 @@ import express from "express";
 import { connection } from "../config/db.js";
 const router = express.Router();
 
-// ====== API REST (np. do pobrania historii wiadomości) ======
+
 router.get("/messages/:conversationId", async (req, res) => {
   const { conversationId } = req.params;
 
@@ -15,7 +15,7 @@ router.get("/messages/:conversationId", async (req, res) => {
 
   res.json(rows);
 });
-// 📨 Pobierz listę rozmów użytkownika (dla pracodawcy lub kandydata)
+
 router.get("/conversations/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
@@ -44,7 +44,7 @@ router.get("/conversations/:userId", async (req, res) => {
   }
 });
 
-// 📬 Utwórz nową konwersację (jeśli nie istnieje)
+
 router.post("/conversation/start", async (req, res) => {
   const { employer_id, candidate_id } = req.body;
 

@@ -1,8 +1,5 @@
 import { connection } from "../config/db.js";
 
-
-
-
 export async function getCandiatInfo(id) {
   const [row] = await connection.query(
     "SELECT * FROM candidate_info WHERE user_id = ?",

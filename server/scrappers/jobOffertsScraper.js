@@ -58,199 +58,199 @@ export async function scrapeAll() {
   // ================================
   // BULLDOGJOB.PL
   // ================================
-  // for (let i = 1; i <= 10; i++) {
-  //   // dla testów ogranicz
-  //   console.log(`Scraping BulldogJob.pl — strona ${i}`);
-  //   await page.goto(
-  //     `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
-  //     {
-  //       waitUntil: "networkidle2",
-  //     }
-  //   );
+  for (let i = 1; i <= 10; i++) {
+    // dla testów ogranicz
+    console.log(`Scraping BulldogJob.pl — strona ${i}`);
+    await page.goto(
+      `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
+      {
+        waitUntil: "networkidle2",
+      }
+    );
 
-  //   const jobs = await page.evaluate(() => {
-  //     return Array.from(
-  //       document.querySelectorAll(".JobListItem_item__fYh8y")
-  //     ).map((el) => ({
-  //       title:
-  //         el
-  //           .querySelector(".JobListItem_item__title__278xz h3")
-  //           ?.textContent?.trim() || "",
-  //       companyName:
-  //         el
-  //           .querySelector(".JobListItem_item__title__278xz div")
-  //           ?.textContent?.trim() || "",
-  //       workingMode: [
-  //         el
-  //           .querySelector(".JobListItem_item__details__sg4tk .relative span")
-  //           ?.textContent?.trim() || "",
-  //         Array.from(
-  //           el.querySelectorAll(
-  //             ".JobListItem_item__details__sg4tk .shadow-dropdown span"
-  //           )
-  //         ).map((t) => t.textContent),
-  //       ],
-  //       contractType: [
-  //         el
-  //           .querySelectorAll(
-  //             ".JobListItem_item__details__sg4tk .items-start "
-  //           )[0]
-  //           ?.textContent?.trim() || "",
-  //       ],
-  //       experience: [
-  //         el
-  //           .querySelectorAll(
-  //             ".JobListItem_item__details__sg4tk .items-start "
-  //           )[1]
-  //           ?.textContent?.trim() || "",
-  //       ],
-  //       technologies: Array.from(
-  //         el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
-  //       ).map((tag) => tag.textContent.trim()),
-  //       salary:
-  //         el
-  //           .querySelector(".JobListItem_item__salary__OIin6")
-  //           ?.textContent?.trim() || "not available",
-  //       img: el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
-  //       link: el.href,
-  //       type: "bulldogjob.pl",
-  //     }));
-  //   });
+    const jobs = await page.evaluate(() => {
+      return Array.from(
+        document.querySelectorAll(".JobListItem_item__fYh8y")
+      ).map((el) => ({
+        title:
+          el
+            .querySelector(".JobListItem_item__title__278xz h3")
+            ?.textContent?.trim() || "",
+        companyName:
+          el
+            .querySelector(".JobListItem_item__title__278xz div")
+            ?.textContent?.trim() || "",
+        workingMode: [
+          el
+            .querySelector(".JobListItem_item__details__sg4tk .relative span")
+            ?.textContent?.trim() || "",
+          Array.from(
+            el.querySelectorAll(
+              ".JobListItem_item__details__sg4tk .shadow-dropdown span"
+            )
+          ).map((t) => t.textContent),
+        ],
+        contractType: [
+          el
+            .querySelectorAll(
+              ".JobListItem_item__details__sg4tk .items-start "
+            )[0]
+            ?.textContent?.trim() || "",
+        ],
+        experience: [
+          el
+            .querySelectorAll(
+              ".JobListItem_item__details__sg4tk .items-start "
+            )[1]
+            ?.textContent?.trim() || "",
+        ],
+        technologies: Array.from(
+          el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
+        ).map((tag) => tag.textContent.trim()),
+        salary:
+          el
+            .querySelector(".JobListItem_item__salary__OIin6")
+            ?.textContent?.trim() || "not available",
+        img: el.querySelector(".JobListItem_item__logo__Jnbqn img")?.src || "",
+        link: el.href,
+        type: "bulldogjob.pl",
+      }));
+    });
 
-  //   for (let job of jobs) {
-  //     console.log(`→ Szczegóły ${job.title}`);
-  //     const jobPage = await browser.newPage();
-  //     await jobPage.goto(job.link, { waitUntil: "networkidle2" });
-  //     await new Promise((resolve) => setTimeout(resolve, 1500));
+    for (let job of jobs) {
+      console.log(`→ Szczegóły ${job.title}`);
+      const jobPage = await browser.newPage();
+      await jobPage.goto(job.link, { waitUntil: "networkidle2" });
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  //     const details = await jobPage.evaluate(() => {
-  //       return {
-  //         description:
-  //           [...document.querySelectorAll("div.bg-white.rounded-lg.px-6")]?.map(
-  //             (el) => el.innerHTML
-  //           ) || "",
-  //         active_to:
-  //           document.querySelector("aside.jsx-4039385543 div.flex p.leading-6")
-  //             ?.textContent || null,
-  //       };
-  //     });
-  //     await insertOffer(connection, job, details);
-  //     await jobPage.close();
-  //     await new Promise((r) => setTimeout(r, 1000));
-  //   }
-  // }
+      const details = await jobPage.evaluate(() => {
+        return {
+          description:
+            [...document.querySelectorAll("div.bg-white.rounded-lg.px-6")]?.map(
+              (el) => el.innerHTML
+            ) || "",
+          active_to:
+            document.querySelector("aside.jsx-4039385543 div.flex p.leading-6")
+              ?.textContent || null,
+        };
+      });
+      await insertOffer(connection, job, details);
+      await jobPage.close();
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
 
   //THEPROTOCOL.IT
 
-  // for (let i = 1; i <= 10; i++) {
-  //   console.log(`Scraping TheProtocol.it — strona ${i}`);
-  //   await page.goto(`https://theprotocol.it/filtry/;c?pageNumber=${i}`, {
-  //     waitUntil: "networkidle2",
-  //   });
+  for (let i = 1; i <= 10; i++) {
+    console.log(`Scraping TheProtocol.it — strona ${i}`);
+    await page.goto(`https://theprotocol.it/filtry/;c?pageNumber=${i}`, {
+      waitUntil: "networkidle2",
+    });
 
-  //   const jobs = await page.evaluate(() => {
-  //     return Array.from(document.querySelectorAll("a.a4pzt2q"))
-  //       .map((el) => ({
-  //         title: el.querySelector("#offer-title")?.textContent?.trim() || "",
-  //         companyName: el
-  //           .querySelectorAll("div.l1c07yeh")[0]
-  //           ?.textContent?.trim(),
-  //         workingMode: el
-  //           .querySelectorAll("div.l1c07yeh")[2]
-  //           ?.textContent?.trim(),
-  //         experience: ["Junior", "Mid", "Senior"],
-  //         contractType: ["B2B", "UoP"],
-  //         technologies: [...el.querySelectorAll("div.c13r9id2 div")].map(
-  //           (t) => t.textContent
-  //         ),
-  //         salary: "not available",
-  //         img: el.querySelector("img")?.src,
-  //         link: el.href,
-  //         type: "theprotocol.it",
-  //       }))
-  //       .filter((el) => el.title);
-  //   });
+    const jobs = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll("a.a4pzt2q"))
+        .map((el) => ({
+          title: el.querySelector("#offer-title")?.textContent?.trim() || "",
+          companyName: el
+            .querySelectorAll("div.l1c07yeh")[0]
+            ?.textContent?.trim(),
+          workingMode: el
+            .querySelectorAll("div.l1c07yeh")[2]
+            ?.textContent?.trim(),
+          experience: ["Junior", "Mid", "Senior"],
+          contractType: ["B2B", "UoP"],
+          technologies: [...el.querySelectorAll("div.c13r9id2 div")].map(
+            (t) => t.textContent
+          ),
+          salary: "not available",
+          img: el.querySelector("img")?.src,
+          link: el.href,
+          type: "theprotocol.it",
+        }))
+        .filter((el) => el.title);
+    });
 
-  //   for (let job of jobs) {
-  //     console.log(`→ Szczegóły ${job.title}`);
-  //     const jobPage = await browser.newPage();
-  //     await jobPage.goto(job.link, { waitUntil: "networkidle2" });
-  //     await new Promise((resolve) => setTimeout(resolve, 1500));
+    for (let job of jobs) {
+      console.log(`→ Szczegóły ${job.title}`);
+      const jobPage = await browser.newPage();
+      await jobPage.goto(job.link, { waitUntil: "networkidle2" });
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  //     const details = await jobPage.evaluate(() => {
-  //       function convertEnglishDate(dateStr) {
-  //         const months = {
-  //           jan: "01",
-  //           january: "01",
+      const details = await jobPage.evaluate(() => {
+        function convertEnglishDate(dateStr) {
+          const months = {
+            jan: "01",
+            january: "01",
 
-  //           feb: "02",
-  //           february: "02",
+            feb: "02",
+            february: "02",
 
-  //           mar: "03",
-  //           march: "03",
+            mar: "03",
+            march: "03",
 
-  //           apr: "04",
-  //           april: "04",
+            apr: "04",
+            april: "04",
 
-  //           may: "05",
+            may: "05",
 
-  //           jun: "06",
-  //           june: "06",
+            jun: "06",
+            june: "06",
 
-  //           jul: "07",
-  //           july: "07",
+            jul: "07",
+            july: "07",
 
-  //           aug: "08",
-  //           august: "08",
+            aug: "08",
+            august: "08",
 
-  //           sep: "09",
-  //           september: "09",
+            sep: "09",
+            september: "09",
 
-  //           oct: "10",
-  //           october: "10",
+            oct: "10",
+            october: "10",
 
-  //           nov: "11",
-  //           november: "11",
+            nov: "11",
+            november: "11",
 
-  //           dec: "12",
-  //           december: "12",
-  //         };
+            dec: "12",
+            december: "12",
+          };
 
-  //         if (!dateStr) return null;
+          if (!dateStr) return null;
 
-  //         const parts = dateStr.toLowerCase().split(" ");
-  //         if (parts.length < 3) return null;
+          const parts = dateStr.toLowerCase().split(" ");
+          if (parts.length < 3) return null;
 
-  //         const day = parts[0].replace(/\D/g, "");
-  //         const month = parts[1];
-  //         const year = parts[2];
+          const day = parts[0].replace(/\D/g, "");
+          const month = parts[1];
+          const year = parts[2];
 
-  //         const mm = months[month];
-  //         if (!mm) return null;
+          const mm = months[month];
+          if (!mm) return null;
 
-  //         const dd = day.padStart(2, "0");
+          const dd = day.padStart(2, "0");
 
-  //         return `${dd}.${mm}.${year}`;
-  //       }
+          return `${dd}.${mm}.${year}`;
+        }
 
-  //       return {
-  //         description: document.querySelector("#PROGRESS_AND_BENEFITS")
-  //           ?.innerHTML,
-  //         requirements: document.querySelector("#REQUIREMENTS")?.innerHTML,
-  //         active_to:
-  //           convertEnglishDate(
-  //             document
-  //               .querySelectorAll("span.t1638tgf")[1]
-  //               ?.textContent.substring(4)
-  //           ) || null,
-  //       };
-  //     });
+        return {
+          description: document.querySelector("#PROGRESS_AND_BENEFITS")
+            ?.innerHTML,
+          requirements: document.querySelector("#REQUIREMENTS")?.innerHTML,
+          active_to:
+            convertEnglishDate(
+              document
+                .querySelectorAll("span.t1638tgf")[1]
+                ?.textContent.substring(4)
+            ) || null,
+        };
+      });
 
-  //     await insertOffer(connection, job, details);
-  //     await jobPage.close();
-  //     await new Promise((r) => setTimeout(r, 1000));
-  //   }
-  // }
+      await insertOffer(connection, job, details);
+      await jobPage.close();
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
 
   //NOFLUFFJOBS.COM
 

@@ -563,7 +563,6 @@ const AdminPanel = () => {
                       <tr>
                         <th>Firma (stara → nowa)</th>
                         <th>NIP (stary → nowy)</th>
-                        <th>Logo</th>
                         <th>Akcje</th>
                       </tr>
                     </thead>
@@ -578,17 +577,14 @@ const AdminPanel = () => {
                             {r.old_nip} → <b>{r.new_nip}</b>
                           </td>
                           <td>
-                            <img src={r.new_logo} alt="new logo" height="40" />
-                          </td>
-                          <td>
                             <button
-                              className={styles.approve}
+                              className={styles.editBtn}
                               onClick={() => askApprove(r.id)}
                             >
                               ✔
                             </button>
                             <button
-                              className={styles.reject}
+                              className={styles.deleteBtn}
                               onClick={() => askReject(r.id)}
                             >
                               ✖

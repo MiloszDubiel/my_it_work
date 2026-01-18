@@ -117,7 +117,7 @@ const CandidateSettings = () => {
       `http://localhost:5000/user/get-user-applications`,
       {
         user_id: userData.id,
-      }
+      },
     );
 
     if (res.status == 200) {
@@ -128,7 +128,7 @@ const CandidateSettings = () => {
   const handleClearHistory = async () => {
     try {
       await axios.delete(
-        `http://localhost:5000/user/clear-history/${userData.id}`
+        `http://localhost:5000/user/clear-history/${userData.id}`,
       );
 
       getMyApplayings();
@@ -164,7 +164,7 @@ const CandidateSettings = () => {
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
       if (!passwordRegex.test(ProfielData.newPassword)) {
         return setErorr(
-          "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
+          "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny.",
         );
       }
 
@@ -191,7 +191,7 @@ const CandidateSettings = () => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       if (res.status === 200) {
@@ -216,6 +216,7 @@ const CandidateSettings = () => {
 
     setInfo("");
     setErorr("");
+
     if (!candidateProfile.location.trim()) {
       setErorr("Lokalizacja nie może być pusta.");
       return;
@@ -226,6 +227,7 @@ const CandidateSettings = () => {
     }
     if (!candidateProfile.current_position.trim()) {
       setErorr("Aktualne stanowisko nie może być puste.");
+      return;
     }
     if (!candidateProfile.desired_position.trim()) {
       setErorr("Stanowisko docelowe nie może być puste.");
@@ -264,7 +266,7 @@ const CandidateSettings = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       e.target.parentElement.scrollTo(0, 0);
@@ -278,11 +280,12 @@ const CandidateSettings = () => {
   };
 
   const cancelApplication = async () => {
+    setErorr("");
     setInfo("");
     if (!selectedApp) return;
 
     const res = await axios.delete(
-      `http://localhost:5000/user/cancel-application/${selectedApp}`
+      `http://localhost:5000/user/cancel-application/${selectedApp}`,
     );
 
     if (res.status == 200) {
@@ -318,7 +321,7 @@ const CandidateSettings = () => {
     setCandidateProfile((prev) => ({
       ...prev,
       [type]: prev[type].map((item, i) =>
-        i === index ? { ...item, level } : item
+        i === index ? { ...item, level } : item,
       ),
     }));
   };
@@ -340,7 +343,7 @@ const CandidateSettings = () => {
     setCandidateProfile((prev) => ({
       ...prev,
       education: prev.education.map((item, i) =>
-        i === index ? { ...item, level } : item
+        i === index ? { ...item, level } : item,
       ),
     }));
   };
@@ -407,7 +410,7 @@ const CandidateSettings = () => {
                 setActiveTab("candidate-profile");
               }}
             >
-              Moje profil kandydata
+              Mój profil kandydata
             </button>
             <button
               className={activeTab === "applications" ? styles.active : ""}
@@ -928,14 +931,14 @@ const CandidateSettings = () => {
                               >
                                 Anuluj
                               </button>
-                            ) : (
+                            ) : app.status == "zaakceptowana" ? (
                               <button
                                 className={styles.confirmBtn}
                                 onClick={async () => {
                                   console.log(app);
                                   try {
                                     const user = JSON.parse(
-                                      sessionStorage.getItem("user-data")
+                                      sessionStorage.getItem("user-data"),
                                     );
 
                                     const res = await axios.post(
@@ -943,33 +946,35 @@ const CandidateSettings = () => {
                                       {
                                         employer_id: app.owner_id,
                                         candidate_id: user.id,
-                                      }
+                                      },
                                     );
 
                                     const conversationId = res.data.id;
 
                                     document.querySelector(
-                                      "#chatContainer"
+                                      "#chatContainer",
                                     ).style.display = "flex";
 
                                     document.querySelector(
-                                      "#root"
+                                      "#root",
                                     ).style.overflow = "hidden";
                                     window.dispatchEvent(
                                       new CustomEvent("openConversation", {
                                         detail: { conversationId },
-                                      })
+                                      }),
                                     );
                                   } catch (err) {
                                     console.error(
                                       "Błąd uruchamiania wiadomości:",
-                                      err
+                                      err,
                                     );
                                   }
                                 }}
                               >
                                 Otwórz wiadomości
                               </button>
+                            ) : (
+                              "  "
                             )}
                           </td>
                         </tr>
@@ -998,7 +1003,7 @@ const CandidateSettings = () => {
                         className={styles.offerCard}
                         onClick={() => {
                           document.querySelector(
-                            `.favorite${offer.id}`
+                            `.favorite${offer.id}`,
                           ).style.display = "flex";
                         }}
                       >
