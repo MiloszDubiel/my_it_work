@@ -1,0 +1,232 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", sans-serif;
+}
+
+/* HERO SECTION */
+.hero {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  padding: 6rem 2rem;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.heroButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btnPrimary {
+  background: white;
+  color: #3b82f6;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btnPrimary:hover {
+  background: #e0e7ff;
+}
+
+.btnSecondary {
+  border: 2px solid white;
+  color: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* JOBS SECTION */
+.jobsSection {
+  padding: 2rem;
+}
+
+.jobsSection h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.jobsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.jobCard {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.jobCard:hover {
+  transform: translateY(-4px);
+}
+
+.jobCard h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+.jobCard span {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.detailsBtn {
+  display: inline-block;
+  margin-top: 1rem;
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.detailsBtn:hover {
+  background: #2563eb;
+}
+
+/* ABOUT SECTION */
+.aboutSection {
+  background: #f9fafb;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.aboutSection h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.aboutGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.aboutGrid div {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.aboutGrid h3 {
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+}
+
+/* =======================================
+   RESPONSIVE DESIGN
+   ======================================= */
+
+/* 📱 TELEFONY — max 600px */
+@media (max-width: 600px) {
+  .hero {
+    padding: 4rem 1rem;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .jobsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .jobCard {
+    padding: 1rem;
+  }
+
+  .aboutGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 📲 TABLETY — 600px–900px */
+@media (min-width: 600px) and (max-width: 900px) {
+  .hero {
+    padding: 5rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.4rem;
+  }
+
+  .jobsGrid {
+    grid-template-columns: repeat(1, 1fr); /* 2 kolumny */
+  }
+
+  .aboutGrid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* 💻 DUŻE EKRANY — powyżej 1200px */
+@media (min-width: 1200px) {
+  .hero {
+    padding: 8rem 4rem;
+  }
+
+  .hero h1 {
+    font-size: 3.2rem;
+  }
+
+  .jobsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .aboutGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
