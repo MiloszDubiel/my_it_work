@@ -5,7 +5,6 @@ import axios from "axios";
 import LoadingComponent from "../Loading/LoadingComponent";
 import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-
 import EmployerInfo from "../Employers/EmployerInfo";
 
 const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
@@ -18,11 +17,13 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   const [modalMessage, setModalMessage] = useState("");
   const confirmCallbackRef = useRef(null);
 
+  console.log(offer);
+
   useEffect(() => {
     const checkFavorite = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`
+          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
         );
         setIsFavorite(res.data.isFavorite);
       } catch (err) {
@@ -39,7 +40,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
     try {
       if (isFavorite) {
         await axios.delete(
-          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`
+          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
         );
         setIsFavorite(false);
         sessionStorage.setItem("setIsFavorite", false);
@@ -74,7 +75,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`
+        `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`,
       );
       setAlreadyApplied(res.data.applied);
       setAppliedDate(res.data.applied_at);
@@ -93,8 +94,8 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
     if (alreadyApplied) {
       setModalMessage(
         `Już aplikowałeś na tę ofertę: ${new Date(
-          appliedDate
-        ).toLocaleDateString()}`
+          appliedDate,
+        ).toLocaleDateString()}`,
       );
       setShowInfo(true);
       return;
@@ -110,7 +111,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
           {
             user_id: userData.id,
             offer_id: offer.id,
-          }
+          },
         );
 
         setModalMessage(res.data.message);
@@ -177,7 +178,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                 return;
               }
               document.querySelector(
-                `.offer-details-container${offer.id}`
+                `.offer-details-container${offer.id}`,
               ).style.display = "none";
               document.querySelector("#root").style.overflow = "auto";
             }}
@@ -278,7 +279,10 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
             <div className={styles.companyBox}>
               <div className={styles.companyRow}>
                 <div className={styles.companyLogoSmall}>
-                  <img src={offer?.img || ""} alt="zdjecie" />
+                  <img
+                    src={offer.company_img || offer.offer_img || ""}
+                    alt="zdjecie"
+                  />
                 </div>
                 <div>
                   <div className={styles.companyNameSmall}>
@@ -301,7 +305,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                       onClick={async () => {
                         try {
                           const user = JSON.parse(
-                            sessionStorage.getItem("user-data")
+                            sessionStorage.getItem("user-data"),
                           );
 
                           const res = await axios.post(
@@ -309,13 +313,13 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                             {
                               employer_id: offer.owner_id,
                               candidate_id: user.id,
-                            }
+                            },
                           );
 
                           const conversationId = res.data.id;
 
                           document.querySelector(
-                            "#chatContainer"
+                            "#chatContainer",
                           ).style.display = "flex";
 
                           document.querySelector("#root").style.overflow =
@@ -323,7 +327,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                           window.dispatchEvent(
                             new CustomEvent("openConversation", {
                               detail: { conversationId },
-                            })
+                            }),
                           );
                         } catch (err) {
                           console.error("Błąd uruchamiania wiadomości:", err);
