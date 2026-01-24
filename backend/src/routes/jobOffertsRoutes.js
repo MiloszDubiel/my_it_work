@@ -32,7 +32,7 @@ router.post("/favorites", async (req, res) => {
   try {
     await connection.query(
       "INSERT IGNORE INTO favorites (user_id, offer_id) VALUES (?, ?)",
-      [user_id, offer_id]
+      [user_id, offer_id],
     );
     res.json({ success: true, message: "Dodano do ulubionych" });
   } catch (err) {
@@ -47,7 +47,7 @@ router.delete("/favorites/:user_id/:offer_id", async (req, res) => {
   try {
     await connection.query(
       "DELETE FROM favorites WHERE user_id = ? AND offer_id = ?",
-      [user_id, offer_id]
+      [user_id, offer_id],
     );
     res.json({ success: true, message: "Usunięto z ulubionych" });
   } catch (err) {
@@ -62,7 +62,7 @@ router.get("/favorites/:user_id/:offer_id", async (req, res) => {
   try {
     const [rows] = await connection.query(
       "SELECT * FROM favorites WHERE user_id = ? AND offer_id = ?",
-      [user_id, offer_id]
+      [user_id, offer_id],
     );
 
     res.json({ isFavorite: rows.length > 0 });
@@ -119,7 +119,7 @@ router.post("/add", async (req, res) => {
         "user",
         employer_id,
         date,
-      ]
+      ],
     );
 
     const offerId = jobOfferResult.insertId;
@@ -135,7 +135,7 @@ router.post("/add", async (req, res) => {
         requirements || "",
         benefits || "",
         responsibilities || "",
-      ]
+      ],
     );
 
     await conn.commit();
@@ -170,7 +170,7 @@ router.delete("/delete/:id", async (req, res) => {
       `
       DELETE FROM job_offers WHERE id = ?
       `,
-      [id]
+      [id],
     );
 
     await conn.commit();
@@ -229,12 +229,12 @@ router.post("/update", async (req, res) => {
         `${salary_min} - ${salary_max}`,
         date,
         offer_id,
-      ]
+      ],
     );
 
     await conn.query(
       `
-      UPDATE job_details SET description = ? ,requirements = ?, benefits = ? , responsibilities = ? 
+      UPDATE job_details SET description = ? ,requirements = ?, benefits = ? , responsibilities = ?, active_to = ?
       WHERE job_offer_id = ? 
       `,
       [
@@ -242,8 +242,9 @@ router.post("/update", async (req, res) => {
         requirements || "",
         benefits || "",
         responsibilities || "",
+        date,
         offer_id,
-      ]
+      ],
     );
 
     await conn.commit();
@@ -268,7 +269,7 @@ router.post("/applications", async (req, res) => {
   try {
     await connection.query(
       "INSERT INTO job_applications (user_id, offer_id) VALUES (?, ?)",
-      [user_id, offer_id]
+      [user_id, offer_id],
     );
     res.json({ message: "Aplikacja została dodana" });
   } catch (err) {
@@ -282,7 +283,7 @@ router.get("/applications/:userId/:offerId", async (req, res) => {
   try {
     const [rows] = await connection.query(
       "SELECT created_at FROM job_applications WHERE user_id = ? AND offer_id = ? AND status <> 'anulowana'",
-      [userId, offerId]
+      [userId, offerId],
     );
     if (rows.length > 0) {
       res.json({ applied: true, applied_at: rows[0].created_at });

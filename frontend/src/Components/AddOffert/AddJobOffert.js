@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 const AddJobOffer = ({ onOfferAdded }) => {
   const [userData, setUserData] = useState(
-    JSON.parse(sessionStorage.getItem("user-data"))
+    JSON.parse(sessionStorage.getItem("user-data")),
   );
 
   const [offer, setOffer] = useState({
@@ -24,6 +24,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
     benefits: "",
     company_id: "",
     employer_id: userData.id,
+    date: "",
   });
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
         "http://localhost:5000/api/employers/get-company-info",
         {
           id: userData.id,
-        }
+        },
       );
 
       setOffer({
@@ -89,12 +90,12 @@ const AddJobOffer = ({ onOfferAdded }) => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/job-offerts/add",
-        offer
+        offer,
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
         setMessage(
-          "Oferta została przesłana do weryfikacji przez Administratora"
+          "Oferta została przesłana do weryfikacji przez administratora",
         );
         onOfferAdded();
         setOffer({
@@ -254,7 +255,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
             <label>
               Technologie{" "}
-              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>{" "}
+              <span className={styles.span}>
+                Kliknij podwójnie aby usunąć
+              </span>{" "}
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>

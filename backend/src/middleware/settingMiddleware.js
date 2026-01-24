@@ -16,7 +16,8 @@ const CvAndRefStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     if (file.fieldname === "cv") cb(null, `cv_${req.body.user_id}${ext}`);
-    else if (file.fieldname === "references") cb(null, `ref_${req.body.user_id}${ext}`);
+    else if (file.fieldname === "references")
+      cb(null, `ref_${req.body.user_id}${ext}`);
   },
 });
 
@@ -25,10 +26,9 @@ export const uploadCvAndRef = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/avatars";
+    const dir = "src/uploads/avatars";
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -51,7 +51,7 @@ export const avatarUpload = multer({
 
 const logoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/company_logos";
+    const dir = "src/uploads/company_logos";
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },

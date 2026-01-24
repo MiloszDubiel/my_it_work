@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
 
-const UpdateJobOffer = ({ offer, onOfferAdded }) => {
+const UpdateJobOffer = ({ offer }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -19,6 +19,8 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
       return [];
     }
   };
+
+  console.log(offer);
 
   const getSalaryRange = (salary) => {
     if (!salary) return null;
@@ -95,12 +97,12 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/job-offerts/update",
-        updateOffer
+        updateOffer,
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
         setMessage(
-          "Oferta została przesłana do weryfikacji przez Administratora"
+          "Oferta została przesłana do weryfikacji przez administratora",
         );
         window.dispatchEvent(new Event("updated-offer"));
       }
@@ -129,7 +131,7 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
 
   const deleteSkillorLanguage = (e) => {
     const skills = updateOffer.technologies.filter(
-      (skill) => skill !== e.target.textContent
+      (skill) => skill !== e.target.textContent,
     );
 
     setUpdateOffer({
@@ -148,7 +150,7 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
             className={styles.closeBtn}
             onClick={() => {
               document.querySelector(
-                `.update-job-offer${offer.id}`
+                `.update-job-offer${offer.id}`,
               ).style.display = "none";
               document.querySelector("#root").style.overflow = "auto";
               setError("");
@@ -260,7 +262,9 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
 
             <label>
               Technologie{" "}
-              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>{" "}
+              <span className={styles.span}>
+                Kliknij podwójnie aby usunąć
+              </span>{" "}
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>
@@ -360,4 +364,3 @@ const UpdateJobOffer = ({ offer, onOfferAdded }) => {
 };
 
 export default UpdateJobOffer;
-

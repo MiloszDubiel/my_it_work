@@ -23,7 +23,7 @@ export async function insertOffer(db, job, details) {
         job.img || "",
         job.type || "",
         "scraped",
-      ]
+      ],
     );
 
     const jobOfferId = result.insertId;
@@ -37,7 +37,7 @@ export async function insertOffer(db, job, details) {
         details?.description || "",
         details?.requirements || "",
         details?.active_to,
-      ]
+      ],
     );
 
     console.log(`✅ Zapisano ofertę ID ${jobOfferId}: ${job.title}`);
@@ -65,12 +65,12 @@ export async function scrapeAll() {
       `https://bulldogjob.pl/companies/jobs/s/order,published,desc/page,${i}`,
       {
         waitUntil: "networkidle2",
-      }
+      },
     );
 
     const jobs = await page.evaluate(() => {
       return Array.from(
-        document.querySelectorAll(".JobListItem_item__fYh8y")
+        document.querySelectorAll(".JobListItem_item__fYh8y"),
       ).map((el) => ({
         title:
           el
@@ -86,26 +86,26 @@ export async function scrapeAll() {
             ?.textContent?.trim() || "",
           Array.from(
             el.querySelectorAll(
-              ".JobListItem_item__details__sg4tk .shadow-dropdown span"
-            )
+              ".JobListItem_item__details__sg4tk .shadow-dropdown span",
+            ),
           ).map((t) => t.textContent),
         ],
         contractType: [
           el
             .querySelectorAll(
-              ".JobListItem_item__details__sg4tk .items-start "
+              ".JobListItem_item__details__sg4tk .items-start ",
             )[0]
             ?.textContent?.trim() || "",
         ],
         experience: [
           el
             .querySelectorAll(
-              ".JobListItem_item__details__sg4tk .items-start "
+              ".JobListItem_item__details__sg4tk .items-start ",
             )[1]
             ?.textContent?.trim() || "",
         ],
         technologies: Array.from(
-          el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span")
+          el.querySelectorAll(".JobListItem_item__tags__POZkk .flex span"),
         ).map((tag) => tag.textContent.trim()),
         salary:
           el
@@ -125,15 +125,41 @@ export async function scrapeAll() {
 
       const details = await jobPage.evaluate(() => {
         return {
-          description:
-            [...document.querySelectorAll("div.bg-white.rounded-lg.px-6")]?.map(
-              (el) => el.innerHTML
-            ) || "",
-          active_to:
+          description: [
+            ...document.querySelectorAll("div.bg-white.rounded-lg.px-6"),
+          ]?.map((el) => el.innerHTML),
+          active_to_raw:
             document.querySelector("aside.jsx-4039385543 div.flex p.leading-6")
               ?.textContent || null,
         };
       });
+
+      if (details.active_to_raw) {
+        const dateParts = details.active_to_raw.match(
+          /(\d{2})\.(\d{2})\.(\d{4})/,
+        );
+
+        if (dateParts) {
+          const [_, day, month, year] = dateParts;
+          details.active_to = `${year}-${month}-${day}`;
+        } else {
+          details.active_to = getFutureDate(30);
+        }
+      } else {
+        details.active_to = getFutureDate(30);
+      }
+
+      function getFutureDate(daysInFuture) {
+        const date = new Date();
+        date.setDate(date.getDate() + daysInFuture);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      }
+
       await insertOffer(connection, job, details);
       await jobPage.close();
       await new Promise((r) => setTimeout(r, 1000));
@@ -161,7 +187,7 @@ export async function scrapeAll() {
           experience: ["Junior", "Mid", "Senior"],
           contractType: ["B2B", "UoP"],
           technologies: [...el.querySelectorAll("div.c13r9id2 div")].map(
-            (t) => t.textContent
+            (t) => t.textContent,
           ),
           salary: "not available",
           img: el.querySelector("img")?.src,
@@ -179,58 +205,61 @@ export async function scrapeAll() {
 
       const details = await jobPage.evaluate(() => {
         function convertEnglishDate(dateStr) {
+          // Funkcja pomocnicza generująca datę +30 dni w formacie YYYY-MM-DD
+          const getDefaultDate = () => {
+            const future = new Date();
+            future.setDate(future.getDate() + 30);
+            const y = future.getFullYear();
+            const m = String(future.getMonth() + 1).padStart(2, "0");
+            const d = String(future.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+          };
+
           const months = {
             jan: "01",
             january: "01",
-
             feb: "02",
             february: "02",
-
             mar: "03",
             march: "03",
-
             apr: "04",
             april: "04",
-
             may: "05",
-
             jun: "06",
             june: "06",
-
             jul: "07",
             july: "07",
-
             aug: "08",
             august: "08",
-
             sep: "09",
             september: "09",
-
             oct: "10",
             october: "10",
-
             nov: "11",
             november: "11",
-
             dec: "12",
             december: "12",
           };
 
-          if (!dateStr) return null;
+          if (!dateStr) return getDefaultDate();
 
-          const parts = dateStr.toLowerCase().split(" ");
-          if (parts.length < 3) return null;
+          const parts = dateStr.toLowerCase().trim().split(/\s+/);
+
+          if (parts.length < 3) return getDefaultDate();
 
           const day = parts[0].replace(/\D/g, "");
           const month = parts[1];
           const year = parts[2];
 
           const mm = months[month];
-          if (!mm) return null;
+
+          if (!mm) return getDefaultDate();
 
           const dd = day.padStart(2, "0");
 
-          return `${dd}.${mm}.${year}`;
+          if (!/^\d{4}$/.test(year)) return getDefaultDate();
+
+          return `${year}-${mm}-${dd}`;
         }
 
         return {
@@ -241,7 +270,7 @@ export async function scrapeAll() {
             convertEnglishDate(
               document
                 .querySelectorAll("span.t1638tgf")[1]
-                ?.textContent.substring(4)
+                ?.textContent.substring(4),
             ) || null,
         };
       });
@@ -256,7 +285,7 @@ export async function scrapeAll() {
 
   await page.goto(
     "https://nofluffjobs.com/pl/artificial-intelligence?criteria=category%3Dsys-administrator,business-analyst,architecture,backend,data,ux,devops,erp,embedded,frontend,fullstack,game-dev,mobile,project-manager,security,support,testing,other",
-    { waitUntil: "networkidle2" }
+    { waitUntil: "networkidle2" },
   );
 
   for (let i = 0; i < 10; i++) {
@@ -281,7 +310,7 @@ export async function scrapeAll() {
         ],
         experience: ["Junior", "Mid", "Senior"],
         technologies: Array.from(
-          el.querySelectorAll("nfj-posting-item-tiles span")
+          el.querySelectorAll("nfj-posting-item-tiles span"),
         ).map((t) => t.textContent),
         contractType: ["B2B", "UoP"],
         salary:
@@ -290,7 +319,7 @@ export async function scrapeAll() {
         img: el.querySelector("img")?.src || "",
         link: el.href,
         type: "nofluffjobs.com",
-      })
+      }),
     );
   });
 
@@ -302,9 +331,29 @@ export async function scrapeAll() {
 
     const details = await jobPage.evaluate(() => {
       function extractDate(text) {
+        const getDefaultDate = () => {
+          const future = new Date();
+          future.setDate(future.getDate() + 30);
+          const y = future.getFullYear();
+          const m = String(future.getMonth() + 1).padStart(2, "0");
+          const d = String(future.getDate()).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        };
+
+        if (!text) return getDefaultDate();
+
         const regex = /\b(\d{2})\.(\d{2})\.(\d{4})\b/;
         const match = text.match(regex);
-        return match ? match[0] : null;
+
+        if (match) {
+          const day = match[1];
+          const month = match[2];
+          const year = match[3];
+
+          return `${year}-${month}-${day}`;
+        }
+
+        return getDefaultDate();
       }
 
       return {
@@ -312,7 +361,7 @@ export async function scrapeAll() {
         requirements: document.querySelector("#posting-specs")?.innerHTML,
         active_to:
           extractDate(
-            document.querySelector("common-posting-time-info")?.textContent
+            document.querySelector("common-posting-time-info")?.textContent,
           ) || null,
       };
     });

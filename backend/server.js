@@ -10,11 +10,12 @@ import statsRoutes from "./src/routes/statsRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import http from "http";
 import { connection } from "./src/config/db.js";
+import path from "path";
 
 import { Server } from "socket.io";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -29,10 +30,9 @@ app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
 app.use("/api/stats", statsRoutes);
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
 
 const server = http.createServer(app);
-
 
 const io = new Server(server, {
   cors: {

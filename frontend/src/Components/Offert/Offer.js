@@ -1,9 +1,9 @@
 import OfferInfo from "./OfferInfo";
 import styles from "./offer.module.css";
-import { useCallback } from "react";
-import EmployerInfo from "../Employers/EmployerInfo";
 
 const Offer = ({ offer, index }) => {
+  console.log(offer);
+
   const parseJSON = (value) => {
     try {
       return JSON.parse(value) || [];
@@ -30,7 +30,8 @@ const Offer = ({ offer, index }) => {
         <div className={styles.logoSection}>
           <img
             src={
-              offer.img ||
+              offer.company_img ||
+              offer.offer_img ||
               "http://localhost:5000/uploads/offert_logo/default.jpg"
             }
             alt={offer.companyName}
@@ -74,7 +75,7 @@ const Offer = ({ offer, index }) => {
           className={styles.actions}
           onClick={() => {
             document.querySelector(
-              `.offer-details-container${offer.id}`
+              `.offer-details-container${offer.id}`,
             ).style.display = "flex";
 
             document.querySelector("#root").style.overflow = "hidden";

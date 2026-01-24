@@ -10,7 +10,7 @@ function parsePaginationParams(req) {
   const page = Math.max(1, parseInt(req.query.page || "1", 10));
   const pageSize = Math.max(
     1,
-    Math.min(100, parseInt(req.query.pageSize || "10", 10))
+    Math.min(100, parseInt(req.query.pageSize || "10", 10)),
   );
   const search = (req.query.search || "").trim();
   const offset = (page - 1) * pageSize;
@@ -21,7 +21,6 @@ router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
 
-    // COUNT
     let countSql = "SELECT COUNT(*) AS cnt FROM users WHERE role != 'Admin'";
     const countParams = [];
 
@@ -35,7 +34,6 @@ router.get("/get-users", authenticateToken, isAdmin, async (req, res) => {
     const total = countRow.cnt;
     const totalPages = Math.ceil(total / pageSize);
 
-    // SELECT rows
     let dataSql = `
     SELECT id, email, name, surname, role, is_active, created_at
     FROM users
@@ -72,7 +70,7 @@ router.put("/users/:id", authenticateToken, isAdmin, async (req, res) => {
 
     const [result] = await connection.query(
       "UPDATE users SET name=?, surname=?, email=?, is_active=? WHERE id=?",
-      [name, surname, email, is_active, userId]
+      [name, surname, email, is_active, userId],
     );
 
     if (result.affectedRows === 0) {
@@ -96,7 +94,6 @@ router.post("/delete-user", authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-//Firmy
 router.get("/get-companies", authenticateToken, isAdmin, async (req, res) => {
   try {
     const { page, pageSize, search, offset } = parsePaginationParams(req);
@@ -141,7 +138,7 @@ router.put("/edit-company", authenticateToken, isAdmin, async (req, res) => {
       `UPDATE companies 
        SET companyName = ?, nip =? 
        WHERE id = ?`,
-      [companyName, nip, id]
+      [companyName, nip, id],
     );
 
     res.status(200).json({ info: "Zaktualizowano firmę" });
@@ -228,12 +225,12 @@ router.put("/update-offer", authenticateToken, isAdmin, async (req, res) => {
       `UPDATE job_offers 
        SET title = ?, is_active = ?
        WHERE id = ?`,
-      [title, is_active, id]
+      [title, is_active, id],
     );
 
     await connection.query(
       "UPDATE job_details SET description = ? WHERE job_offer_id = ?",
-      [description, id]
+      [description, id],
     );
 
     res.json({ info: "Zaktualizowano ofertę" });
@@ -252,7 +249,7 @@ router.put("/change-password", authenticateToken, isAdmin, async (req, res) => {
 
   const [rows] = await connection.query(
     "SELECT password FROM users WHERE id = ?",
-    [adminId]
+    [adminId],
   );
 
   const match = await bcrypt.compare(oldPassword, rows[0].password);
@@ -293,7 +290,7 @@ router.get(
     } catch (err) {
       res.status(500).json({ error: "Błąd serwera." });
     }
-  }
+  },
 );
 router.post(
   "/approve-company-change",
@@ -304,7 +301,7 @@ router.post(
 
     const [[request]] = await connection.query(
       `SELECT * FROM company_change_requests WHERE id = ?`,
-      [request_id]
+      [request_id],
     );
 
     if (!request) return res.status(404).json({ error: "Nie znaleziono." });
@@ -318,16 +315,16 @@ router.post(
         request.new_nip,
         request.new_logo,
         request.company_id,
-      ]
+      ],
     );
 
     await connection.query(
       `UPDATE company_change_requests SET status = 'approved' WHERE id = ?`,
-      [request_id]
+      [request_id],
     );
 
     res.json({ msg: "Zmieniono dane firmy." });
-  }
+  },
 );
 
 router.post(
@@ -339,28 +336,49 @@ router.post(
 
     await connection.query(
       `UPDATE company_change_requests SET status = 'rejected' WHERE id = ?`,
-      [request_id]
+      [request_id],
     );
 
     res.json({ msg: "Prośbę odrzucono." });
-  }
+  },
 );
 
-router.get("/scrap", async (req, res) => {
-  try {
-    res.json({ message: "Scraper uruchomiony" });
+router.get(
+  "/scrap/:scrap_when",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { scrap_when } = req.params;
 
-    scrapeAll()
-      .then(() => {
-        console.log("Zakończono scrapowanie");
-        res.json({ info: "Zakończono scrapowanie" });
-      })
-      .catch((err) => {
-        console.error("Błąd scraper", err);
-        res.status(500).json({ error: " Scraper error " + err });
-      });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    console.log("Inicjacja scrapowania:", scrap_when);
+
+    try {
+      await connection.query("INSERT INTO scrap_data(date) VALUES(?)", [
+        scrap_when,
+      ]);
+      res.json({ message: "Scraper uruchomiony w tle" });
+      scrapeAll()
+        .then(() => {
+          console.log("Zakończono scrapowanie pomyślnie");
+        })
+        .catch((err) => {
+          console.error("Błąd podczas scrapowania w tle:", err);
+        });
+    } catch (error) {
+      console.error(error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: error.message });
+      }
+    }
+  },
+);
+
+router.get("/scrape-date", authenticateToken, isAdmin, async (req, res) => {
+  const [rows] = await connection.query(`
+            SELECT date FROM scrap_data ORDER BY id DESC LIMIT 1
+        `);
+
+  res.json({ date: rows[0].date });
 });
+
 export default router;

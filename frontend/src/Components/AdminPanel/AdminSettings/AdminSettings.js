@@ -8,17 +8,29 @@ const AdminSettings = () => {
   const [lastScrap, setLastScrap] = useState(null);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin/scrape-date", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setLastScrap(res.data.date);
+      });
+  }, []);
+
   const changePassword = () => {
     setMessage("");
 
     if (
       newPassword.length < 8 ||
       !/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/.test(
-        newPassword
+        newPassword,
       )
     ) {
       return setMessage(
-        "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
+        "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny.",
       );
     }
 
@@ -33,7 +45,7 @@ const AdminSettings = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((res) => {
         if (res.status == 200) {
@@ -49,12 +61,15 @@ const AdminSettings = () => {
     setMessage("Scrapowanie uruchomione…");
 
     try {
-      await axios.get("http://localhost:5000/admin/scrap", {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      await axios.get(
+        `http://localhost:5000/admin/scrap/${new Date().toISOString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+          timeout: 5000,
         },
-        timeout: 5000, 
-      });
+      );
 
       setMessage("Scraper działa w tle 🚀");
       setLastScrap(new Date().toISOString());

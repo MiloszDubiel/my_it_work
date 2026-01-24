@@ -45,12 +45,13 @@ export function getAllOfferts() {
   job_details.active_to,
   job_details.requirements,
   job_offers.updated_at,
-  companies.img,
-  owner_id
+  companies.img AS company_img,
+  owner_id,
+  job_offers.img AS offer_img
 FROM job_offers
-INNER JOIN job_details
+LEFT JOIN job_details -- Zmień z INNER JOIN na LEFT JOIN
   ON job_offers.id = job_details.job_offer_id
-LEFT JOIN companies
+LEFT JOIN companies 
   ON job_offers.company_id = companies.id
 WHERE job_offers.is_active = 1
 ORDER BY job_offers.updated_at DESC;`);
