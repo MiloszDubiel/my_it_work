@@ -29,7 +29,7 @@ const MainPage = () => {
       <Navbar />
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <h1>Znajdź swoją wymarzoną pracę IT 🚀</h1>
+          <h1>Znajdź swoją wymarzoną pracę IT</h1>
           <p>
             Przeglądaj oferty pracy, poznaj firmy i aplikuj w kilka kliknięć.
           </p>

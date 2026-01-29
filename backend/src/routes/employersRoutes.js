@@ -8,7 +8,6 @@ import { connection } from "../config/db.js";
 import { uploadLogo } from "../middleware/settingMiddleware.js";
 import path from "path";
 
-
 const router = express.Router();
 
 router.post("/filltred", async (req, res) => {
@@ -52,13 +51,13 @@ router.post(
 
       if (req.file) {
         logoPath = `http://localhost:5000/uploads/company_logos/logo_${company_id}${path.extname(
-          req.file.originalname
+          req.file.originalname,
         )}`;
       }
 
       await connection.query(
         "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ? WHERE owner_id=?",
-        [description, link, email, phone_number, logoPath, owner_id]
+        [description, link, email, phone_number, logoPath, owner_id],
       );
 
       return res.status(200).json({ info: "Zapisano zmiany" });
@@ -66,7 +65,7 @@ router.post(
       console.error(err);
       return res.status(500).json({ error: "Błąd serwera" });
     }
-  }
+  },
 );
 
 router.post("/request-company-change", async (req, res) => {
@@ -78,7 +77,7 @@ router.post("/request-company-change", async (req, res) => {
          WHERE company_id = ? 
          AND employer_id = ? 
          AND status = 'pending'`,
-      [company_id, owner_id]
+      [company_id, owner_id],
     );
 
     if (rows.length > 0) {
@@ -87,7 +86,6 @@ router.post("/request-company-change", async (req, res) => {
       });
     }
 
-  
     const sql = `
         INSERT INTO company_change_requests 
         (company_id, employer_id, new_company_name, new_nip, status)
@@ -120,7 +118,7 @@ router.post("/get-my-offers", async (req, res) => {
 
     const [companyResult] = await connection.query(
       "SELECT id FROM companies WHERE owner_id = ?",
-      [owner_id]
+      [owner_id],
     );
 
     if (companyResult.length === 0) {
@@ -147,7 +145,8 @@ router.post("/get-my-offers", async (req, res) => {
     job_details.description,
     job_details.requirements,
     job_details.benefits,
-    job_details.responsibilities
+    job_details.responsibilities,
+    job_details.active_to
 FROM job_offers
 INNER JOIN job_details 
     ON job_offers.id = job_details.job_offer_id
@@ -155,7 +154,7 @@ INNER JOIN companies
     ON job_offers.company_id = companies.id
 WHERE company_id = ?
 `,
-      [company_id]
+      [company_id],
     );
 
     return res.status(200).json({ offers });
@@ -190,7 +189,7 @@ router.post("/get-my-applications", async (req, res) => {
       JOIN candidate_info ON users.id = candidate_info.user_id
       WHERE job_offers.employer_id = ? AND  job_applications.status NOT IN('odrzucono', 'anulowana', 'zaakceptowana')
       ORDER BY job_applications.created_at DESC`,
-      [employer_id]
+      [employer_id],
     );
 
     res.json({ applications: rows });
@@ -210,7 +209,7 @@ router.post("/update-application-status", async (req, res) => {
   try {
     const [result] = await connection.query(
       "UPDATE job_applications SET status = ? WHERE id = ?",
-      [status, application_id]
+      [status, application_id],
     );
 
     if (result.affectedRows === 0) {
@@ -229,7 +228,7 @@ router.put("/revoke-application/:id", async (req, res) => {
   try {
     await connection.query(
       "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
-      [app_id]
+      [app_id],
     );
     res.json({ success: true, message: "Odrzucono aplikacje" });
   } catch (err) {
@@ -244,7 +243,7 @@ router.put("/accept-application/:id", async (req, res) => {
   try {
     await connection.query(
       "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
-      [app_id]
+      [app_id],
     );
     res.json({ success: true, message: "Przyjęto aplikacje" });
   } catch (err) {

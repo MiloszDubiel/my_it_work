@@ -131,7 +131,7 @@ const EmployerSettings = () => {
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      }
+      },
     );
 
     if (res.status === 200) {
@@ -167,7 +167,7 @@ const EmployerSettings = () => {
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
       if (!passwordRegex.test(dataToChange.newPassword)) {
         return setError(
-          "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny."
+          "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny.",
         );
       }
 
@@ -216,7 +216,6 @@ const EmployerSettings = () => {
       return false;
     }
 
- 
     try {
       let res = await axios.post(
         "http://localhost:5000/api/employers/request-company-change",
@@ -225,7 +224,7 @@ const EmployerSettings = () => {
           companyName: company.companyName,
           nip: company.nip,
           company_id: company.id,
-        }
+        },
       );
 
       if (res.status == 200) {
@@ -241,7 +240,7 @@ const EmployerSettings = () => {
     if (!selectedApp.length) return;
 
     const res = await axios.put(
-      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`
+      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`,
     );
 
     if (res.status == 200) {
@@ -268,7 +267,7 @@ const EmployerSettings = () => {
             conversationId,
             message: "Witam, niestety Twoja aplikacja została odrzucona.",
           },
-        })
+        }),
       );
     } catch (err) {
       console.error("Błąd uruchamiania wiadomości:", err);
@@ -281,7 +280,7 @@ const EmployerSettings = () => {
     if (!selectedApp.length) return;
 
     const res = await axios.put(
-      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`
+      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`,
     );
 
     if (res.status == 200) {
@@ -309,7 +308,7 @@ const EmployerSettings = () => {
             message:
               "Witam, jestem zainteresowany Twoją aplikacją. Proszę o kontakt.",
           },
-        })
+        }),
       );
     } catch (err) {
       console.error("Błąd uruchamiania wiadomości:", err);
@@ -323,7 +322,7 @@ const EmployerSettings = () => {
 
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`
+        `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`,
       );
 
       if (res.data.success) {
@@ -375,13 +374,13 @@ const EmployerSettings = () => {
               className={activeTab === "company" ? styles.active : ""}
               onClick={() => setActiveTab("company")}
             >
-              🏢 Informacje o firmie
+              Informacje o firmie
             </button>
             <button
               className={activeTab === "offers" ? styles.active : ""}
               onClick={() => setActiveTab("offers")}
             >
-              💼 Oferty pracy
+              Oferty pracy
             </button>
             <button
               className={activeTab === "applications" ? styles.active : ""}
@@ -393,7 +392,7 @@ const EmployerSettings = () => {
               className={activeTab === "settings" ? styles.active : ""}
               onClick={() => setActiveTab("settings")}
             >
-              ⚙️ Ustawienia konta
+              Ustawienia konta
             </button>
           </aside>
 
@@ -533,21 +532,23 @@ const EmployerSettings = () => {
                           </span>
                           <span className={styles.actions}>
                             <button
+                              className={styles.acceptBtn}
                               onClick={() => {
                                 document.querySelector(
-                                  `.update-job-offer${offer.id}`
+                                  `.update-job-offer${offer.id}`,
                                 ).style.display = "flex";
                               }}
                             >
-                              ✏️
+                              Edytuj
                             </button>
                             <button
+                              className={styles.deleteBtn}
                               onClick={() => {
                                 setSelectedOffer(offer.id);
                                 setShowDeleteOfferModal(true);
                               }}
                             >
-                              🗑️
+                              Usuń
                             </button>
                           </span>
                         </div>
@@ -609,7 +610,7 @@ const EmployerSettings = () => {
                             className={styles.smallBtnOutline}
                             onClick={() => {
                               document.querySelector(
-                                `.candidate-details-container${app.user_id}`
+                                `.candidate-details-container${app.user_id}`,
                               ).style.display = "flex";
                               document.querySelector("#root").style.overflow =
                                 "hidden";

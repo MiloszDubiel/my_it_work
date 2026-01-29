@@ -70,7 +70,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((res) => {
         setUsers(res.data.users);
@@ -87,7 +87,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((res) => {
         setCompanies(res.data.companies);
@@ -104,7 +104,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((res) => {
         setOffers(res.data.offers);
@@ -122,7 +122,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then(() => loadUsers())
       .catch((err) => console.error(err));
@@ -137,7 +137,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then(() => loadCompanies())
       .catch((err) => console.error(err));
@@ -152,7 +152,7 @@ const AdminPanel = () => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then(() => loadOffers())
       .catch((err) => console.error(err));
@@ -221,7 +221,7 @@ const AdminPanel = () => {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
-      }
+      },
     );
     loadRequests();
     loadCompanies();
@@ -235,7 +235,7 @@ const AdminPanel = () => {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
-      }
+      },
     );
     loadRequests();
   };
@@ -251,31 +251,31 @@ const AdminPanel = () => {
               className={activeTab === "analise" ? styles.active : ""}
               onClick={() => setActiveTab("analise")}
             >
-              📊 Analiza
+              Analiza
             </li>
             <li
               className={activeTab === "users" ? styles.active : ""}
               onClick={() => setActiveTab("users")}
             >
-              👤 Użytkownicy
+              Użytkownicy
             </li>
             <li
               className={activeTab === "companies" ? styles.active : ""}
               onClick={() => setActiveTab("companies")}
             >
-              🏢 Firmy
+              Firmy
             </li>
             <li
               className={activeTab === "offers" ? styles.active : ""}
               onClick={() => setActiveTab("offers")}
             >
-              💼 Oferty pracy
+              Oferty pracy
             </li>
             <li
               className={activeTab === "settings" ? styles.active : ""}
               onClick={() => setActiveTab("settings")}
             >
-              ⚙️ Ustawienia
+              Ustawienia
             </li>
           </ul>
         </aside>
@@ -352,7 +352,7 @@ const AdminPanel = () => {
                                 setIsEditing(true);
                               }}
                             >
-                              ✏️
+                              Edytuj
                             </button>
 
                             {u.role !== "admin" && (
@@ -360,7 +360,7 @@ const AdminPanel = () => {
                                 className={styles.deleteBtn}
                                 onClick={() => askDeleteUser(u.id)}
                               >
-                                🗑
+                                Usuń
                               </button>
                             )}
                           </div>
@@ -402,7 +402,7 @@ const AdminPanel = () => {
                             setIsEditing(true);
                           }}
                         >
-                          ✏️ Edytuj
+                          Edytuj
                         </button>
 
                         {u.role !== "admin" && (
@@ -410,7 +410,7 @@ const AdminPanel = () => {
                             className={styles.deleteBtn}
                             onClick={() => askDeleteUser(u.id)}
                           >
-                            🗑 Usuń
+                            Usuń
                           </button>
                         )}
                       </div>
@@ -485,14 +485,14 @@ const AdminPanel = () => {
                                 setIsEditingCompany(true);
                               }}
                             >
-                              ✏️
+                              Edytuj
                             </button>
 
                             <button
                               className={styles.deleteBtn}
                               onClick={() => askDeleteCompany(c.id)}
                             >
-                              🗑
+                              Usuń
                             </button>
                           </div>
                         </td>
@@ -521,14 +521,14 @@ const AdminPanel = () => {
                             setIsEditingCompany(true);
                           }}
                         >
-                          ✏️ Edytuj
+                          Edytuj
                         </button>
 
                         <button
                           className={styles.deleteBtn}
                           onClick={() => askDeleteCompany(c.id)}
                         >
-                          🗑 Usuń
+                          Usuń
                         </button>
                       </div>
                     </div>
@@ -581,13 +581,13 @@ const AdminPanel = () => {
                               className={styles.editBtn}
                               onClick={() => askApprove(r.id)}
                             >
-                              ✔
+                              Akceptuj
                             </button>
                             <button
                               className={styles.deleteBtn}
                               onClick={() => askReject(r.id)}
                             >
-                              ✖
+                              Odrzuć
                             </button>
                           </td>
                         </tr>
@@ -616,14 +616,14 @@ const AdminPanel = () => {
                             className={styles.editBtn}
                             onClick={() => askApprove(r.id)}
                           >
-                            ✔ Akceptuj
+                            Akceptuj
                           </button>
 
                           <button
                             className={styles.deleteBtn}
                             onClick={() => askReject(r.id)}
                           >
-                            ✖ Odrzuć
+                            Odrzuć
                           </button>
                         </div>
                       </div>
@@ -676,7 +676,7 @@ const AdminPanel = () => {
                           {!o.updated_at
                             ? ""
                             : new Date(o.updated_at).toLocaleDateString(
-                                "pl-PL"
+                                "pl-PL",
                               )}
                         </td>
                         <td>{o.is_active == "1" ? "Tak" : "Nie"}</td>
@@ -695,14 +695,14 @@ const AdminPanel = () => {
                                 setIsEditingOffer(true);
                               }}
                             >
-                              ✏️
+                              Edytuj
                             </button>
 
                             <button
                               className={styles.deleteBtn}
                               onClick={() => askDeleteOffer(o.id)}
                             >
-                              🗑
+                              Usuń
                             </button>
                           </div>
                         </td>
@@ -736,14 +736,14 @@ const AdminPanel = () => {
                             setIsEditingOffer(true);
                           }}
                         >
-                          ✏️ Edytuj
+                          Edytuj
                         </button>
 
                         <button
                           className={styles.deleteBtn}
                           onClick={() => askDeleteOffer(o.id)}
                         >
-                          🗑 Usuń
+                          Usuń
                         </button>
                       </div>
                     </div>

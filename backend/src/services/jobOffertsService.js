@@ -46,19 +46,46 @@ export function getAllOfferts() {
   job_details.requirements,
   job_offers.updated_at,
   companies.img AS company_img,
-  owner_id,
+  job_offers.owner_id,
   job_offers.img AS offer_img
 FROM job_offers
-LEFT JOIN job_details -- Zmień z INNER JOIN na LEFT JOIN
+LEFT JOIN job_details
   ON job_offers.id = job_details.job_offer_id
+  AND job_details.active_to >= CURDATE()
 LEFT JOIN companies 
   ON job_offers.company_id = companies.id
 WHERE job_offers.is_active = 1
-ORDER BY job_offers.updated_at DESC;`);
+ORDER BY job_offers.updated_at DESC;
+`);
 }
 
 export async function getFillteredOfferts({ title, experience, location }) {
-  let sql = "SELECT * FROM job_offers WHERE is_active = 1 ";
+  let sql = `SELECT
+  job_offers.source,
+  job_offers.id,
+  job_offers.title,
+  job_offers.companyName,
+  job_offers.workingMode,
+  job_offers.contractType,
+  job_offers.experience,
+  job_offers.technologies,
+  job_offers.salary,
+  job_offers.is_active,
+  job_offers.link,
+  job_details.description,
+  job_details.active_to,
+  job_details.requirements,
+  job_offers.updated_at,
+  companies.img AS company_img,
+  job_offers.owner_id,
+  job_offers.img AS offer_img
+FROM job_offers
+LEFT JOIN job_details
+  ON job_offers.id = job_details.job_offer_id
+  AND job_details.active_to >= CURDATE()
+LEFT JOIN companies 
+  ON job_offers.company_id = companies.id
+WHERE job_offers.is_active = 1`;
   const params = [];
 
   if (title && title.trim() !== "") {
@@ -80,6 +107,8 @@ export async function getFillteredOfferts({ title, experience, location }) {
     sql += " AND workingMode LIKE ?";
     params.push(`%${location}%`);
   }
+
+  sql += "ORDER BY job_offers.updated_at DESC";
 
   try {
     const [rows] = await connection.query(sql, params);

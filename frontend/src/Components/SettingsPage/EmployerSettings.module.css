@@ -307,24 +307,30 @@ select:focus {
 }
 
 .deleteBtn {
-  background: #dc2626;
+  background: #dc2626 !important;
   padding: 6px 12px;
   border-radius: 6px;
   color: white;
   border: none;
   cursor: pointer;
+  transition: 0.2s;
 }
 .acceptBtn {
-  background: #32a110;
+  background: #32a110 !important;
   padding: 6px 12px;
   border-radius: 6px;
   color: white;
   border: none;
   cursor: pointer;
+  transition: 0.2s;
+}
+.acceptBtn:hover {
+  background: #26770d !important;
+
 }
 
 .deleteBtn:hover {
-  background: #b91c1c;
+  background: #b91c1c !important;
 }
 
 .noApps {

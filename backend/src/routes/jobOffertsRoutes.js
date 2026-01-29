@@ -102,8 +102,8 @@ router.post("/add", async (req, res) => {
     const [jobOfferResult] = await conn.query(
       `
       INSERT INTO job_offers 
-      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id, date)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?, ?)
+      (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?)
       `,
       [
         title,
@@ -118,7 +118,6 @@ router.post("/add", async (req, res) => {
         "own",
         "user",
         employer_id,
-        date,
       ],
     );
 
@@ -126,8 +125,8 @@ router.post("/add", async (req, res) => {
     await conn.query(
       `
       INSERT INTO job_details
-      (job_offer_id, description, requirements, benefits, responsibilities)
-      VALUES (?, ?,?, ?, ?)
+      (job_offer_id, description, requirements, benefits, responsibilities, active_to)
+      VALUES (?, ?,?, ?, ?, ?)
       `,
       [
         offerId,
@@ -135,6 +134,7 @@ router.post("/add", async (req, res) => {
         requirements || "",
         benefits || "",
         responsibilities || "",
+        date,
       ],
     );
 

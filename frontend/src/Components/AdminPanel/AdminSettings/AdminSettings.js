@@ -74,7 +74,7 @@ const AdminSettings = () => {
       setMessage("Scraper działa w tle 🚀");
       setLastScrap(new Date().toISOString());
     } catch {
-      setMessage("Nie udało się uruchomić scrapera ❌");
+      setMessage("Nie udało się uruchomić scrapera");
     }
   };
 
@@ -119,7 +119,7 @@ const AdminSettings = () => {
         </p>
 
         <button onClick={runScraper} className={styles.scrapBtn}>
-          🔄 Uruchom scrapowanie teraz
+           Uruchom scrapowanie teraz
         </button>
       </div>
     </div>

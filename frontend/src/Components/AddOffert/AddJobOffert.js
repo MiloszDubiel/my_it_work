@@ -173,7 +173,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
           <form className={styles.form}>
             <h2>Dodaj ofertę pracy</h2>
-
+            <p>* - pola wymagane</p>
             <label>Tytuł oferty*</label>
             <input
               type="text"
@@ -287,12 +287,12 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 <option>React.js</option>
                 <option>Angular.js</option>
                 <option>Vue.js</option>
-                <option>Inna...</option>
+                <option disabled>Inna...</option>
               </select>
               <input
                 type="text"
                 name="add_skill"
-                placeholder="Inna technologia..."
+                placeholder="IInna technologia niż podane..."
               />
               <button
                 type="button"

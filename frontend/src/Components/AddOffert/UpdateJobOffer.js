@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 const UpdateJobOffer = ({ offer }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  console.log(offer);
 
   const safeArray = (value) => {
     if (!value) return [];
@@ -49,7 +50,7 @@ const UpdateJobOffer = ({ offer }) => {
     responsibilities: offer.responsibilities,
     benefits: offer.benefits,
     offer_id: offer.id,
-    date: offer.date,
+    date: offer.active_to,
     salary_min: salary?.salaryMin ?? "",
     salary_max: salary?.salaryMax ?? "",
   });
@@ -167,6 +168,7 @@ const UpdateJobOffer = ({ offer }) => {
 
           <form className={styles.form}>
             <h2>Edytuj ofertę pracy</h2>
+            <p>* - pola wymagane</p>
             <label>Tytuł oferty*</label>
             <input
               type="text"
@@ -294,12 +296,12 @@ const UpdateJobOffer = ({ offer }) => {
                 <option>React.js</option>
                 <option>Angular.js</option>
                 <option>Vue.js</option>
-                <option>Inna...</option>
+                <option disabled>Inna...</option>
               </select>
               <input
                 type="text"
                 name="add_skill"
-                placeholder="Inna technologia..."
+                placeholder="Inna technologia niż podane..."
               />
               <button
                 type="button"

@@ -95,10 +95,10 @@ const AdminDashboard = () => {
 
   return (
     <div className={styles.dashboard}>
-      <h1>📊 Statystyki użytkownika</h1>
+      <h1>Statystyki użytkownika</h1>
 
       <section className={styles.card}>
-        <h2>💰 Wynagrodzenia</h2>
+        <h2>Wynagrodzenia</h2>
         <p>
           Średnia: <strong>{avgSalary.toFixed(0)} PLN</strong>
         </p>
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
       </section>
 
       <section className={styles.card}>
-        <h2>📈 Skuteczność aplikacji</h2>
+        <h2>Skuteczność aplikacji</h2>
         <p>
           Aktualna: <strong>{successRate}%</strong>
         </p>
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
       </section>
 
       <section className={styles.card}>
-        <h2>🤝 Dopasowanie do ofert</h2>
+        <h2>Dopasowanie do ofert</h2>
 
         {offers.slice(0, 5).map((o) => {
           const score = matchScore(o);
