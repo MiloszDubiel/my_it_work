@@ -46,7 +46,7 @@ export function getAllOfferts() {
   job_details.requirements,
   job_offers.updated_at,
   companies.img AS company_img,
-  job_offers.owner_id,
+  job_offers.employer_id,
   job_offers.img AS offer_img
 FROM job_offers
 LEFT JOIN job_details
@@ -77,7 +77,7 @@ export async function getFillteredOfferts({ title, experience, location }) {
   job_details.requirements,
   job_offers.updated_at,
   companies.img AS company_img,
-  job_offers.owner_id,
+  job_offers.employer_id,
   job_offers.img AS offer_img
 FROM job_offers
 LEFT JOIN job_details

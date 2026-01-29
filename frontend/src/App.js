@@ -10,6 +10,7 @@ import FiltredJobOffersPage from "./Components/JobOffersPage/FilteredJobPage";
 import FilltredEmployers from "./Components/Employers/FiltredEmployer";
 import AdminRoute from "./Components/AdminPanel/AdminRoute";
 import FiltredCandidate from "./Components/Candidate/FiltredCandidate";
+import IsEmployer from "./Components/Employers/IsEmplyer";
 
 const App = () => {
   return (
@@ -21,7 +22,14 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/job-offers" element={<JobOffersPage />} />
           <Route path="/employers" element={<EmployersComponent />} />
-          <Route path="/candidates" element={<CandidatePage />} />
+          <Route
+            path="/candidates"
+            element={
+              <IsEmployer>
+                <CandidatePage />
+              </IsEmployer>
+            }
+          />
           <Route
             path="/job-offers/filltred"
             element={<FiltredJobOffersPage offersPage={true} />}

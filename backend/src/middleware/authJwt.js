@@ -18,3 +18,10 @@ export const isAdmin = (req, res, next) => {
     return res.status(403).json({ error: "Brak dostępu" });
   next();
 };
+
+export const isEmployer = (req, res, next) => {
+  if (req.user.role !== "employer") {
+    return res.status(403).json({ error: "Brak dostępu" });
+  }
+  next();
+};

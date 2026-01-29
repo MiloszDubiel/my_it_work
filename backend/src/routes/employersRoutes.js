@@ -47,17 +47,25 @@ router.post(
       const { owner_id, description, link, email, phone_number, company_id } =
         req.body;
 
+      console.log(req.file);
+
       let logoPath = null;
 
       if (req.file) {
         logoPath = `http://localhost:5000/uploads/company_logos/logo_${company_id}${path.extname(
           req.file.originalname,
         )}`;
+
+        await connection.query(
+          "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ? WHERE owner_id=?",
+          [description, link, email, phone_number, logoPath, owner_id],
+        );
+        return res.status(200).json({ info: "Zapisano zmiany" });
       }
 
       await connection.query(
-        "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ? WHERE owner_id=?",
-        [description, link, email, phone_number, logoPath, owner_id],
+        "UPDATE companies SET description=?, link=?, email=?, phone_number=? WHERE owner_id=?",
+        [description, link, email, phone_number, owner_id],
       );
 
       return res.status(200).json({ info: "Zapisano zmiany" });

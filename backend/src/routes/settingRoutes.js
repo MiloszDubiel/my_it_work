@@ -4,7 +4,6 @@ import {
   avatarUpload,
 } from "../middleware/settingMiddleware.js";
 import { connection } from "../config/db.js";
-import { getCandiatInfo } from "../services/settingService.js";
 import bcrypt from "bcryptjs";
 
 const router = express.Router();
@@ -60,12 +59,12 @@ router.post(
 
       await connection.query(
         `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
-        values
+        values,
       );
 
       const [user] = await connection.query(
         "SELECT name, surname, email, id, avatar, role FROM users WHERE id = ? ",
-        [id]
+        [id],
       );
 
       res.status(200).json({
@@ -76,7 +75,7 @@ router.post(
       console.error(err);
       res.status(500).json({ error: "Błąd serwera" });
     }
-  }
+  },
 );
 
 router.post("/get-candiate-info", async (req, res) => {
@@ -85,7 +84,10 @@ router.post("/get-candiate-info", async (req, res) => {
   if (!id) {
     return res.status(400).json({ error: "Niepoprawne dane" });
   }
-  const candiat = await getCandiatInfo(id);
+  const [candiat] = await connection.query(
+    "SELECT * FROM candidate_info WHERE user_id = ?",
+    [id],
+  );
   return res.json({ candiate: candiat });
 });
 
@@ -98,7 +100,7 @@ router.post("/has-candiate-profile", async (req, res) => {
 
   const [row] = await connection.query(
     "SELECT * FROM candidate_info WHERE user_id = ?",
-    [id]
+    [id],
   );
 
   return res.json({ info: row });
@@ -137,7 +139,7 @@ LEFT JOIN companies
   ON job_offers.company_id = companies.id
 JOIN favorites ON favorites.offer_id = job_offers.id 
 WHERE favorites.user_id = ?`,
-      [user_id]
+      [user_id],
     );
 
     res.json(rows);
@@ -162,7 +164,6 @@ router.post(
         skills,
         lang,
         edu,
-        exp,
         link_git,
         working_mode,
         present_job,
@@ -170,12 +171,13 @@ router.post(
         phone_number,
         access,
         career_level,
+        years_of_experience,
       } = req.body;
-
-      console.log(req.files?.cv);
 
       const cvFile = req.files?.cv || null;
       const refFile = req.files?.references || null;
+
+
 
       const cvPath = cvFile
         ? `http://localhost:5000/uploads/cv/cv_${user_id}.pdf`
@@ -186,12 +188,12 @@ router.post(
 
       const [rows] = await connection.query(
         "SELECT id FROM candidate_info WHERE user_id = ?",
-        [user_id]
+        [user_id],
       );
 
       if (rows.length === 0) {
         await connection.query(
-          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level, description, years_of_experience) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
           [
             user_id,
             cvPath,
@@ -200,7 +202,6 @@ router.post(
             skills,
             lang,
             edu,
-            exp,
             link_git,
             working_mode,
             present_job,
@@ -209,7 +210,8 @@ router.post(
             access,
             career_level,
             description,
-          ]
+            years_of_experience,
+          ],
         );
 
         return res.json({
@@ -225,7 +227,6 @@ router.post(
         "skills = ?",
         "lang = ?",
         "edu = ?",
-        "exp = ?",
         "link_git = ?",
         "working_mode = ?",
         "present_job = ?",
@@ -234,6 +235,7 @@ router.post(
         "access = ?",
         "career_level = ?",
         "description = ?",
+        "years_of_experience = ?",
       ];
 
       const updateValues = [
@@ -241,7 +243,6 @@ router.post(
         skills,
         lang,
         edu,
-        exp,
         link_git,
         working_mode,
         present_job,
@@ -250,6 +251,7 @@ router.post(
         access,
         career_level,
         description,
+        years_of_experience,
       ];
 
       if (cvPath) {
@@ -267,7 +269,7 @@ router.post(
         `UPDATE candidate_info
          SET ${updateFields.join(", ")}, updated_at = NOW()
          WHERE user_id = ?`,
-        updateValues
+        updateValues,
       );
 
       res.json({
@@ -278,7 +280,7 @@ router.post(
       console.error(err);
       res.status(500).json({ error: "Błąd serwera", details: err.message });
     }
-  }
+  },
 );
 
 //Pobieranie złozony moich cv
@@ -294,7 +296,7 @@ router.post("/get-user-applications", async (req, res) => {
        JOIN companies ON job_offers.company_id = companies.id
        WHERE job_applications.user_id = ?
        ORDER BY created_at DESC`,
-      [user_id]
+      [user_id],
     );
 
     res.status(200).json(rows);
@@ -313,7 +315,7 @@ router.delete("/cancel-application/:id", async (req, res) => {
     // Sprawdź czy aplikacja istnieje
     const [rows] = await connection.query(
       "SELECT * FROM job_applications WHERE id = ?",
-      [id]
+      [id],
     );
 
     if (rows.length === 0) {
@@ -322,7 +324,7 @@ router.delete("/cancel-application/:id", async (req, res) => {
 
     await connection.query(
       "UPDATE job_applications SET status = 'anulowana' WHERE id = ?",
-      [id]
+      [id],
     );
 
     res.status(200).json({ info: "Aplikacja została anulowana." });
@@ -339,7 +341,7 @@ router.delete("/clear-history/:id", async (req, res) => {
   try {
     await connection.query(
       "DELETE FROM job_applications WHERE user_id = ? AND status IN('odrzucono', 'anulowana')",
-      [id]
+      [id],
     );
     return res.status(200).json({ info: "Usunięto" });
   } catch (err) {

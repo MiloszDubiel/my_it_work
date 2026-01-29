@@ -237,14 +237,15 @@ select:focus {
 
 .error {
   color: #dc2626;
-  font-weight: 600;
+  padding-bottom: 10px;
+  font-size: 14px;
 }
 
 .info {
   color: #16a34a;
-  font-weight: 600;
+  padding-bottom: 10px;
+  font-size: 14px;
 }
-
 .offerCard {
   display: flex;
   align-items: center;

@@ -4,7 +4,6 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
-import CandidateInfo from "../Candidate/CandidateInfo";
 
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -34,11 +33,12 @@ const CandidateSettings = () => {
     education: [],
     cv_link: "",
     portfolio_link: "",
-    linkedin: "",
     github: "",
-    availability: "",
+    years_of_experience: "",
     remote_preference: "Remote",
   });
+
+  console.log(candidateProfile);
   const [cvFile, setCvFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
@@ -83,6 +83,7 @@ const CandidateSettings = () => {
             remote_preference: res.data.candiate[0].working_mode,
             skills: JSON.parse(res.data.candiate[0]?.skills),
             github: res.data.candiate[0].link_git,
+            years_of_experience: res.data.candiate[0].years_of_experience,
           });
           setCvPreviewUrl(res.data.candiate[0].cv);
           setReferencePreviewUrl(res.data.candiate[0]?.references);
@@ -201,11 +202,6 @@ const CandidateSettings = () => {
 
         //fetchUserData();
       }
-
-      // if (res.data.error) {
-      //   document.querySelector(`.${styles.content}`).scroll(0, 0);
-      //   setErorr(res.data.error);
-      // }
     } catch (err) {
       console.log(err);
     }
@@ -254,6 +250,10 @@ const CandidateSettings = () => {
     formData.append("exp", candidateProfile.career_level);
     formData.append("access", candidateProfile.availability);
     formData.append("career_level", candidateProfile.career_level);
+    formData.append(
+      "years_of_experience",
+      candidateProfile.years_of_experience,
+    );
 
     if (referenceFile) formData.append("references", referenceFile);
     if (cvFile) formData.append("cv", cvFile);
@@ -550,7 +550,8 @@ const CandidateSettings = () => {
                   </>
                 ) : (
                   <>
-                    <label>Infofmacje o kandydacie</label>
+                    <p>* - pola wymagane</p>
+                    <label>Infofmacje o kandydacie*</label>
                     <textarea
                       name="description"
                       value={candidateProfile.description}
@@ -559,7 +560,7 @@ const CandidateSettings = () => {
                       required
                     />
 
-                    <label>Lokalizacja</label>
+                    <label>Lokalizacja*</label>
                     <input
                       type="text"
                       name="location"
@@ -569,19 +570,19 @@ const CandidateSettings = () => {
                       required
                     />
 
-                    <label>Numer telefonu</label>
+                    <label>Numer telefonu*</label>
                     <input
                       type="tel"
                       name="phone_number"
                       value={candidateProfile.phone_number}
                       onChange={handleChange}
                       placeholder="123456789"
-                      max={9}
                       pattern="[0-9]{9}"
+                      maxlength="9"
                       required
                     />
 
-                    <label>Aktualne stanowisko</label>
+                    <label>Aktualne stanowisko*</label>
                     <input
                       type="text"
                       name="current_position"
@@ -589,7 +590,7 @@ const CandidateSettings = () => {
                       onChange={handleChange}
                       placeholder="Frontend Developer"
                     />
-                    <label>Stanowisko docelowe</label>
+                    <label>Stanowisko docelowe*</label>
                     <input
                       type="text"
                       name="desired_position"
@@ -601,7 +602,7 @@ const CandidateSettings = () => {
                     <label>Poziom doświadczenia</label>
                     <select
                       name="career_level"
-                      value={candidateProfile.career_level}
+                      value={candidateProfile.yer}
                       onChange={handleChange}
                     >
                       <option>Intern</option>
@@ -613,8 +614,8 @@ const CandidateSettings = () => {
 
                     <label>Lata doświadczenia</label>
                     <select
-                      name="career_level"
-                      value={candidateProfile.career_level}
+                      name="years_of_experience"
+                      value={candidateProfile.years_of_experience}
                       onChange={handleChange}
                     >
                       <option>Brak doświadczenia</option>

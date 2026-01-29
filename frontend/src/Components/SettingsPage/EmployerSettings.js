@@ -212,7 +212,7 @@ const EmployerSettings = () => {
     }
 
     if (!/^\d{10}$/.test(company.nip)) {
-      setError("Nip musi mieć 10 znaków.");
+      setError("Nip musi mieć 10 znaków i to muszą być cyfry.");
       return false;
     }
 
@@ -372,25 +372,41 @@ const EmployerSettings = () => {
 
             <button
               className={activeTab === "company" ? styles.active : ""}
-              onClick={() => setActiveTab("company")}
+              onClick={() => {
+                setActiveTab("company");
+                setError("");
+                setInfo("");
+              }}
             >
               Informacje o firmie
             </button>
             <button
               className={activeTab === "offers" ? styles.active : ""}
-              onClick={() => setActiveTab("offers")}
+              onClick={() => {
+                setActiveTab("offers");
+                setError("");
+                setInfo("");
+              }}
             >
               Oferty pracy
             </button>
             <button
               className={activeTab === "applications" ? styles.active : ""}
-              onClick={() => setActiveTab("applications")}
+              onClick={() => {
+                setActiveTab("applications");
+                setError("");
+                setInfo("");
+              }}
             >
               Aplikacje na moje oferty pracy
             </button>
             <button
               className={activeTab === "settings" ? styles.active : ""}
-              onClick={() => setActiveTab("settings")}
+              onClick={() => {
+                setActiveTab("settings");
+                setError("");
+                setInfo("");
+              }}
             >
               Ustawienia konta
             </button>
@@ -421,6 +437,7 @@ const EmployerSettings = () => {
                     onChange={(e) =>
                       setCompany({ ...company, nip: e.target.value })
                     }
+                    maxLength={10}
                   />
 
                   <button type="submit" className={styles.saveBtn}>
