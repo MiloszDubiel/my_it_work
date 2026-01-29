@@ -30,7 +30,7 @@ const MainPage = () => {
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <h1>Znajdź swoją wymarzoną pracę IT</h1>
-          <p>
+          <p style={{ textAlign: "center" }}>
             Przeglądaj oferty pracy, poznaj firmy i aplikuj w kilka kliknięć.
           </p>
           <div className={styles.heroButtons}>
@@ -64,7 +64,7 @@ const MainPage = () => {
                       className={styles.detailsBtn}
                       onClick={() => {
                         document.querySelector(
-                          `.offer-details-container${el.id}`
+                          `.offer-details-container${el.id}`,
                         ).style.display = "flex";
                       }}
                     >

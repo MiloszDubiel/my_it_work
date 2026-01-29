@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "./AdminDashboard.module.css";
 import {
   BarChart,
   Bar,
@@ -9,160 +8,89 @@ import {
   Tooltip,
   LineChart,
   Line,
-  ResponsiveContainer,
 } from "recharts";
-const AdminDashboard = () => {
-  const user = JSON.parse(sessionStorage.getItem("user-data"));
+import styles from "./AdminDashboard.module.css";
 
-  const [offers, setOffers] = useState([]);
-  const [applications, setApplications] = useState([]);
-  const [userData, setUserData] = useState(null);
-  const [boost, setBoost] = useState(0);
+export default function AdminDashboard() {
+  const [salaryStats, setSalaryStats] = useState(null);
+  const [techStats, setTechStats] = useState([]);
+  const [expStats, setExpStats] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/stats/offers")
-      .then((res) => setOffers(res.data));
+      .get("http://localhost:5000/api/stats/salary-stats")
+      .then((res) => setSalaryStats(res.data));
 
     axios
-      .get(`http://localhost:5000/api/stats/applications/${user.id}`)
-      .then((res) => setApplications(res.data));
+      .get("http://localhost:5000/api/stats/tech-frequency")
+      .then((res) => setTechStats(res.data.slice(0, 10)));
 
     axios
-      .get(`http://localhost:5000/api/stats/user/${user.id}/skills`)
-      .then((res) => setUserData(res.data));
+      .get("http://localhost:5000/api/stats/experience-vs-salary")
+      .then((res) => setExpStats(res.data));
   }, []);
 
-  const parseSalary = (salary) => {
-    if (!salary) return 0;
-
-    return (() => {
-      const cleaned = salary
-        .replace(/\u00A0/g, " ")
-        .replace(/pln/gi, "")
-        .replace(/[–—]/g, "-");
-      const numbers = cleaned.match(/\d{1,3}(?:[ ]\d{3})*/g);
-      if (!numbers) return 0;
-
-      const parsed = numbers.map((n) => Number(n.replace(/\s/g, "")));
-
-      if (parsed.length >= 2) {
-        return Math.round((parsed[0] + parsed[1]) / 2);
-      }
-
-      return parsed[0];
-    })();
-  };
-
-  const salaryData = offers.map((o, index) => ({
-    id: index,
-    salary: parseSalary(o.salary),
-  }));
-
-  const salaries = offers
-    .map((o) => {
-      if (!o.salary) return null;
-      const [min, max] = o.salary.split(/-|–/).map(Number);
-      return (min + max) / 2;
-    })
-    .filter(Boolean);
-
-  const avgSalary = salaries.reduce((a, b) => a + b, 0) / salaries.length || 0;
-
-  const medianSalary =
-    [...salaries].sort((a, b) => a - b)[Math.floor(salaries.length / 2)] || 0;
-
-  const accepted = applications.filter(
-    (a) => a.status === "zaakceptowana"
-  ).length;
-  const successRate = applications.length
-    ? Math.round((accepted / applications.length) * 100)
-    : 0;
-
-  const simulatedRate = Math.min(100, successRate + boost);
-
-  const matchScore = (offer) => {
-    if (!userData) return 0;
-    const offerTech = JSON.parse(offer.technologies || "[]");
-    const userTech = JSON.parse(userData.skills || "[]");
-
-    const techMatch =
-      userTech.filter((t) => offerTech.includes(t)).length / offerTech.length ||
-      0;
-
-    return Math.round(techMatch * 100);
-  };
+  if (!salaryStats) return null;
 
   return (
-    <div className={styles.dashboard}>
-      <h1>Statystyki użytkownika</h1>
-
+    <div className={styles.grid}>
+      {/* 1) Salary stats */}
       <section className={styles.card}>
-        <h2>Wynagrodzenia</h2>
+        <h2>💰 Statystyka wynagrodzeń</h2>
         <p>
-          Średnia: <strong>{avgSalary.toFixed(0)} PLN</strong>
+          Średnia: <b>{salaryStats.avg.toFixed(0)} PLN</b>
         </p>
         <p>
-          Mediana: <strong>{medianSalary.toFixed(0)} PLN</strong>
+          Mediana: <b>{salaryStats.median.toFixed(0)} PLN</b>
         </p>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={salaryData}>
-            <XAxis dataKey="id" hide />
-            <YAxis />
-            <Tooltip formatter={(v) => `${v} PLN`} />
-            <Bar dataKey="salary" fill="#3b82f6" />
-          </BarChart>
-        </ResponsiveContainer>
+        <p>
+          Min: <b>{salaryStats.min.toFixed(0)} PLN</b>
+        </p>
+        <p>
+          Max: <b>{salaryStats.max.toFixed(0)} PLN</b>
+        </p>
+
+        <LineChart
+          width={400}
+          height={200}
+          data={salaryStats.raw.map((v, i) => ({ i, v }))}
+        >
+          <XAxis dataKey="i" hide />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="v" stroke="#2563eb" />
+        </LineChart>
       </section>
 
+      {/* 2) Tech frequency */}
       <section className={styles.card}>
-        <h2>Skuteczność aplikacji</h2>
-        <p>
-          Aktualna: <strong>{successRate}%</strong>
-        </p>
+        <h2>Technologie</h2>
 
-        <input
-          type="range"
-          min="0"
-          max="20"
-          value={boost}
-          onChange={(e) => setBoost(Number(e.target.value))}
-        />
-        <ResponsiveContainer width="100%" height={220}>
-          <LineChart
-            width={400}
-            height={200}
-            data={[
-              { name: "Teraz", value: successRate },
-              { name: "Po poprawie parametrów", value: simulatedRate },
-            ]}
-          >
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line dataKey="value" stroke="#16a34a" />
-          </LineChart>
-        </ResponsiveContainer>
+        <BarChart width={400} height={250} data={techStats}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="count" fill="#3b82f6" />
+        </BarChart>
       </section>
 
+      {/* 3) Experience vs salary */}
       <section className={styles.card}>
-        <h2>Dopasowanie do ofert</h2>
+        <h2>Doświadczenie vs wynagrodzenie</h2>
 
-        {offers.slice(0, 5).map((o) => {
-          const score = matchScore(o);
-          return (
-            <div key={o.id} className={styles.matchRow}>
-              <span>{o.title}</span>
-              <div className={styles.bar}>
-                <div className={styles.fill} style={{ width: `${score}%` }} />
-              </div>
-              <strong>{score}%</strong>
-            </div>
-          );
-        })}
+        <BarChart width={400} height={250} data={expStats}>
+          <XAxis dataKey="level" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="avg_salary" fill="#16a34a" />
+        </BarChart>
+
+        {expStats.map((e) => (
+          <p key={e.level}>
+            {e.level}: {e.avg_salary?.toFixed(0)} PLN ({e.offers} ofert)
+          </p>
+        ))}
       </section>
     </div>
   );
-};
-
-export default AdminDashboard;
+}
