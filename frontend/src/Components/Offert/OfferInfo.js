@@ -7,17 +7,28 @@ import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import EmployerInfo from "../Employers/EmployerInfo";
 
+const safeJsonParse = (value, fallback = null) => {
+  if (!value || typeof value !== "string") return fallback;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [userData] = useState(
+    safeJsonParse(sessionStorage.getItem("user-data")),
+  );
   const [showConfirm, setShowConfirm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const confirmCallbackRef = useRef(null);
-
-  console.log(offer);
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -245,8 +256,8 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
           <article className={styles.leftCol}>
             <h3 className={styles.sectionTitle}>Wymagane technologie</h3>
             <ul className={styles.techList}>
-              {JSON.parse(offer.technologies).length > 0 ? (
-                JSON.parse(offer.technologies).map((el) => <li>{el}</li>)
+              {safeJsonParse(offer.technologies).length > 0 ? (
+                safeJsonParse(offer.technologies).map((el) => <li>{el}</li>)
               ) : (
                 <li>Brak podanych technologii</li>
               )}
@@ -304,7 +315,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                       className={styles.compBtnOutline}
                       onClick={async () => {
                         try {
-                          const user = JSON.parse(
+                          const user = safeJsonParse(
                             sessionStorage.getItem("user-data"),
                           );
 
@@ -347,7 +358,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                 <li>
                   Typ umowy:
                   <ul>
-                    {JSON.parse(offer?.contractType || "[]").map((el) => {
+                    {safeJsonParse(offer?.contractType).map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>
@@ -359,7 +370,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                 <li>
                   Doświadczenie:{" "}
                   <ul>
-                    {JSON.parse(offer?.experience || "[]").map((el) => {
+                    {safeJsonParse(offer?.experience).map((el) => {
                       return (
                         <li>
                           <strong>{el}</strong>

@@ -17,7 +17,7 @@ router.post("/login", async (req, res) => {
   try {
     const [result] = await connection.query(
       "SELECT * FROM users WHERE email = ?",
-      [email]
+      [email],
     );
 
     if (result.length === 0) {
@@ -59,7 +59,15 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/registre", async (req, res) => {
-  let { email, password, repeatPassword, role, companyName, nip } = req.body;
+  let {
+    email,
+    password,
+    repeatPassword,
+    role,
+    companyName,
+    firstName,
+    lastName,
+  } = req.body;
 
   if (!email || !password || !repeatPassword || !role) {
     return res.status(400).json({ error: "Puste pola" });
@@ -78,7 +86,7 @@ router.post("/registre", async (req, res) => {
   try {
     const [user] = await connection.query(
       "SELECT * FROM users WHERE email = ?",
-      [email]
+      [email],
     );
 
     if (user.length > 0) {
@@ -90,25 +98,25 @@ router.post("/registre", async (req, res) => {
 
     if (role == "employer") {
       let [result] = await connection.query(
-        "INSERT INTO users (email, password, role, is_active) VALUES (?, ?, ?, '0')",
-        [email, hash, role]
+        "INSERT INTO users (email, password, role, is_active, name, surname) VALUES (?, ?, ?, '0', ?, ?)",
+        [email, hash, role, firstName, lastName],
       );
 
       const employerId = result.insertId;
 
       await connection.query(
         "INSERT INTO companies (companyName, nip, owner_id) VALUES (?, ?, ?)",
-        [companyName, nip, employerId]
+        [companyName, nip, employerId],
       );
 
       return res.json({
-        info: "Konto zostanie zweryfikowane i zostanie aktywowane przez Administratora",
+        info: "Konto zostanie zweryfikowane i zostanie aktywowane przez administratora",
       });
     }
 
     await connection.query(
-      "INSERT INTO users (email, password, role, is_active) VALUES (?, ?, ?, '1')",
-      [email, hash, role]
+      "INSERT INTO users (email, password, role, is_active, name, surname) VALUES (?, ?, ?, '1', ?, ?)",
+      [email, hash, role, firstName, lastName],
     );
     return res.json({ info: "Zarejstrowano pomyślnie" });
   } catch (error) {

@@ -1,6 +1,6 @@
 .container {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -100,7 +100,10 @@
   font-weight: 700;
   cursor: pointer;
   font-size: 15px;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.1s ease;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    opacity 0.1s ease;
 }
 
 .btnPrimary:active {
@@ -164,11 +167,27 @@
     transform: rotate(360deg);
   }
 }
+@media (max-height: 700px) {
+  .container {
+    align-items: flex-start; /* zamiast center */
+    padding-top: 24px;
+    padding-bottom: 24px;
+    overflow-y: auto;
+  }
+}
 
 @media (max-width: 480px) {
   .container {
-    margin: 12px;
+    align-items: flex-start;
+    padding: 16px 12px;
+  }
+
+  .container1 {
     padding: 16px;
-    max-width: calc(100% - 24px);
+    border-radius: 10px;
+  }
+
+  .title {
+    font-size: 18px;
   }
 }

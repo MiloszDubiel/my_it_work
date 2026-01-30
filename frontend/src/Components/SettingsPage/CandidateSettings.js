@@ -5,9 +5,22 @@ import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
 
+const safeJsonParse = (value, fallback = null) => {
+  if (!value || typeof value !== "string") return fallback;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
-  const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [userData] = useState(
+    safeJsonParse(sessionStorage.getItem("user-data")),
+  );
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
   const [applications, setApplications] = useState([]);
@@ -73,19 +86,19 @@ const CandidateSettings = () => {
             ...candidateProfile,
             description: res.data.candiate[0]?.description,
             career_level: res.data.candiate[0]?.exp,
-            languages: JSON.parse(res.data.candiate[0]?.lang),
-            education: JSON.parse(res.data.candiate[0]?.edu),
+            languages: safeJsonParse(res.data.candiate[0]?.lang),
+            education: safeJsonParse(res.data.candiate[0]?.edu),
             location: res.data.candiate[0]?.locations,
             desired_position: res.data.candiate[0]?.target_job,
             current_position: res.data.candiate[0]?.present_job,
-            phone_number: res.data.candiate[0].phone_number,
-            availability: res.data.candiate[0].access,
-            remote_preference: res.data.candiate[0].working_mode,
-            skills: JSON.parse(res.data.candiate[0]?.skills),
-            github: res.data.candiate[0].link_git,
-            years_of_experience: res.data.candiate[0].years_of_experience,
+            phone_number: res.data.candiate[0]?.phone_number,
+            availability: res.data.candiate[0]?.access,
+            remote_preference: res.data.candiate[0]?.working_mode,
+            skills: safeJsonParse(res.data.candiate[0]?.skills),
+            github: res.data.candiate[0]?.link_git,
+            years_of_experience: res.data.candiate[0]?.years_of_experience,
           });
-          setCvPreviewUrl(res.data.candiate[0].cv);
+          setCvPreviewUrl(res.data.candiate[0]?.cv);
           setReferencePreviewUrl(res.data.candiate[0]?.references);
         }
       });
@@ -689,7 +702,7 @@ const CandidateSettings = () => {
                     </div>
 
                     <div className={styles.skillsList}>
-                      {candidateProfile.skills.map((item, index) => (
+                      {candidateProfile.skills?.map((item, index) => (
                         <div className={styles.skillItem} key={index}>
                           <span
                             onDoubleClick={() => deleteItem(index, "skills")}
@@ -731,7 +744,7 @@ const CandidateSettings = () => {
                     </div>
 
                     <div className={styles.skillsList}>
-                      {candidateProfile.languages.map((item, index) => (
+                      {candidateProfile.languages?.map((item, index) => (
                         <div className={styles.skillItem} key={index}>
                           <span
                             onDoubleClick={() => deleteItem(index, "languages")}
@@ -765,7 +778,7 @@ const CandidateSettings = () => {
 
                     <div className={styles.skill}>
                       <div className={styles.skillsList}>
-                        {candidateProfile.education.map((item, index) => (
+                        {candidateProfile.education?.map((item, index) => (
                           <div key={index} className={styles.skillItem}>
                             <span
                               style={{ cursor: "pointer" }}
@@ -938,7 +951,7 @@ const CandidateSettings = () => {
                                 onClick={async () => {
                                   console.log(app);
                                   try {
-                                    const user = JSON.parse(
+                                    const user = safeJsonParse(
                                       sessionStorage.getItem("user-data"),
                                     );
 

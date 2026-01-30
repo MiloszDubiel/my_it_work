@@ -30,7 +30,7 @@ const AdminSettings = () => {
       )
     ) {
       return setMessage(
-        "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny.",
+        "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny",
       );
     }
 

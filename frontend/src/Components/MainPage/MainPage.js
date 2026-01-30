@@ -5,9 +5,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import OfferInfo from "../Offert/OfferInfo";
 
+const safeJsonParse = (value, fallback = null) => {
+  if (!value || typeof value !== "string") return fallback;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 const MainPage = () => {
   const [offers, setOffers] = useState([]);
-  const userData = JSON.parse(sessionStorage.getItem("user-data"));
+
+  const userData = safeJsonParse(sessionStorage.getItem("user-data"));
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -58,7 +70,7 @@ const MainPage = () => {
                 <div className={styles.jobCard}>
                   <h3>{el.title}</h3>
                   <p>{el.companyName}</p>
-                  <span>{JSON.parse(el.contractType)[0]}</span>
+                  <span>{safeJsonParse(el.contractType[0])}</span>
                   <div className={styles.divButton}>
                     <button
                       className={styles.detailsBtn}

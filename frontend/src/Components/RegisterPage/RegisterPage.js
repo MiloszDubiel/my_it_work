@@ -13,11 +13,35 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const validate = () => {
-    if (!email) return "Podaj adres e-mail.";
-    if (!password || password.length < 8)
-      return "Hasło musi mieć co najmniej 8 znaków.";
+    if (!firstName) {
+      return "Podaj imię";
+    }
+    if (!/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/.test(firstName)) {
+      return "Imię nie moze zawierać cyfr i znaków specjalnych oraz musi się zaczynać z wielkiej litery";
+    }
+    if (!lastName) {
+      return "Podaj nazwisko";
+    }
+    if (
+      !/^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,}(-[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,})?$/.test(
+        lastName,
+      )
+    ) {
+      return "Nazwisko musi zawierac min. 2 litery oraz może zawierać znak '-'";
+    }
+
+    if (!email) return "Podaj adres e-mail";
+    if (
+      password.length < 8 ||
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/.test(
+        password,
+      )
+    )
+      return "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny";
     if (password !== repeatPassword) return "Hasła są różne";
     if (role === "employer" && !companyName) return "Podaj nazwę firmy";
     if (role === "employer" && !nip) return "Podaj NIP";
@@ -49,13 +73,14 @@ const RegisterPage = () => {
         password,
         repeatPassword,
         role,
-        ...(role === "employer" ? { companyName } : {}),
-        ...(role === "employer" ? { nip } : {}),
+        firstName,
+        lastName,
+        ...(role === "employer" ? { companyName, nip } : {}),
       };
 
       const res = await axios.post(
         "http://localhost:5000/auth/registre",
-        payload
+        payload,
       );
       setInfo(res.data.info);
     } catch (err) {
@@ -73,6 +98,22 @@ const RegisterPage = () => {
         aria-label="Formularz rejestracji"
       >
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <label className={styles.field}>
+            <span className={styles.label}>Utwórz konto jako:</span>
+            <select
+              className={styles.input}
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                -- Wybierz --
+              </option>
+              <option value="candidate">Kandydat</option>
+              <option value="employer">Pracodawca</option>
+            </select>
+          </label>
+
           <h2 className={styles.title}>Zarejestruj się</h2>
 
           {error && (
@@ -86,86 +127,98 @@ const RegisterPage = () => {
             </div>
           )}
 
-          <label className={styles.field}>
-            <span className={styles.label}>E-mail</span>
-            <input
-              className={styles.input}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              required
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.label}>Hasło</span>
-            <input
-              className={styles.input}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Hasło"
-              required
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.label}>Powtórz hasło</span>
-            <input
-              className={styles.input}
-              type="password"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
-              placeholder="Powtórz hasło"
-              required
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.label}>Utwórz konto jako:</span>
-            <select
-              className={styles.input}
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option disabled value="">
-                -- Wybierz --
-              </option>
-              <option value="candidate">Kandydat</option>
-              <option value="employer">Pracodawca</option>
-            </select>
-          </label>
-
-          {/* Pokazuje się tylko dla pracodawcy */}
-          {role === "employer" && (
+          {role && (
             <>
               <label className={styles.field}>
-                <span className={styles.label}>Nazwa firmy</span>
+                <span className={styles.label}>Imię</span>
                 <input
                   className={styles.input}
                   type="text"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Nazwa firmy"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Imię"
                   required
                 />
               </label>
+
               <label className={styles.field}>
-                <span className={styles.label}>NIP</span>
+                <span className={styles.label}>Nazwisko</span>
                 <input
                   className={styles.input}
                   type="text"
-                  value={nip}
-                  onChange={(e) => setNIP(e.target.value)}
-                  placeholder="NIP"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Nazwisko"
                   required
                 />
               </label>
+
+              <label className={styles.field}>
+                <span className={styles.label}>E-mail</span>
+                <input
+                  className={styles.input}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  required
+                />
+              </label>
+
+              <label className={styles.field}>
+                <span className={styles.label}>Hasło</span>
+                <input
+                  className={styles.input}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Hasło"
+                  required
+                />
+              </label>
+
+              <label className={styles.field}>
+                <span className={styles.label}>Powtórz hasło</span>
+                <input
+                  className={styles.input}
+                  type="password"
+                  value={repeatPassword}
+                  onChange={(e) => setRepeatPassword(e.target.value)}
+                  placeholder="Powtórz hasło"
+                  required
+                />
+              </label>
+              {role === "employer" && (
+                <>
+                  <label className={styles.field}>
+                    <span className={styles.label}>Nazwa firmy</span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="Nazwa firmy"
+                      required
+                    />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span className={styles.label}>NIP</span>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={nip}
+                      onChange={(e) => setNIP(e.target.value)}
+                      placeholder="NIP"
+                      required
+                      minLength={10}
+                      maxLength={10}
+                    />
+                  </label>
+                </>
+              )}
             </>
           )}
-
           <button
             className={styles.btnPrimary}
             type="submit"
