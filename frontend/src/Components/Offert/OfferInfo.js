@@ -138,7 +138,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   };
 
   const open = useCallback(() => {
-    document.querySelector(`#company-info-${offer.owner_id}`).style.display =
+    document.querySelector(`#company-info-${offer.employer_id}`).style.display =
       "flex";
   }, [offer.owner_id]);
   return (
@@ -152,7 +152,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
           : `offer-details-container${offer.id}`)
       }
     >
-      {!in_company_info && <EmployerInfo companyOwner={offer.owner_id} />}
+      {!in_company_info && <EmployerInfo companyOwner={offer.employer_id} />}
       {showConfirm && (
         <ConfirmModal
           message={modalMessage}
@@ -290,10 +290,16 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
             <div className={styles.companyBox}>
               <div className={styles.companyRow}>
                 <div className={styles.companyLogoSmall}>
-                  <img
-                    src={offer.company_img || offer.offer_img || ""}
-                    alt="zdjecie"
-                  />
+                  {offer.company_img || offer.offer_img ? (
+                    <img
+                      src={offer.company_img || offer.offer_img}
+                      alt="zdjecie"
+                    />
+                  ) : (
+                    <div className={styles.logoFallback}>
+                      {offer?.companyName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <div className={styles.companyNameSmall}>

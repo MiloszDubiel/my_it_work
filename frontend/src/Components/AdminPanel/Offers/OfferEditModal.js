@@ -59,7 +59,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((res) => {
         setInfo(res.data.info);
@@ -95,6 +95,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
           name="description"
           value={form.description}
           onChange={handleChange}
+          style={{ height: "300px" }}
         ></textarea>
 
         <label>Aktywny</label>

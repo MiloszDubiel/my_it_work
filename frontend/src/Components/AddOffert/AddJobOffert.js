@@ -4,6 +4,12 @@ import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
 import { useEffect } from "react";
 
+Date.prototype.toDateInputValue = function () {
+  var local = new Date(this);
+  local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+  return local.toJSON().slice(0, 10);
+};
+
 const AddJobOffer = ({ onOfferAdded }) => {
   const [userData, setUserData] = useState(
     JSON.parse(sessionStorage.getItem("user-data")),
@@ -24,7 +30,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
     benefits: "",
     company_id: "",
     employer_id: userData.id,
-    date: "",
+    date: new Date().toDateInputValue(),
   });
 
   useEffect(() => {
@@ -179,7 +185,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               type="text"
               value={offer.title}
               onChange={(e) => setOffer({ ...offer, title: e.target.value })}
-              placeholder="Np. Frontend Developer"
+              placeholder="Tytuł oferty"
             />
 
             <label>Lokalizacja*</label>
@@ -187,7 +193,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               type="text"
               value={offer.location}
               onChange={(e) => setOffer({ ...offer, location: e.target.value })}
-              placeholder="Np. Warszawa / Zdalnie"
+              placeholder="Lokalizacja"
             />
 
             <label>Ważne do*</label>
@@ -204,7 +210,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 setOffer({ ...offer, contract_type: e.target.value })
               }
             >
-              <option value="">Wybierz...</option>
+              <option value="" disabled>
+                Wybierz...
+              </option>
               <option value="Umowa o pracę">Umowa o pracę</option>
               <option value="B2B">B2B</option>
               <option value="Umowa zlecenie">Umowa zlecenie</option>
@@ -213,7 +221,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
             <div className={styles.salaryGroup}>
               <div>
-                <label>Wynagrodzenie min.</label>
+                <label>Minimalne wynagrodzenie</label>
                 <input
                   type="number"
                   value={offer.salary_min}
@@ -225,7 +233,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               </div>
 
               <div>
-                <label>Wynagrodzenie max.</label>
+                <label>Maksymalne wynagrodzenie</label>
                 <input
                   type="number"
                   value={offer.salary_max}
@@ -254,10 +262,8 @@ const AddJobOffer = ({ onOfferAdded }) => {
             </select>
 
             <label>
-              Technologie{" "}
-              <span className={styles.span}>
-                Kliknij podwójnie aby usunąć
-              </span>{" "}
+              Technologie
+              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>
@@ -287,7 +293,6 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 <option>React.js</option>
                 <option>Angular.js</option>
                 <option>Vue.js</option>
-                <option disabled>Inna...</option>
               </select>
               <input
                 type="text"
@@ -309,7 +314,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               onChange={(e) =>
                 setOffer({ ...offer, description: e.target.value })
               }
-              placeholder="Wprowadź pełny opis stanowiska..."
+              placeholder="Opis"
             />
 
             <label>Wymagania</label>
@@ -318,7 +323,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               onChange={(e) =>
                 setOffer({ ...offer, requirements: e.target.value })
               }
-              placeholder="Wymagania dla kandydata..."
+              placeholder="Wymagania"
             />
 
             <label>Zakres obowiązków</label>
@@ -327,14 +332,14 @@ const AddJobOffer = ({ onOfferAdded }) => {
               onChange={(e) =>
                 setOffer({ ...offer, responsibilities: e.target.value })
               }
-              placeholder="Czym będziesz się zajmować..."
+              placeholder="Zakres obowiązków"
             />
 
             <label>Benefity</label>
             <textarea
               value={offer.benefits}
               onChange={(e) => setOffer({ ...offer, benefits: e.target.value })}
-              placeholder="Co oferuje firma..."
+              placeholder="Benefity"
             />
 
             <button

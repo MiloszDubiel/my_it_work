@@ -21,7 +21,6 @@ const UpdateJobOffer = ({ offer }) => {
     }
   };
 
-  console.log(offer);
 
   const getSalaryRange = (salary) => {
     if (!salary) return null;
@@ -176,7 +175,7 @@ const UpdateJobOffer = ({ offer }) => {
               onChange={(e) =>
                 setUpdateOffer({ ...updateOffer, title: e.target.value })
               }
-              placeholder="Np. Frontend Developer"
+              placeholder="Tytuł oferty"
             />
 
             <label>Lokalizacja*</label>
@@ -186,7 +185,7 @@ const UpdateJobOffer = ({ offer }) => {
               onChange={(e) =>
                 setUpdateOffer({ ...updateOffer, location: e.target.value })
               }
-              placeholder="Np. Warszawa / Zdalnie"
+              placeholder="Lokalizacja"
             />
             <label>Ważne do*</label>
             <input
@@ -207,7 +206,9 @@ const UpdateJobOffer = ({ offer }) => {
                 })
               }
             >
-              <option value="">Wybierz...</option>
+              <option value="" disabled>
+                Wybierz...
+              </option>
               <option value="Umowa o pracę">Umowa o pracę</option>
               <option value="B2B">B2B</option>
               <option value="Umowa zlecenie">Umowa zlecenie</option>
@@ -216,7 +217,7 @@ const UpdateJobOffer = ({ offer }) => {
 
             <div className={styles.salaryGroup}>
               <div>
-                <label>Wynagrodzenie min.</label>
+                <label>Minimalne wynagrodzenie</label>
                 <input
                   type="number"
                   value={updateOffer.salary_min}
@@ -231,7 +232,7 @@ const UpdateJobOffer = ({ offer }) => {
               </div>
 
               <div>
-                <label>Wynagrodzenie max.</label>
+                <label>Maksymalne wynagrodzenie</label>
                 <input
                   type="number"
                   value={updateOffer.salary_max}
@@ -247,7 +248,6 @@ const UpdateJobOffer = ({ offer }) => {
             </div>
 
             <label>Doświadczenie</label>
-
             <select
               name="career_level"
               value={updateOffer.experience}
@@ -263,10 +263,8 @@ const UpdateJobOffer = ({ offer }) => {
             </select>
 
             <label>
-              Technologie{" "}
-              <span className={styles.span}>
-                Kliknij podwójnie aby usunąć
-              </span>{" "}
+              Technologie
+              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>
@@ -296,12 +294,11 @@ const UpdateJobOffer = ({ offer }) => {
                 <option>React.js</option>
                 <option>Angular.js</option>
                 <option>Vue.js</option>
-                <option disabled>Inna...</option>
               </select>
               <input
                 type="text"
                 name="add_skill"
-                placeholder="Inna technologia niż podane..."
+                placeholder="Inna technologia..."
               />
               <button
                 type="button"
@@ -318,7 +315,7 @@ const UpdateJobOffer = ({ offer }) => {
               onChange={(e) =>
                 setUpdateOffer({ ...updateOffer, description: e.target.value })
               }
-              placeholder="Wprowadź pełny opis stanowiska..."
+              placeholder="Opis stanowiska"
             />
 
             <label>Wymagania</label>
@@ -327,7 +324,7 @@ const UpdateJobOffer = ({ offer }) => {
               onChange={(e) =>
                 setUpdateOffer({ ...updateOffer, requirements: e.target.value })
               }
-              placeholder="Wymagania dla kandydata..."
+              placeholder="Wymagania"
             />
 
             <label>Zakres obowiązków</label>
@@ -339,7 +336,7 @@ const UpdateJobOffer = ({ offer }) => {
                   responsibilities: e.target.value,
                 })
               }
-              placeholder="Czym będziesz się zajmować..."
+              placeholder="Zakres obowiązków"
             />
 
             <label>Benefity</label>
@@ -348,7 +345,7 @@ const UpdateJobOffer = ({ offer }) => {
               onChange={(e) =>
                 setUpdateOffer({ ...updateOffer, benefits: e.target.value })
               }
-              placeholder="Co oferuje firma..."
+              placeholder="Benefity"
             />
 
             <button

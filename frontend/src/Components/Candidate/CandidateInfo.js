@@ -24,7 +24,7 @@ const CandidateInfo = ({ candidate }) => {
   const languages = parseList(candidate.lang);
   const locations = parseList(candidate.locations);
   const workingMode = parseList(candidate.working_mode);
-  const experiences = parseList(candidate.exp);
+  const experiences = parseList(candidate.years_of_experience);
   const educations = parseList(candidate.edu);
   const references = parseList(candidate.references);
   const cv = parseList(candidate.cv);
@@ -57,7 +57,7 @@ const CandidateInfo = ({ candidate }) => {
               className={styles.closeBtn}
               onClick={() => {
                 document.querySelector(
-                  `.candidate-details-container${candidate.user_id}`
+                  `.candidate-details-container${candidate.user_id}`,
                 ).style.display = "none";
                 document.querySelector("#root").style.overflow = "auto";
               }}
@@ -104,7 +104,7 @@ const CandidateInfo = ({ candidate }) => {
               <div className={styles.meta} style={{ fontSize: "12x" }}>
                 Lata doświadczenie:
                 <span className={styles.salary}>
-                  {candidate.career_level || "Nie podano"}
+                  {candidate.years_of_experience || "Nie podano"}
                 </span>
               </div>
             </div>
@@ -132,7 +132,7 @@ const CandidateInfo = ({ candidate }) => {
                     {
                       employer_id: user.id,
                       candidate_id: candidate.user_id,
-                    }
+                    },
                   );
 
                   const conversationId = res.data.id;
@@ -144,7 +144,7 @@ const CandidateInfo = ({ candidate }) => {
                   window.dispatchEvent(
                     new CustomEvent("openConversation", {
                       detail: { conversationId },
-                    })
+                    }),
                   );
                 } catch (err) {
                   console.error("Błąd uruchamiania wiadomości:", err);
@@ -188,22 +188,12 @@ const CandidateInfo = ({ candidate }) => {
                     </li>
                   ) : (
                     <li key={i}>Brak CV</li>
-                  )
+                  ),
                 )}
               </ul>
             ) : (
               <p>Brak</p>
             )}
-
-            <hr />
-            <h3 className={styles.sectionTitle}>
-              Doświadczenie w latch:{" "}
-              {experiences.length > 0 ? (
-                <span>{experiences[0]}</span>
-              ) : (
-                <span>Brak</span>
-              )}
-            </h3>
 
             <hr />
             <h3 className={styles.sectionTitle}>Wykształcenie</h3>
@@ -216,7 +206,10 @@ const CandidateInfo = ({ candidate }) => {
                 ))}
               </ul>
             ) : (
-              <p>Brak danych</p>
+              <p>
+                <strong>Brak</strong>
+                Brak danych
+              </p>
             )}
             <hr />
             <h3 className={styles.sectionTitle}>Referencje</h3>
@@ -236,7 +229,7 @@ const CandidateInfo = ({ candidate }) => {
                     </li>
                   ) : (
                     <li key={i}>{el}</li>
-                  )
+                  ),
                 )}
               </ul>
             ) : (
@@ -263,7 +256,9 @@ const CandidateInfo = ({ candidate }) => {
                         </li>
                       ))
                     ) : (
-                      <li>Brak</li>
+                      <li>
+                        <strong>Brak</strong>
+                      </li>
                     )}
                   </ul>
                 </li>
@@ -281,7 +276,9 @@ const CandidateInfo = ({ candidate }) => {
                         </li>
                       ))
                     ) : (
-                      <li>Brak</li>
+                      <li>
+                        <strong>Brak</strong>
+                      </li>
                     )}
                   </ul>
                 </li>
@@ -296,7 +293,9 @@ const CandidateInfo = ({ candidate }) => {
                         </li>
                       ))
                     ) : (
-                      <li>Brak</li>
+                      <li>
+                        <strong>Brak</strong>
+                      </li>
                     )}
                   </ul>
                 </li>

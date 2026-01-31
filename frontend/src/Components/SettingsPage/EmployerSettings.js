@@ -633,7 +633,7 @@ const EmployerSettings = () => {
                                 "hidden";
                             }}
                           >
-                            👤 Profil
+                            Profil
                           </button>
 
                           <button
@@ -643,7 +643,7 @@ const EmployerSettings = () => {
                               setShowCancelModal(true);
                             }}
                           >
-                            🗑
+                            Odrzuć
                           </button>
 
                           <button
@@ -653,7 +653,7 @@ const EmployerSettings = () => {
                               setShowAcceptModal(true);
                             }}
                           >
-                            🗑
+                            Akceptuj
                           </button>
                         </span>
                       </div>

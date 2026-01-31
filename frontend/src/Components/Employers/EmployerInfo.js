@@ -12,7 +12,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/employers/get-company-info",
-        { id: companyOwner }
+        { id: companyOwner },
       );
 
       if (res.data?.companyInfo?.length > 0) {
@@ -30,7 +30,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/employers/get-my-offers",
-        { owner_id: companyOwner }
+        { owner_id: companyOwner },
       );
 
       setOffers(res.data?.offers || []);
@@ -94,13 +94,13 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
             <div>
               {company?.img ? (
                 <img
-                  src={company?.img}
+                  src={company.img}
                   alt={company?.companyName}
                   className={styles.logo}
                 />
               ) : (
-                <div className={styles.logoPlaceholder}>
-                  {company?.companyName?.charAt(0).toUpperCase()}
+                <div className={styles.logoFallback}>
+                  {company?.companyName?.charAt(0)?.toUpperCase() || "?"}
                 </div>
               )}
             </div>
