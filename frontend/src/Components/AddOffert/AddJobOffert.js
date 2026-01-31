@@ -173,7 +173,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
           <form className={styles.form}>
             <h2>Dodaj ofertę pracy</h2>
-            <p>* - pola wymagane</p>
+            <p style={{ fontSize: "12px" }}>* - pola wymagane</p>
             <label>Tytuł oferty*</label>
             <input
               type="text"

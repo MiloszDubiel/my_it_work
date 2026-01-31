@@ -16,6 +16,12 @@ const safeJsonParse = (value, fallback = null) => {
   }
 };
 
+const isUniqueItem = (list = [], newName = "") => {
+  return !list.some(
+    (item) => item?.name?.trim().toLowerCase() === newName.trim().toLowerCase(),
+  );
+};
+
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData] = useState(
@@ -51,7 +57,6 @@ const CandidateSettings = () => {
     remote_preference: "Remote",
   });
 
-  console.log(candidateProfile);
   const [cvFile, setCvFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
@@ -62,6 +67,11 @@ const CandidateSettings = () => {
   const cvInputRef = useRef();
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(ProfielData.avatar);
+  const [customSkill, setCustomSkill] = useState("");
+  const [showCustomSkill, setShowCustomSkill] = useState(false);
+
+  const [customLanguage, setCustomLanguage] = useState("");
+  const [showCustomLanguage, setShowCustomLanguage] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -312,22 +322,80 @@ const CandidateSettings = () => {
 
   const addSkillWithLevel = (e) => {
     const name = e.target.value;
-    if (!name || name === "Inna..." || name === "Inny") return;
 
-    setCandidateProfile((prev) => ({
-      ...prev,
-      skills: [...prev.skills, { name, level: "Brak" }],
-    }));
+    if (name === "custom") {
+      setShowCustomSkill(true);
+      return;
+    }
+
+    if (!name) return;
+
+    setCandidateProfile((prev) => {
+      if (!isUniqueItem(prev.skills, name)) return prev;
+
+      return {
+        ...prev,
+        skills: [...prev.skills, { name, level: "Podstawowy" }],
+      };
+    });
+
+    setShowCustomSkill(false);
+  };
+
+  const addCustomSkill = () => {
+    const name = customSkill.trim();
+    if (!name) return;
+
+    setCandidateProfile((prev) => {
+      if (!isUniqueItem(prev.skills, name)) return prev;
+
+      return {
+        ...prev,
+        skills: [...prev.skills, { name, level: "Podstawowy" }],
+      };
+    });
+
+    setCustomSkill("");
+    setShowCustomSkill(false);
   };
 
   const addLanguageWithLevel = (e) => {
     const name = e.target.value;
+
+    if (name === "custom") {
+      setShowCustomLanguage(true);
+      return;
+    }
+
     if (!name) return;
 
-    setCandidateProfile((prev) => ({
-      ...prev,
-      languages: [...prev.languages, { name, level: "Brak" }],
-    }));
+    setCandidateProfile((prev) => {
+      if (!isUniqueItem(prev.languages, name)) return prev;
+
+      return {
+        ...prev,
+        languages: [...prev.languages, { name, level: "Podstawowy" }],
+      };
+    });
+
+    setShowCustomLanguage(false);
+  };
+
+  const addCustomLanguage = () => {
+    const name = customLanguage.trim();
+    if (!name) return;
+
+    setCandidateProfile((prev) => {
+      if (!isUniqueItem(prev.languages, name)) return prev;
+
+      return {
+        ...prev,
+        languages: [...prev.languages, { name, level: "Podstawowy" }],
+      };
+    });
+
+    setCustomLanguage("");
+    setShowCustomLanguage(false);
   };
 
   const updateLevel = (index, type, level) => {
@@ -340,14 +408,17 @@ const CandidateSettings = () => {
   };
 
   const addEducation = (e) => {
-    const name = e.target.previousSibling.value;
+    const name = e.target.previousSibling.value.trim();
+    if (!name) return;
 
-    if (!name.trim()) return;
+    setCandidateProfile((prev) => {
+      if (!isUniqueItem(prev.education, name)) return prev;
 
-    setCandidateProfile((prev) => ({
-      ...prev,
-      education: [...prev.education, { name, level: "Brak" }],
-    }));
+      return {
+        ...prev,
+        education: [...prev.education, { name, level: "Podstawowy" }],
+      };
+    });
 
     e.target.previousSibling.value = "";
   };
@@ -515,6 +586,7 @@ const CandidateSettings = () => {
                   }
                 />
 
+                <hr />
                 <label>Zdjęcie profilowe</label>
 
                 {avatarPreview ? (
@@ -525,18 +597,27 @@ const CandidateSettings = () => {
                   <p>Brak zdjęcia profilowego</p>
                 )}
 
-                <input
-                  type="file"
-                  accept="image/png"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    setAvatarFile(file);
-                    if (file) {
-                      setAvatarPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                />
+                <div className={styles.fileUploadBox}>
+                  <label className={styles.fileUploadBtn}>
+                    Wybierz plik
+                    <input
+                      type="file"
+                      accept="image/png"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        setAvatarFile(file);
+                        if (file) {
+                          setAvatarPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    />
+                  </label>
 
+                  {avatarFile && (
+                    <span className={styles.fileName}>{avatarFile.name}</span>
+                  )}
+                </div>
+                <hr />
                 <button type="submit" className={styles.saveBtn}>
                   Zapisz zmiany
                 </button>
@@ -563,7 +644,7 @@ const CandidateSettings = () => {
                   </>
                 ) : (
                   <>
-                    <p>* - pola wymagane</p>
+                    <p style={{ fontSize: "12px" }}>* - pola wymagane</p>
                     <label>Infofmacje o kandydacie*</label>
                     <textarea
                       name="description"
@@ -571,6 +652,7 @@ const CandidateSettings = () => {
                       onChange={handleChange}
                       placeholder="Powiedz coś o sobie"
                       required
+                      style={{ minHeight: "250px", maxWidth: "100%" }}
                     />
 
                     <label>Lokalizacja*</label>
@@ -637,12 +719,12 @@ const CandidateSettings = () => {
                       <option>3</option>
                       <option>4+</option>
                     </select>
-
+                    <hr />
                     <label>Umiejętności</label>
 
                     <div className={styles.skill}>
-                      <select onChange={addSkillWithLevel}>
-                        <option value="" disabled selected>
+                      <select onChange={addSkillWithLevel} defaultValue="">
+                        <option value="" disabled>
                           Wybierz...
                         </option>
 
@@ -698,8 +780,32 @@ const CandidateSettings = () => {
                         <option>Webpack</option>
                         <option>Vite</option>
                         <option>Three.js</option>
+                        <option value="custom">Inna...</option>
                       </select>
                     </div>
+                    {showCustomSkill && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          marginTop: "8px",
+                        }}
+                      >
+                        <input
+                          type="text"
+                          placeholder="Wpisz umiejętność"
+                          value={customSkill}
+                          onChange={(e) => setCustomSkill(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className={styles.addCustomBtn}
+                          onClick={addCustomSkill}
+                        >
+                          Dodaj
+                        </button>
+                      </div>
+                    )}
 
                     <div className={styles.skillsList}>
                       {candidateProfile.skills?.map((item, index) => (
@@ -720,7 +826,6 @@ const CandidateSettings = () => {
                             <option value="" disabled selected>
                               Wybierz...
                             </option>
-                            <option>Brak</option>
                             <option>Podstawowy</option>
                             <option>Średni</option>
                             <option>Zaawansowany</option>
@@ -729,19 +834,45 @@ const CandidateSettings = () => {
                         </div>
                       ))}
                     </div>
-
+                    <hr />
                     <label>Języki</label>
 
                     <div className={styles.skill}>
-                      <select onChange={addLanguageWithLevel}>
-                        <option value="" disabled selected>
+                      <select onChange={addLanguageWithLevel} defaultValue="">
+                        <option value="" disabled>
                           Wybierz...
                         </option>
+
                         <option>Angielski</option>
                         <option>Niemiecki</option>
                         <option>Hiszpański</option>
+
+                        <option value="custom">Inny...</option>
                       </select>
                     </div>
+                    {showCustomLanguage && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          marginTop: "8px",
+                        }}
+                      >
+                        <input
+                          type="text"
+                          placeholder="Wpisz język"
+                          value={customLanguage}
+                          onChange={(e) => setCustomLanguage(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className={styles.addCustomBtn}
+                          onClick={addCustomLanguage}
+                        >
+                          Dodaj
+                        </button>
+                      </div>
+                    )}
 
                     <div className={styles.skillsList}>
                       {candidateProfile.languages?.map((item, index) => (
@@ -762,7 +893,6 @@ const CandidateSettings = () => {
                             <option value="" disabled selected>
                               Wybierz...
                             </option>
-                            <option>Brak</option>
                             <option>A1</option>
                             <option>A2</option>
                             <option>B1</option>
@@ -773,38 +903,10 @@ const CandidateSettings = () => {
                         </div>
                       ))}
                     </div>
-
+                    <hr />
                     <label>Edukacja</label>
 
                     <div className={styles.skill}>
-                      <div className={styles.skillsList}>
-                        {candidateProfile.education?.map((item, index) => (
-                          <div key={index} className={styles.skillItem}>
-                            <span
-                              style={{ cursor: "pointer" }}
-                              onDoubleClick={() => deleteEducation(index)}
-                            >
-                              {item.name}
-                            </span>
-
-                            <select
-                              value={item.level}
-                              onChange={(e) =>
-                                updateEducationLevel(index, e.target.value)
-                              }
-                            >
-                              <option>Brak</option>
-                              <option>Podstawowe</option>
-                              <option>Średnie</option>
-                              <option>Licencjat</option>
-                              <option>Inżynier</option>
-                              <option>Magister</option>
-                              <option>Doktor</option>
-                            </select>
-                          </div>
-                        ))}
-                      </div>
-
                       <input type="text" placeholder="Szkoła..." />
 
                       <button
@@ -816,14 +918,49 @@ const CandidateSettings = () => {
                       </button>
                     </div>
 
+                    <div className={styles.skillsList}>
+                      {candidateProfile.education?.map((item, index) => (
+                        <div key={index} className={styles.skillItem}>
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onDoubleClick={() => deleteEducation(index)}
+                          >
+                            {item.name}
+                          </span>
+
+                          <select
+                            value={item.level}
+                            onChange={(e) =>
+                              updateEducationLevel(index, e.target.value)
+                            }
+                          >
+                            <option>Podstawowe</option>
+                            <option>Średnie</option>
+                            <option>Licencjat</option>
+                            <option>Inżynier</option>
+                            <option>Magister</option>
+                            <option>Doktor</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                    <hr />
                     <label>CV</label>
-                    <div className={styles.fileInputWrapper}>
-                      <input
-                        type="file"
-                        ref={cvInputRef}
-                        accept=".pdf"
-                        onChange={(e) => setCvFile(e.target.files[0])}
-                      />
+                    <div className={styles.fileUploadBox}>
+                      <label className={styles.fileUploadBtn}>
+                        Wybierz plik
+                        <input
+                          type="file"
+                          ref={cvInputRef}
+                          accept=".pdf"
+                          onChange={(e) => setCvFile(e.target.files[0])}
+                        />
+                      </label>
+
+                      {cvFile && (
+                        <span className={styles.fileName}>{cvFile.name}</span>
+                      )}
+
                       {cvPreviewUrl && (
                         <a
                           href={cvPreviewUrl}
@@ -837,13 +974,23 @@ const CandidateSettings = () => {
                     </div>
 
                     <label>Referencje</label>
-                    <div className={styles.fileInputWrapper}>
-                      <input
-                        type="file"
-                        ref={referenceInputRef}
-                        accept=".pdf"
-                        onChange={(e) => setReferenceFile(e.target.files[0])}
-                      />
+                    <div className={styles.fileUploadBox}>
+                      <label className={styles.fileUploadBtn}>
+                        Wybierz plik
+                        <input
+                          type="file"
+                          ref={referenceInputRef}
+                          accept=".pdf"
+                          onChange={(e) => setReferenceFile(e.target.files[0])}
+                        />
+                      </label>
+
+                      {referenceFile && (
+                        <span className={styles.fileName}>
+                          {referenceFile.name}
+                        </span>
+                      )}
+
                       {referencePreviewUrl && (
                         <a
                           href={referencePreviewUrl}
@@ -855,7 +1002,7 @@ const CandidateSettings = () => {
                         </a>
                       )}
                     </div>
-
+                    <hr />
                     <label>GitHub</label>
                     <input
                       type="url"
