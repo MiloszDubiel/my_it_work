@@ -92,8 +92,11 @@ const Navbar = ({ employersPage }) => {
               <>
                 {userData?.role != "admin" && (
                   <span className={styles.name}>
-                    {userData.name || "Użytkowniku" || userData.surname || ""}
+                    {userData.name || "Użytkownik" || userData.surname || ""}
                   </span>
+                )}
+                {userData?.role == "admin" && (
+                  <span className={styles.name}>Administrator</span>
                 )}
                 <button
                   onClick={() => {
@@ -117,11 +120,11 @@ const Navbar = ({ employersPage }) => {
                             .display;
                         if (dis === "none")
                           document.querySelector(
-                            "#chatContainer"
+                            "#chatContainer",
                           ).style.display = "flex";
                         else
                           document.querySelector(
-                            "#chatContainer"
+                            "#chatContainer",
                           ).style.display = "none";
                       }}
                     >
@@ -146,7 +149,7 @@ const Navbar = ({ employersPage }) => {
             >
               {userData?.email ? (
                 <>
-                  {userData?.role !== "admin" ? (
+                  {userData?.role !== "admin" && (
                     <Link
                       onClick={() => {
                         document.querySelector("#settings").style.display =
@@ -160,11 +163,9 @@ const Navbar = ({ employersPage }) => {
                     >
                       Ustawienia
                     </Link>
-                  ) : (
-                    ""
                   )}
 
-                  {userData?.role === "employer" ? (
+                  {userData?.role === "employer" && (
                     <>
                       {employersPage ? <Link>Dodaj swoją firmę</Link> : ""}
 
@@ -179,23 +180,18 @@ const Navbar = ({ employersPage }) => {
                         Zarządzaj ogłoszeniemi o pracę
                       </Link>
                     </>
-                  ) : (
-                    ""
                   )}
-                  {userData?.role === "Candidate" ? (
+
+                  {userData?.role === "Candidate" && (
                     <>
                       <Link to="/user/add-candidate">
                         Dodaj swoją kandydaturę
                       </Link>
                     </>
-                  ) : (
-                    ""
                   )}
 
-                  {userData?.role == "admin" ? (
+                  {userData?.role == "admin" && (
                     <Link to="/admin">Panel administratora</Link>
-                  ) : (
-                    ""
                   )}
 
                   <button

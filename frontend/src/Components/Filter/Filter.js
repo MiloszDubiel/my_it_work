@@ -8,7 +8,7 @@ const Filter = ({ candidatesPage, offersPage, employersPage }) => {
     experience: "",
     location: "",
     companyName: "",
-
+    nip: "",
     technologia: "",
   });
 
@@ -36,8 +36,8 @@ const Filter = ({ candidatesPage, offersPage, employersPage }) => {
         {offersPage
           ? "Filtruj oferty pracy"
           : employersPage
-          ? "Filtruj pracodawców"
-          : "Filtruj kandydatów"}
+            ? "Filtruj pracodawców"
+            : "Filtruj kandydatów"}
       </h2>
 
       <div className={styles.filters}>
@@ -66,7 +66,21 @@ const Filter = ({ candidatesPage, offersPage, employersPage }) => {
               name="companyName"
               value={filters.companyName}
               onChange={handleChange}
-              placeholder="np. Asseco"
+              placeholder="Asseco"
+            />
+          </div>
+        )}
+        {/*NIP */}
+        {employersPage && (
+          <div className={styles.filterGroup}>
+            <label htmlFor="NIP">NIP</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={filters.nip}
+              onChange={handleChange}
+              placeholder="NIP"
             />
           </div>
         )}
@@ -81,7 +95,7 @@ const Filter = ({ candidatesPage, offersPage, employersPage }) => {
               name="technologia"
               value={filters.technologia}
               onChange={handleChange}
-              placeholder="np. JavaScript"
+              placeholder="JavaScript"
             />
           </div>
         )}
@@ -108,17 +122,19 @@ const Filter = ({ candidatesPage, offersPage, employersPage }) => {
 
         {/* Lokalizacja */}
 
-        <div className={styles.filterGroup}>
-          <label htmlFor="location">Lokalizacja</label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            value={filters.location}
-            onChange={handleChange}
-            placeholder="np. Warszawa, Kraków..."
-          />
-        </div>
+        {(offersPage || candidatesPage) && (
+          <div className={styles.filterGroup}>
+            <label htmlFor="location">Lokalizacja</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={filters.location}
+              onChange={handleChange}
+              placeholder="Warszawa, Kraków..."
+            />
+          </div>
+        )}
       </div>
 
       <div className={styles.actions}>

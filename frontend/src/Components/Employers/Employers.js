@@ -110,10 +110,6 @@ const EmployersComponent = () => {
           <div className={styles.offersList}>
             {currentOffers.length > 0 ? (
               currentOffers.map((offer) => {
-                console.log(offer);
-                const technologies = safeParse(offer.technologies)?.[0] || [];
-                const locations = safeParse(offer.locations)?.[0];
-
                 return (
                   <>
                     <EmployerInfo companyOwner={offer.owner_id} />

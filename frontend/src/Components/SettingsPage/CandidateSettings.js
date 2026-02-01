@@ -169,30 +169,47 @@ const CandidateSettings = () => {
     setInfo("");
     setErorr("");
 
-    if (!ProfielData.name?.trim()) {
-      return setErorr("Imię jest wymagane.");
+    if (
+      !ProfielData.name?.trim() ||
+      !/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/.test(ProfielData.name?.trim())
+    ) {
+      document.querySelector(`.${styles.content}`).scroll(0, 0);
+      return setErorr(
+        "Imię nie moze zawierać cyfr i znaków specjalnych oraz musi się zaczynać z wielkiej litery",
+      );
     }
 
-    if (!ProfielData.surname?.trim()) {
-      return setErorr("Nazwisko jest wymagane.");
+    if (
+      !ProfielData.surname?.trim() ||
+      !/^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,}(-[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,})?$/.test(
+        ProfielData.surname?.trim(),
+      )
+    ) {
+      document.querySelector(`.${styles.content}`).scroll(0, 0);
+      return setErorr(
+        "Nazwisko musi zawierac min. 2 litery oraz może zawierać znak '-'",
+      );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!ProfielData.email?.trim()) {
+      document.querySelector(`.${styles.content}`).scroll(0, 0);
       return setErorr("Email jest wymagany.");
-    } else if (!emailRegex.test(ProfielData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ProfielData.email)) {
+      document.querySelector(`.${styles.content}`).scroll(0, 0);
       return setErorr("Podaj poprawny email.");
     }
     if (ProfielData.newPassword) {
       const passwordRegex =
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
       if (!passwordRegex.test(ProfielData.newPassword)) {
+        document.querySelector(`.${styles.content}`).scroll(0, 0);
         return setErorr(
           "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę i 1 znak specjalny.",
         );
       }
 
       if (ProfielData.newPassword !== ProfielData.repeatPassword) {
+        document.querySelector(`.${styles.content}`).scroll(0, 0);
         return setErorr("Hasła są różne.");
       }
     }
@@ -222,8 +239,6 @@ const CandidateSettings = () => {
         setInfo("Profil zaktualizowany");
         sessionStorage.setItem("user-data", JSON.stringify(res.data.userData));
         document.querySelector(`.${styles.content}`).scroll(0, 0);
-
-        //fetchUserData();
       }
     } catch (err) {
       console.log(err);
@@ -238,23 +253,29 @@ const CandidateSettings = () => {
 
     if (!candidateProfile.location.trim()) {
       setErorr("Lokalizacja nie może być pusta.");
+      e.target.parentElement.scrollTo(0, 0);
+
       return;
     }
     if (!candidateProfile.description.trim()) {
       setErorr("Opis nie może byc pusty.");
+      e.target.parentElement.scrollTo(0, 0);
       return;
     }
     if (!candidateProfile.current_position.trim()) {
       setErorr("Aktualne stanowisko nie może być puste.");
+      e.target.parentElement.scrollTo(0, 0);
       return;
     }
     if (!candidateProfile.desired_position.trim()) {
       setErorr("Stanowisko docelowe nie może być puste.");
+      e.target.parentElement.scrollTo(0, 0);
       return;
     }
     const phoneRegex = /^[0-9]{9}$/;
     if (!phoneRegex.test(candidateProfile.phone_number)) {
       setErorr("Numer telefonu musi składać się z 9 cyfr.");
+      e.target.parentElement.scrollTo(0, 0);
       return;
     }
 

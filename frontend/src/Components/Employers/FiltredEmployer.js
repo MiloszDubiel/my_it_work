@@ -1,140 +1,136 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import styles from "./employers.module.css";
-import SortButton, { Sort } from "../SortButton/SortButton";
+import SortButton from "../SortButton/SortButton";
 import Navbar from "../NavBar/NavBar";
 import Filter from "../Filter/Filter";
 import { useLocation } from "react-router-dom";
+import EmployerInfo from "./EmployerInfo";
 
-const FilltredEmployers = ({}) => {
+const safeParse = (value) => {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return [];
+  }
+};
+
+const FilltredEmployers = () => {
   const [offers, setOffers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const offersPerPage = 9;
 
-  const location = useLocation();
-  const { state } = location;
+  const { state } = useLocation();
+
+  const open = useCallback((id) => {
+    if (id)
+      document.querySelector(`#company-info-${id}`).style.display = "flex";
+  });
 
   useEffect(() => {
     const fetchOffers = async () => {
       try {
         const res = await axios.post(
-          `http://localhost:5000/api/employers/filltred`,
-          {
-            state,
-          }
+          "http://localhost:5000/api/employers/filltred",
+          { state },
         );
-
         setOffers(res.data);
       } catch (err) {
-        console.error("Błąd podczas pobierania kamdydatów:", err);
+        console.error("Błąd pobierania pracodawców:", err);
       }
     };
+
     fetchOffers();
   }, [state]);
 
   const indexOfLast = currentPage * offersPerPage;
   const indexOfFirst = indexOfLast - offersPerPage;
-  const currentOffers = offers?.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(offers?.length / offersPerPage);
+  const currentOffers = offers.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(offers.length / offersPerPage);
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
-
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
+  console.log(currentOffers);
 
   return (
     <>
       <Navbar />
-      <Filter employersPage={true} />
+      <Filter employersPage />
       <div className={styles.container}>
         <h1>Pracodawcy</h1>
 
         <div className={styles.offersList}>
-          <SortButton employersPage={true} />
-          {currentOffers?.length > 0 ? (
-            currentOffers.map((offer, index) => (
-              <div className={styles.offerRow} key={index}>
-                <div className={styles.logoSection}>
-                  <img
-                    src={offer.img || "/default-company.png"}
-                    alt={offer.companyName}
-                    className={styles.companyImg}
-                  />
-                </div>
+          <SortButton employersPage />
 
-                <div className={styles.infoSection}>
-                  <h3>{offer.title}</h3>
-                  <p className={styles.company}>{offer.companyName}</p>
-
-                  {offer.location && (
-                    <p className={styles.location}>{offer.location}</p>
-                  )}
-
-                  <div className={styles.tags}>
-                    <div className={styles.technologies}>
-                      {offer.technologies &&
-                        JSON.parse(offer.technologies)[0]
-                          .slice(0, 2)
-                          .map((tech, i) => (
-                            <span key={i} className={styles.tag}>
-                              {tech}
-                            </span>
-                          ))}
-
-                      {JSON.parse(offer.technologies)[0].slice(0, 2).length <
-                      JSON.parse(offer.technologies)[0].length ? (
-                        <p className={styles.item}>i więcej... </p>
-                      ) : (
-                        ""
-                      )}
+          {currentOffers.length > 0 ? (
+            currentOffers.map((offer) => {
+              return (
+                <>
+                  <EmployerInfo companyOwner={offer.owner_id} />
+                  <div className={styles.offerRow} key={offer.id || offer._id}>
+                    <div className={styles.logoSection}>
+                      <img
+                        src={offer.img || "/default-company.png"}
+                        alt={offer.companyName || "Firma"}
+                        className={styles.companyImg}
+                        onError={(e) =>
+                          (e.currentTarget.src = "/default-company.png")
+                        }
+                      />
                     </div>
-                    <div className={styles.locations}>
-                      <p className={styles.item}>Lokalizacje: </p>{" "}
-                      {offer.locations ? (
-                        <span className={styles.tag}>
-                          {JSON.parse(offer.locations)[0]}
-                        </span>
-                      ) : (
-                        ""
+
+                    <div className={styles.infoSection}>
+                      <h3>{offer.companyName}</h3>
+                      <p className={styles.company}>{offer.link}</p>
+
+                      {offer.location && (
+                        <p className={styles.location}>{offer.location}</p>
                       )}
+
+                      <div className={styles.tags}>
+                        <span className={styles.tag}>
+                          {"Kontakt: " +
+                            offer.email +
+                            ", " +
+                            offer.phone_number}
+                        </span>
+                        <span className={styles.tag}>
+                          {"NIP: " + offer.nip}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={styles.actions + " " + styles.detailsBtn}
+                      onClick={() => {
+                        open(offer.owner_id);
+                      }}
+                    >
+                      Szczegóły
                     </div>
                   </div>
-                </div>
-
-                <div className={styles.actions}>
-                  <a
-                    href={offer.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.detailsBtn}
-                  >
-                    Szczegóły
-                  </a>
-                </div>
-              </div>
-            ))
+                </>
+              );
+            })
           ) : (
-            <p className={styles.noOffers}>Brak dostępnych ofert.</p>
+            <p className={styles.noOffers}>Brak dostępnych firm.</p>
           )}
         </div>
 
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <button
-              onClick={handlePrev}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className={styles.pageBtn}
             >
               ‹
             </button>
+
             <span style={{ fontSize: "12px" }}>
               Strona {currentPage} z {totalPages}
             </span>
+
             <button
-              onClick={handleNext}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className={styles.pageBtn}
             >

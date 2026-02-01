@@ -23,20 +23,23 @@ export function saveEmployersToDb(employers) {
 }
 
 export function getAllEmployers() {
-  return connection.query("SELECT * FROM companies");
+  return connection.query(
+    "SELECT companies.* FROM companies INNER JOIN users ON companies.owner_id = users.id WHERE users.is_active = '1'",
+  );
 }
 
 export async function getFillteredEmployers({ locations, companyName }) {
-  let sql = "SELECT * FROM companies WHERE 1=1"; // 1=1 żeby łatwo dokładać warunki
+  let sql =
+    "SELECT companies.* FROM companies INNER JOIN users ON companies.owner_id = users.id WHERE users.is_active = '1' AND 1=1"; // 1=1 żeby łatwo dokładać warunki
   const params = [];
 
   if (locations && locations.trim() !== "") {
-    sql += " AND locations LIKE ?";
+    sql += " AND companies.locations LIKE ?";
     params.push(`%${locations}%`);
   }
 
   if (companyName && companyName.trim() !== "") {
-    sql += " AND companyName LIKE ?";
+    sql += " AND companies.companyName LIKE ?";
     params.push(`%${companyName}%`);
   }
 
@@ -48,10 +51,11 @@ export async function getFillteredEmployers({ locations, companyName }) {
     throw err;
   }
 }
+
 export async function getCompanyInfo(id) {
   const [rows] = await connection.query(
     "SELECT * FROM companies WHERE owner_id = ? ",
-    [id]
+    [id],
   );
 
   return rows;
