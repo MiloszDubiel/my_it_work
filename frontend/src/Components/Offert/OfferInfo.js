@@ -321,8 +321,9 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                       className={styles.compBtnOutline}
                       onClick={async () => {
                         try {
-                          const user = safeJsonParse(
-                            sessionStorage.getItem("user-data"),
+                          const user = JSON.parse(
+                            sessionStorage.getItem("user-data") ||
+                              localStorage.getItem("user-data"),
                           );
 
                           const res = await axios.post(
@@ -395,7 +396,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                       .trim()
                       .split(",")
                       .map((el) => {
-                        return <li>{el}</li>;
+                        return (
+                          <li>
+                            <strong>{el}</strong>
+                          </li>
+                        );
                       })}
                   </ul>
                 </li>

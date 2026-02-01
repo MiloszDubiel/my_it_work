@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 export default function IsEmployer({ children }) {
   const token =
-    sessionStorage.getItem("user-data") || localStorage.getItem("user-data");
+    sessionStorage.getItem("token") || localStorage.getItem("token");
   if (!token) return <Navigate to="/" replace />;
 
   let user;

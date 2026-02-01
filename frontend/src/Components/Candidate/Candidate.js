@@ -17,8 +17,6 @@ const Candidate = ({ candidate, index }) => {
 
   const skills = parseList(candidate.skills);
 
-
-
   return (
     <>
       <CandidateInfo candidate={candidate} />
@@ -39,7 +37,7 @@ const Candidate = ({ candidate, index }) => {
           </p>
 
           <p className={styles.location} style={{ fontSize: "12px" }}>
-            Lata doświadczenia: {candidate.career_level || "Nie podano"}
+            Lata doświadczenia: {candidate.years_of_experience || "Nie podano"}
           </p>
 
           <div className={styles.tags}>
@@ -66,7 +64,7 @@ const Candidate = ({ candidate, index }) => {
           className={styles.actions}
           onClick={() => {
             document.querySelector(
-              `.candidate-details-container${candidate.user_id}`
+              `.candidate-details-container${candidate.user_id}`,
             ).style.display = "flex";
           }}
         >

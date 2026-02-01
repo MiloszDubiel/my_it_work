@@ -9,6 +9,8 @@ const CandidateInfo = ({ candidate }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmCallbackRef = useRef(null);
 
+  console.log(candidate);
+
   const parseList = (value) => {
     if (!value) return [];
     try {
