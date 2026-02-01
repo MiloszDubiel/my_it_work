@@ -12,7 +12,6 @@ const CvAndRefStorage = multer.diskStorage({
 
     cb(null, dir);
   },
-
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     if (file.fieldname === "cv") cb(null, `cv_${req.body.user_id}${ext}`);
@@ -40,7 +39,7 @@ const avatarStorage = multer.diskStorage({
 
 export const avatarUpload = multer({
   storage: avatarStorage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB
   fileFilter: (req, file, cb) => {
     if (!["image/png"].includes(file.mimetype)) {
       return cb(new Error("Invalid file type"));

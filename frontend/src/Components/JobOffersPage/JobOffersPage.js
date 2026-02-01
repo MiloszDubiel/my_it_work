@@ -29,7 +29,11 @@ const JobOffersPage = () => {
       try {
         setIsLoading(true);
 
-        const res = await axios.get("http://localhost:5000/api/job-offerts");
+        const res = await axios.get("http://localhost:5000/api/job-offerts", {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        });
 
         if (!isEmptyObject(res.data)) {
           setIsLoading(false);

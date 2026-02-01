@@ -7,6 +7,8 @@ import {
 import { connection } from "../config/db.js";
 import { uploadLogo } from "../middleware/settingMiddleware.js";
 import path from "path";
+import { authenticateToken } from "../middleware/authJwt.js";
+import { requireRole } from "../middleware/authJwt.js";
 
 const router = express.Router();
 
@@ -29,19 +31,26 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/get-company-info", async (req, res) => {
-  const { id } = req.body;
+router.post(
+  "/get-company-info",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    const { id } = req.body;
 
-  if (!id) {
-    return res.json({ error: "Brak id" });
-  }
+    if (!id) {
+      return res.json({ error: "Brak id" });
+    }
 
-  return res.json({ companyInfo: await getCompanyInfo(id) });
-});
+    return res.json({ companyInfo: await getCompanyInfo(id) });
+  },
+);
 
 router.post(
   "/set-company-info",
   uploadLogo.single("logo"),
+  authenticateToken,
+  requireRole("employer", "admin"),
   async (req, res) => {
     try {
       const { owner_id, description, link, email, phone_number, company_id } =
@@ -76,69 +85,80 @@ router.post(
   },
 );
 
-router.post("/request-company-change", async (req, res) => {
-  try {
-    const { owner_id, companyName, nip, company_id } = req.body;
+router.post(
+  "/request-company-change",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    try {
+      const { owner_id, companyName, nip, company_id } = req.body;
 
-    const [rows] = await connection.query(
-      `SELECT * FROM company_change_requests 
+      const [rows] = await connection.query(
+        `SELECT * FROM company_change_requests 
          WHERE company_id = ? 
          AND employer_id = ? 
          AND status = 'pending'`,
-      [company_id, owner_id],
-    );
+        [company_id, owner_id],
+      );
 
-    if (rows.length > 0) {
-      return res.status(400).json({
-        error: "Poprzednia prośba czeka na odpowiedź administratora.",
-      });
-    }
+      if (rows.length > 0) {
+        return res.status(400).json({
+          error: "Poprzednia prośba czeka na odpowiedź administratora.",
+        });
+      }
 
-    const sql = `
+      const sql = `
         INSERT INTO company_change_requests 
         (company_id, employer_id, new_company_name, new_nip, status)
         VALUES (?, ?, ?, ?, 'pending')
       `;
 
-    await connection.query(sql, [
-      company_id,
-      owner_id,
-      companyName || null,
-      nip || null,
-    ]);
+      await connection.query(sql, [
+        company_id,
+        owner_id,
+        companyName || null,
+        nip || null,
+      ]);
 
-    return res.status(200).json({
-      info: "Wysłano prośbę do administratora.",
-    });
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: "Błąd serwera", details: e.message });
-  }
-});
-
-router.post("/get-my-offers", async (req, res) => {
-  try {
-    const { owner_id } = req.body;
-
-    if (!owner_id) {
-      return res.status(400).json({ error: "Brak owner_id w zapytaniu" });
-    }
-
-    const [companyResult] = await connection.query(
-      "SELECT id FROM companies WHERE owner_id = ?",
-      [owner_id],
-    );
-
-    if (companyResult.length === 0) {
+      return res.status(200).json({
+        info: "Wysłano prośbę do administratora.",
+      });
+    } catch (e) {
+      console.error(e);
       return res
-        .status(404)
-        .json({ error: "Nie znaleziono firmy dla tego właściciela" });
+        .status(500)
+        .json({ error: "Błąd serwera", details: e.message });
     }
+  },
+);
 
-    const company_id = companyResult[0].id;
+router.post(
+  "/get-my-offers",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    try {
+      const { owner_id } = req.body;
 
-    const [offers] = await connection.query(
-      `SELECT  
+      if (!owner_id) {
+        return res.status(400).json({ error: "Brak owner_id w zapytaniu" });
+      }
+
+      const [companyResult] = await connection.query(
+        "SELECT id FROM companies WHERE owner_id = ?",
+        [owner_id],
+      );
+
+      if (companyResult.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Nie znaleziono firmy dla tego właściciela" });
+      }
+
+      const company_id = companyResult[0].id;
+
+      const [offers] = await connection.query(
+        `SELECT  
     job_offers.companyName,
     job_offers.contractType,
     job_offers.workingMode,
@@ -162,25 +182,30 @@ INNER JOIN companies
     ON job_offers.company_id = companies.id
 WHERE company_id = ?
 `,
-      [company_id],
-    );
+        [company_id],
+      );
 
-    return res.status(200).json({ offers });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Błąd serwera" });
-  }
-});
+      return res.status(200).json({ offers });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Błąd serwera" });
+    }
+  },
+);
 
-router.post("/get-my-applications", async (req, res) => {
-  const { employer_id } = req.body;
-  if (!employer_id) {
-    return res.status(400).json({ error: "Missing employer ID" });
-  }
+router.post(
+  "/get-my-applications",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    const { employer_id } = req.body;
+    if (!employer_id) {
+      return res.status(400).json({ error: "Missing employer ID" });
+    }
 
-  try {
-    const [rows] = await connection.query(
-      `SELECT
+    try {
+      const [rows] = await connection.query(
+        `SELECT
       job_applications.id AS app_id,
       job_offers.title,
       job_offers.employer_id,
@@ -197,67 +222,83 @@ router.post("/get-my-applications", async (req, res) => {
       JOIN candidate_info ON users.id = candidate_info.user_id
       WHERE job_offers.employer_id = ? AND  job_applications.status NOT IN('odrzucono', 'anulowana', 'zaakceptowana')
       ORDER BY job_applications.created_at DESC`,
-      [employer_id],
-    );
+        [employer_id],
+      );
 
-    res.json({ applications: rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+      res.json({ applications: rows });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    }
+  },
+);
 
-router.post("/update-application-status", async (req, res) => {
-  const { application_id, status } = req.body;
+router.post(
+  "/update-application-status",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    const { application_id, status } = req.body;
 
-  if (!application_id || !status) {
-    return res.status(400).json({ error: "Missing data" });
-  }
-
-  try {
-    const [result] = await connection.query(
-      "UPDATE job_applications SET status = ? WHERE id = ?",
-      [status, application_id],
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Application not found" });
+    if (!application_id || !status) {
+      return res.status(400).json({ error: "Missing data" });
     }
 
-    res.json({ success: true, info: "Status updated" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
+    try {
+      const [result] = await connection.query(
+        "UPDATE job_applications SET status = ? WHERE id = ?",
+        [status, application_id],
+      );
 
-router.put("/revoke-application/:id", async (req, res) => {
-  const app_id = req.params.id;
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Application not found" });
+      }
 
-  try {
-    await connection.query(
-      "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
-      [app_id],
-    );
-    res.json({ success: true, message: "Odrzucono aplikacje" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd podczas odrzucania aplikacji" });
-  }
-});
+      res.json({ success: true, info: "Status updated" });
+    } catch (err) {
+      res.status(500).json({ error: "Server error" });
+    }
+  },
+);
 
-router.put("/accept-application/:id", async (req, res) => {
-  const app_id = req.params.id;
+router.put(
+  "/revoke-application/:id",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    const app_id = req.params.id;
 
-  try {
-    await connection.query(
-      "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
-      [app_id],
-    );
-    res.json({ success: true, message: "Przyjęto aplikacje" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Błąd podczas przyjmowania aplikacji" });
-  }
-});
+    try {
+      await connection.query(
+        "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
+        [app_id],
+      );
+      res.json({ success: true, message: "Odrzucono aplikacje" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Błąd podczas odrzucania aplikacji" });
+    }
+  },
+);
+
+router.put(
+  "/accept-application/:id",
+  authenticateToken,
+  requireRole("employer", "admin"),
+  async (req, res) => {
+    const app_id = req.params.id;
+
+    try {
+      await connection.query(
+        "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
+        [app_id],
+      );
+      res.json({ success: true, message: "Przyjęto aplikacje" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Błąd podczas przyjmowania aplikacji" });
+    }
+  },
+);
 
 export default router;

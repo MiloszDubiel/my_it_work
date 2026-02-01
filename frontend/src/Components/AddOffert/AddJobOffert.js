@@ -40,6 +40,11 @@ const AddJobOffer = ({ onOfferAdded }) => {
         {
           id: userData.id,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       setOffer({
@@ -97,6 +102,11 @@ const AddJobOffer = ({ onOfferAdded }) => {
       const res = await axios.post(
         "http://localhost:5000/api/job-offerts/add",
         offer,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);

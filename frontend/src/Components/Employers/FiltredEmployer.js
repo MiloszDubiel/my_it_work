@@ -33,6 +33,11 @@ const FilltredEmployers = () => {
         const res = await axios.post(
           "http://localhost:5000/api/employers/filltred",
           { state },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
         );
         setOffers(res.data);
       } catch (err) {

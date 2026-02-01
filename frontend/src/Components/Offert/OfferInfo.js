@@ -7,7 +7,7 @@ import { CiStar } from "react-icons/ci";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import EmployerInfo from "../Employers/EmployerInfo";
 
-const safeJsonParse = (value, fallback = null) => {
+const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
 
   try {
@@ -35,6 +35,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
       try {
         const res = await axios.get(
           `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
         );
         setIsFavorite(res.data.isFavorite);
       } catch (err) {
@@ -52,15 +57,28 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
       if (isFavorite) {
         await axios.delete(
           `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
         );
         setIsFavorite(false);
         sessionStorage.setItem("setIsFavorite", false);
         window.dispatchEvent(new Event("setIsFavorite"));
       } else {
-        await axios.post("http://localhost:5000/api/job-offerts/favorites", {
-          user_id: userData.id,
-          offer_id: offer.id,
-        });
+        await axios.post(
+          "http://localhost:5000/api/job-offerts/favorites",
+          {
+            user_id: userData.id,
+            offer_id: offer.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
         setIsFavorite(true);
         sessionStorage.setItem("setIsFavorite", true);
         window.dispatchEvent(new Event("setIsFavorite"));
@@ -87,6 +105,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
     try {
       const res = await axios.get(
         `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
       setAlreadyApplied(res.data.applied);
       setAppliedDate(res.data.applied_at);
@@ -122,6 +145,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
           {
             user_id: userData.id,
             offer_id: offer.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
           },
         );
 
@@ -316,7 +344,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                     </button>
                   )}
 
-                  {userData && userData?.role !== "employer" && (
+                  {userData?.email && userData?.role !== "employer" && (
                     <button
                       className={styles.compBtnOutline}
                       onClick={async () => {
@@ -329,7 +357,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                           const res = await axios.post(
                             "http://localhost:5001/chat/create",
                             {
-                              employer_id: offer.owner_id,
+                              employer_id: offer.employer_id,
                               candidate_id: user.id,
                             },
                           );
@@ -375,7 +403,7 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                   </ul>
                 </li>
                 <li>
-                  Doświadczenie:{" "}
+                  Doświadczenie:
                   <ul>
                     {safeJsonParse(offer?.experience).map((el) => {
                       return (
@@ -387,21 +415,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                   </ul>
                 </li>
                 <li>
-                  Lokalizacja:{" "}
+                  Lokalizacja:
                   <ul>
-                    {String(offer.workingMode)
-                      .replaceAll("[", "")
-                      .replaceAll("]", "")
-                      .replaceAll('"', "")
-                      .trim()
-                      .split(",")
-                      .map((el) => {
-                        return (
-                          <li>
-                            <strong>{el}</strong>
-                          </li>
-                        );
-                      })}
+                    <li>
+                      <strong>{safeJsonParse(offer.workingMode)}</strong>
+                    </li>
                   </ul>
                 </li>
               </ul>

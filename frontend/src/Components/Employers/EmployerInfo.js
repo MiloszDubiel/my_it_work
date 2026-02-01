@@ -13,6 +13,11 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
       const res = await axios.post(
         "http://localhost:5000/api/employers/get-company-info",
         { id: companyOwner },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (res.data?.companyInfo?.length > 0) {
@@ -31,6 +36,11 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
       const res = await axios.post(
         "http://localhost:5000/api/employers/get-my-offers",
         { owner_id: companyOwner },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       setOffers(res.data?.offers || []);

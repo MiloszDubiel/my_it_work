@@ -28,7 +28,11 @@ const CandidatePage = () => {
       try {
         setIsLoading(true);
 
-        const res = await axios.get("http://localhost:5000/api/candidates");
+        const res = await axios.get("http://localhost:5000/api/candidates", {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        });
 
         if (!isEmptyObject(res.data)) {
           setIsLoading(false);

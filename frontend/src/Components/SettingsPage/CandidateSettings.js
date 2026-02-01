@@ -81,16 +81,32 @@ const CandidateSettings = () => {
 
   useEffect(() => {
     axios
-      .post("http://localhost:5000/user/has-candiate-profile", {
-        id: userData?.id,
-      })
+      .post(
+        "http://localhost:5000/user/has-candiate-profile",
+        {
+          id: userData?.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      )
       .then((res) => {
         return res.data.info?.length > 0 ? setIsCreate(true) : "";
       });
     axios
-      .post("http://localhost:5000/user/get-candiate-info", {
-        id: userData?.id,
-      })
+      .post(
+        "http://localhost:5000/user/get-candiate-info",
+        {
+          id: userData?.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      )
       .then((res) => {
         if (res.data.candiate) {
           setCandidateProfile({
@@ -115,7 +131,11 @@ const CandidateSettings = () => {
       });
 
     axios
-      .get(`http://localhost:5000/user/favorites/${userData?.id}}`)
+      .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => {
         setFavorites(res.data);
       });
@@ -125,7 +145,11 @@ const CandidateSettings = () => {
   useEffect(() => {
     window.addEventListener("setIsFavorite", () => {
       axios
-        .get(`http://localhost:5000/user/favorites/${userData?.id}}`)
+        .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        })
         .then((res) => {
           setFavorites(res.data);
         });
@@ -143,6 +167,11 @@ const CandidateSettings = () => {
       {
         user_id: userData.id,
       },
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      },
     );
 
     if (res.status == 200) {
@@ -154,6 +183,11 @@ const CandidateSettings = () => {
     try {
       await axios.delete(
         `http://localhost:5000/user/clear-history/${userData.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       getMyApplayings();
@@ -232,7 +266,10 @@ const CandidateSettings = () => {
         "http://localhost:5000/user/edit-profile",
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
         },
       );
 
@@ -310,6 +347,7 @@ const CandidateSettings = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       );
@@ -331,6 +369,11 @@ const CandidateSettings = () => {
 
     const res = await axios.delete(
       `http://localhost:5000/user/cancel-application/${selectedApp}`,
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      },
     );
 
     if (res.status == 200) {
@@ -1118,10 +1161,10 @@ const CandidateSettings = () => {
                               <button
                                 className={styles.confirmBtn}
                                 onClick={async () => {
-                                  console.log(app);
                                   try {
-                                    const user = safeJsonParse(
-                                      sessionStorage.getItem("user-data"),
+                                    const user = JSON.parse(
+                                      sessionStorage.getItem("user-data") ||
+                                        localStorage.getItem("user-data"),
                                     );
 
                                     const res = await axios.post(

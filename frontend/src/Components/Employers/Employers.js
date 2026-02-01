@@ -23,9 +23,17 @@ const EmployersComponent = () => {
       setError(null);
 
       try {
-        const res = await axios.get("http://localhost:5000/api/employers", {
-          timeout: 10000,
-        });
+        const res = await axios.get(
+          "http://localhost:5000/api/employers",
+          {
+            timeout: 10000,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
 
         if (isMounted) {
           const data = Array.isArray(res.data) ? res.data : [];

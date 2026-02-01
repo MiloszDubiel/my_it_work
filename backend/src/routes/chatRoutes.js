@@ -2,15 +2,11 @@ import express from "express";
 import { connection } from "../config/db.js";
 const router = express.Router();
 
-
 router.get("/messages/:conversationId", async (req, res) => {
   const { conversationId } = req.params;
-
-  console.log(conversationId);
-
   const [rows] = await connection.query(
     "SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at ASC",
-    [conversationId]
+    [conversationId],
   );
 
   res.json(rows);
@@ -34,7 +30,7 @@ router.get("/conversations/:userId", async (req, res) => {
       WHERE c.employer_id = ? OR c.candidate_id = ?
       ORDER BY c.created_at DESC
       `,
-      [userId, userId]
+      [userId, userId],
     );
 
     res.json(rows);
@@ -44,21 +40,20 @@ router.get("/conversations/:userId", async (req, res) => {
   }
 });
 
-
 router.post("/conversation/start", async (req, res) => {
   const { employer_id, candidate_id } = req.body;
 
   try {
     const [rows] = await connection.query(
       "SELECT * FROM conversations WHERE employer_id = ? AND candidate_id = ?",
-      [employer_id, candidate_id]
+      [employer_id, candidate_id],
     );
 
     if (rows.length > 0) return res.json(rows[0]);
 
     const [result] = await connection.query(
       "INSERT INTO conversations (employer_id, candidate_id) VALUES (?, ?)",
-      [employer_id, candidate_id]
+      [employer_id, candidate_id],
     );
 
     res.json({ id: result.insertId, employer_id, candidate_id });
@@ -72,20 +67,18 @@ router.post("/create", async (req, res) => {
   try {
     const { employer_id, candidate_id } = req.body;
 
-    // Czy istnieje konwersacja?
     const [existing] = await connection.query(
       "SELECT * FROM conversations WHERE employer_id = ? AND candidate_id = ? LIMIT 1",
-      [employer_id, candidate_id]
+      [employer_id, candidate_id],
     );
 
     if (existing.length) {
       return res.json(existing[0]);
     }
 
-    // Tworzenie nowej konwersacji
     const [result] = await connection.query(
       "INSERT INTO conversations (employer_id, candidate_id) VALUES (?, ?)",
-      [employer_id, candidate_id]
+      [employer_id, candidate_id],
     );
 
     const newConversation = {

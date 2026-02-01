@@ -34,9 +34,17 @@ const EmployerSettings = () => {
 
   useEffect(() => {
     axios
-      .post(`http://localhost:5000/api/employers/get-company-info`, {
-        id: userData.id,
-      })
+      .post(
+        `http://localhost:5000/api/employers/get-company-info`,
+        {
+          id: userData.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      )
       .then((res) => {
         setCompany(res.data.companyInfo[0]);
       })
@@ -45,20 +53,35 @@ const EmployerSettings = () => {
 
   const fetchOffers = () => {
     axios
-      .post("http://localhost:5000/api/employers/get-my-offers", {
-        owner_id: userData.id,
-      })
+      .post(
+        "http://localhost:5000/api/employers/get-my-offers",
+        {
+          owner_id: userData.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      )
       .then((res) => setOffers(res.data.offers))
       .catch((err) => console.error(err));
   };
 
   const fetchApplications = async () => {
     axios
-      .post("http://localhost:5000/api/employers/get-my-applications", {
-        employer_id: userData.id,
-      })
+      .post(
+        "http://localhost:5000/api/employers/get-my-applications",
+        {
+          employer_id: userData.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      )
       .then((res) => {
-        console.log();
         setApplications(res.data.applications);
       })
       .catch((err) => console.error(err));
@@ -131,7 +154,10 @@ const EmployerSettings = () => {
       "http://localhost:5000/api/employers/set-company-info",
       formData,
       {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
       },
     );
 
@@ -178,10 +204,18 @@ const EmployerSettings = () => {
     }
 
     try {
-      let res = await axios.post("http://localhost:5000/user/edit-profile", {
-        ...dataToChange,
-        id: userData.id,
-      });
+      let res = await axios.post(
+        "http://localhost:5000/user/edit-profile",
+        {
+          ...dataToChange,
+          id: userData.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      );
 
       if (res.data.info) {
         setInfo(res.data.info + "" + ". Trwa odświeżanie strony...");
@@ -199,7 +233,7 @@ const EmployerSettings = () => {
         setError(res.data.error);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -227,6 +261,11 @@ const EmployerSettings = () => {
           nip: company.nip,
           company_id: company.id,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (res.status == 200) {
@@ -243,6 +282,11 @@ const EmployerSettings = () => {
 
     const res = await axios.put(
       `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`,
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      },
     );
 
     if (res.status == 200) {
@@ -283,6 +327,11 @@ const EmployerSettings = () => {
 
     const res = await axios.put(
       `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`,
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      },
     );
 
     if (res.status == 200) {
@@ -325,6 +374,11 @@ const EmployerSettings = () => {
     try {
       const res = await axios.delete(
         `http://localhost:5000/api/job-offerts/delete/${selectedOffer}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
 
       if (res.data.success) {
@@ -615,7 +669,7 @@ const EmployerSettings = () => {
 
                         <span className={styles.appActions}>
                           <CandidateInfo candidate={app} />
-                          {console.log(app)}
+
                           {app.cv && (
                             <button
                               onClick={() => window.open(app.cv, "_blank")}

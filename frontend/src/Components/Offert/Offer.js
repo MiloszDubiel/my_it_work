@@ -2,8 +2,6 @@ import OfferInfo from "./OfferInfo";
 import styles from "./offer.module.css";
 
 const Offer = ({ offer, index }) => {
-  console.log(offer);
-
   const parseJSON = (value) => {
     try {
       return JSON.parse(value) || [];

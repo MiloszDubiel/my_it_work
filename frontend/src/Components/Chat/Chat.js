@@ -3,7 +3,7 @@ import styles from "./Chat.module.css";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5001");
+const socket = io("http://localhost:5001", { transports: ["websocket"] });
 
 export default function Chat({ conversationId, userId, message }) {
   const [messages, setMessages] = useState([]);
@@ -29,8 +29,6 @@ export default function Chat({ conversationId, userId, message }) {
         `http://localhost:5000/chat/messages/${conversationId}`,
       );
       setMessages(res.data);
-
-      console.log(res.data);
     } catch (err) {
       console.error("Błąd pobierania wiadomości:", err);
     }
@@ -95,11 +93,7 @@ export default function Chat({ conversationId, userId, message }) {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
-        <button
-          type="submit"
-        >
-          Wyślij
-        </button>
+        <button type="submit">Wyślij</button>
       </form>
     </div>
   );

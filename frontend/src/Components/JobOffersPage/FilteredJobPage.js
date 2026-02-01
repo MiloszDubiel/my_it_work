@@ -38,7 +38,12 @@ const FiltredJobOffersPage = ({ offersPage }) => {
           `http://localhost:5000/api/job-offerts/filltred`,
           {
             state,
-          }
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
         );
 
         if (!isEmptyObject(res.data)) {

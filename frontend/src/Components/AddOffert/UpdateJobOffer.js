@@ -97,6 +97,11 @@ const UpdateJobOffer = ({ offer }) => {
       const res = await axios.post(
         "http://localhost:5000/api/job-offerts/update",
         updateOffer,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
       );
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
