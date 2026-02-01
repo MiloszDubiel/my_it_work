@@ -21,7 +21,6 @@ const UpdateJobOffer = ({ offer }) => {
     }
   };
 
-
   const getSalaryRange = (salary) => {
     if (!salary) return null;
 

@@ -9,12 +9,14 @@ export default function ChatPage() {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [message, setMessage] = useState("");
 
-  const user = JSON.parse(sessionStorage.getItem("user-data"));
+  const user = JSON.parse(
+    sessionStorage.getItem("user-data") || localStorage.getItem("user-data"),
+  );
 
   const fetchConversations = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5001/chat/conversations/${user.id}`
+        `http://localhost:5001/chat/conversations/${user.id}`,
       );
       setConversations(res.data);
     } catch (err) {

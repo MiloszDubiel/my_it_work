@@ -3,8 +3,6 @@ import styles from "./candidate.module.css";
 import { useState } from "react";
 
 const Candidate = ({ candidate, index }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
   const parseList = (value) => {
     if (!value) return [];
     try {
@@ -18,9 +16,7 @@ const Candidate = ({ candidate, index }) => {
   };
 
   const skills = parseList(candidate.skills);
-  const languages = parseList(candidate.lang);
-  const locations = parseList(candidate.locations);
-  const workingMode = parseList(candidate.working_mode);
+
 
 
   return (

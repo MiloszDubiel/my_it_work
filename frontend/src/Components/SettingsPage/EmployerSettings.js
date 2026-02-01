@@ -9,7 +9,10 @@ import ConfirmModal from "../PromptModals/ConfirmModal";
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
-  const [userData] = useState(JSON.parse(sessionStorage.getItem("user-data")));
+  const [userData] = useState(
+    JSON.parse(sessionStorage.getItem("user-data")) ||
+      JSON.parse(localStorage.getItem("user-data")),
+  );
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreviewUrl, setLogoPreviewUrl] = useState(null);
   const [company, setCompany] = useState({});
@@ -81,7 +84,7 @@ const EmployerSettings = () => {
     window.addEventListener("setting-changed", () => {
       setActiveTab(sessionStorage.getItem("tab"));
     });
-  },[]);
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     document.querySelector(`.${styles.content}`).scroll(0, 0);
@@ -183,6 +186,7 @@ const EmployerSettings = () => {
       if (res.data.info) {
         setInfo(res.data.info + "" + ". Trwa odświeżanie strony...");
         sessionStorage.setItem("user-data", JSON.stringify(res.data.userData));
+        localStorage.setItem("user-data", JSON.stringify(res.data.userData));
         document.querySelector(`.${styles.content}`).scroll(0, 0);
 
         setTimeout(() => {
@@ -247,7 +251,7 @@ const EmployerSettings = () => {
     }
 
     try {
-      const user = JSON.parse(sessionStorage.getItem("user-data"));
+      const user = userData;
 
       const res = await axios.post("http://localhost:5001/chat/create", {
         employer_id: user.id,
@@ -287,7 +291,7 @@ const EmployerSettings = () => {
     }
 
     try {
-      const user = JSON.parse(sessionStorage.getItem("user-data"));
+      const user = userData;
 
       const res = await axios.post("http://localhost:5001/chat/create", {
         employer_id: user.id,

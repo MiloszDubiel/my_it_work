@@ -125,7 +125,10 @@ const CandidateInfo = ({ candidate }) => {
               className={styles.messageBtn}
               onClick={async () => {
                 try {
-                  const user = JSON.parse(sessionStorage.getItem("user-data"));
+                  const user = JSON.parse(
+                    sessionStorage.getItem("user-data") ||
+                      localStorage.getItem("user-data"),
+                  );
 
                   const res = await axios.post(
                     "http://localhost:5001/chat/create",

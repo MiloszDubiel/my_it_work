@@ -150,6 +150,17 @@
   margin-bottom: 0.5rem;
 }
 
+.jobWrapper {
+  display: flex;
+  flex-direction: column;
+}
+.jobsSection {
+  overflow-x: hidden;
+}
+
+.jobsGrid {
+  width: 100%;
+}
 /* =======================================
    RESPONSIVE DESIGN
    ======================================= */

@@ -11,10 +11,10 @@ Date.prototype.toDateInputValue = function () {
 };
 
 const AddJobOffer = ({ onOfferAdded }) => {
-  const [userData, setUserData] = useState(
-    JSON.parse(sessionStorage.getItem("user-data")),
+  const [userData] = useState(
+    JSON.parse(sessionStorage.getItem("user-data")) ||
+      JSON.parse(localStorage.getItem("user-data")),
   );
-
   const [offer, setOffer] = useState({
     title: "",
     company: "",

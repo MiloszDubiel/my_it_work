@@ -65,7 +65,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
     axios
       .put(`http://localhost:5000/admin/users/${user.id}`, form, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
         },
       })
       .then((res) => {

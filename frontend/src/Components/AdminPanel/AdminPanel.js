@@ -52,7 +52,7 @@ const AdminPanel = () => {
     axios
       .get("http://localhost:5000/admin/company-change-requests", {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
         },
       })
       .then((res) => setRequests(res.data.requests));
@@ -68,7 +68,7 @@ const AdminPanel = () => {
         `http://localhost:5000/admin/get-users?page=${page}&search=${search}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -85,7 +85,7 @@ const AdminPanel = () => {
         `http://localhost:5000/admin/get-companies?page=${pageComapny}&search=${search}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -102,7 +102,7 @@ const AdminPanel = () => {
         `http://localhost:5000/admin/get-offers?page=${pageOffers}&search=${search}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -120,7 +120,7 @@ const AdminPanel = () => {
         { id },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -135,7 +135,7 @@ const AdminPanel = () => {
         { id },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -150,7 +150,7 @@ const AdminPanel = () => {
         { id },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -219,7 +219,7 @@ const AdminPanel = () => {
       { request_id: id },
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
         },
       },
     );
@@ -233,7 +233,7 @@ const AdminPanel = () => {
       { request_id: id },
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
         },
       },
     );

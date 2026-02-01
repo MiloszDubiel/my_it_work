@@ -2,7 +2,8 @@ import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 export default function IsEmployer({ children }) {
-  const token = sessionStorage.getItem("token");
+  const token =
+    sessionStorage.getItem("user-data") || localStorage.getItem("user-data");
   if (!token) return <Navigate to="/" replace />;
 
   let user;

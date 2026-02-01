@@ -25,7 +25,8 @@ const isUniqueItem = (list = [], newName = "") => {
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [userData] = useState(
-    safeJsonParse(sessionStorage.getItem("user-data")),
+    JSON.parse(sessionStorage.getItem("user-data")) ||
+      JSON.parse(localStorage.getItem("user-data")),
   );
   const [info, setInfo] = useState("");
   const [error, setErorr] = useState("");
@@ -81,14 +82,14 @@ const CandidateSettings = () => {
   useEffect(() => {
     axios
       .post("http://localhost:5000/user/has-candiate-profile", {
-        id: userData.id,
+        id: userData?.id,
       })
       .then((res) => {
         return res.data.info?.length > 0 ? setIsCreate(true) : "";
       });
     axios
       .post("http://localhost:5000/user/get-candiate-info", {
-        id: userData.id,
+        id: userData?.id,
       })
       .then((res) => {
         if (res.data.candiate) {
@@ -114,7 +115,7 @@ const CandidateSettings = () => {
       });
 
     axios
-      .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+      .get(`http://localhost:5000/user/favorites/${userData?.id}}`)
       .then((res) => {
         setFavorites(res.data);
       });
@@ -124,7 +125,7 @@ const CandidateSettings = () => {
   useEffect(() => {
     window.addEventListener("setIsFavorite", () => {
       axios
-        .get(`http://localhost:5000/user/favorites/${userData.id}}`)
+        .get(`http://localhost:5000/user/favorites/${userData?.id}}`)
         .then((res) => {
           setFavorites(res.data);
         });

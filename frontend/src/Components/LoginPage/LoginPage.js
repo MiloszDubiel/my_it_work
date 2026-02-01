@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./login.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -12,30 +11,51 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+
+  // Przy starcie strony sprawdzamy czy jest zalogowany użytkownik w localStorage
+  useEffect(() => {
+    const rememberedUser = localStorage.getItem("user-data");
+    const token = localStorage.getItem("token");
+    if (rememberedUser && token) {
+      sessionStorage.setItem("user-data", rememberedUser);
+      sessionStorage.setItem("token", token);
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setInfo("");
 
-    if (!email || !password) {
-      return setError("Puste pola");
-    }
+    if (!email || !password) return setError("Puste pola");
 
     setLoading(true);
     try {
-      let res = await axios.post("http://localhost:5000/auth/login", {
+      const res = await axios.post("http://localhost:5000/auth/login", {
         email: email.trim().toLowerCase(),
         password,
       });
 
+      const user = res.data.user;
+      const token = res.data.token;
+
+      // Jeśli zaznaczono "zapamiętaj mnie" -> zapis w localStorage
+      if (remember) {
+        localStorage.setItem("user-data", JSON.stringify(user));
+        localStorage.setItem("token", token);
+      } else {
+        // W przeciwnym razie tylko sesja
+        sessionStorage.setItem("user-data", JSON.stringify(user));
+        sessionStorage.setItem("token", token);
+      }
+
       setInfo(res.data.info);
-      sessionStorage.setItem("user-data", JSON.stringify(res.data.user));
-      sessionStorage.setItem("token", res.data.token);
+
       setTimeout(() => navigate("/", { replace: true }), 1000);
     } catch (err) {
-      setError(JSON.parse(err.request.response).error);
+      setError(err?.response?.data?.error || "Błąd logowania");
     } finally {
       setLoading(false);
     }
@@ -72,7 +92,6 @@ const LoginPage = () => {
               placeholder="Email"
               autoComplete="email"
               required
-              aria-required="true"
             />
           </label>
 
@@ -87,13 +106,11 @@ const LoginPage = () => {
                 placeholder="Hasło"
                 autoComplete="current-password"
                 required
-                aria-required="true"
               />
               <button
                 type="button"
                 className={styles.togglePwd}
                 onClick={() => setShowPwd((s) => !s)}
-                aria-pressed={showPwd}
                 aria-label={showPwd ? "Ukryj hasło" : "Pokaż hasło"}
               >
                 {showPwd ? "Ukryj" : "Pokaż"}
@@ -110,10 +127,6 @@ const LoginPage = () => {
               />
               <span>Pamiętaj mnie</span>
             </label>
-
-            <a className={styles.forgot} href="/forgot">
-              Zapomniałeś hasła?
-            </a>
           </div>
 
           <button

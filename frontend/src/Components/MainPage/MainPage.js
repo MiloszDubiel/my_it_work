@@ -19,7 +19,9 @@ const safeJsonParse = (value, fallback = null) => {
 const MainPage = () => {
   const [offers, setOffers] = useState([]);
 
-  const userData = safeJsonParse(sessionStorage.getItem("user-data"));
+  const userData = JSON.parse(
+    sessionStorage.getItem("user-data") || localStorage.getItem("user-data"),
+  );
 
   useEffect(() => {
     const fetchOffers = async () => {

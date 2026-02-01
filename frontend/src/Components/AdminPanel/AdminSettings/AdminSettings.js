@@ -12,7 +12,7 @@ const AdminSettings = () => {
     axios
       .get("http://localhost:5000/admin/scrape-date", {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
         },
       })
       .then((res) => {
@@ -43,7 +43,7 @@ const AdminSettings = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
         },
       )
@@ -65,7 +65,7 @@ const AdminSettings = () => {
         `http://localhost:5000/admin/scrap/${new Date().toISOString()}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
           },
           timeout: 5000,
         },
@@ -119,7 +119,7 @@ const AdminSettings = () => {
         </p>
 
         <button onClick={runScraper} className={styles.scrapBtn}>
-           Uruchom scrapowanie teraz
+          Uruchom scrapowanie teraz
         </button>
       </div>
     </div>

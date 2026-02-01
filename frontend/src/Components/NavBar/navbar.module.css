@@ -38,8 +38,8 @@
   align-items: center;
   height: 30px;
   width: 30px;
-  background-color: white;
-  border: 1px solid gray;
+  background-color: white !important;
+  border: 1px solid gray !important;
   border-radius: 100%;
   cursor: pointer;
 }
@@ -129,15 +129,17 @@
   overflow: hidden;
 }
 
-@keyframes fadeDrop {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.userName {
+  display: flex;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.firstName,
+.lastName {
+  line-height: 1.1;
 }
 
 .accountDiv a,
@@ -229,7 +231,6 @@
   .name {
     display: none;
   }
-  
 
   .account {
     gap: 12px;
@@ -238,5 +239,34 @@
   .accountDiv {
     width: 160px;
     top: 65px;
+  }
+}
+@media (min-width: 600px) and (max-width: 900px) {
+  .userName {
+    font-size: 13px;
+  }
+}
+@media (max-width: 600px) {
+  .userName {
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 12px;
+    gap: 2px;
+  }
+
+  .lastName {
+    font-weight: 400;
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
