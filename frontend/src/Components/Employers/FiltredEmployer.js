@@ -67,14 +67,17 @@ const FilltredEmployers = () => {
                   <EmployerInfo companyOwner={offer.owner_id} />
                   <div className={styles.offerRow} key={offer.id || offer._id}>
                     <div className={styles.logoSection}>
-                      <img
-                        src={offer.img || "/default-company.png"}
-                        alt={offer.companyName || "Firma"}
-                        className={styles.companyImg}
-                        onError={(e) =>
-                          (e.currentTarget.src = "/default-company.png")
-                        }
-                      />
+                      {offer.img ? (
+                        <img
+                          src={offer.img}
+                          alt={offer.companyName || "Firma"}
+                          className={styles.companyImg}
+                        />
+                      ) : (
+                        <div className={styles.logoFallback}>
+                          {offer?.companyName?.charAt(0)?.toUpperCase() || "?"}
+                        </div>
+                      )}
                     </div>
 
                     <div className={styles.infoSection}>

@@ -70,7 +70,7 @@ export default function ChatPage() {
         <section className={styles.contentGrid}>
           <article className={styles.leftCol}>
             <div className={styles.inbox}>
-              <h2>📥 Twoje rozmowy</h2>
+              <h2>Twoje rozmowy</h2>
 
               {conversations.length === 0 && (
                 <p className={styles.empty}>Brak konwersacji</p>
@@ -120,7 +120,7 @@ export default function ChatPage() {
                 />
               ) : (
                 <div className={styles.placeholder}>
-                  <p>Wybierz rozmowę z listy, aby rozpocząć czat 💬</p>
+                  <p>Wybierz rozmowę z listy, aby rozpocząć czat</p>
                 </div>
               )}
             </div>

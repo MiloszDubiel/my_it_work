@@ -90,7 +90,7 @@ const Navbar = ({ employersPage }) => {
           <div className={styles.account}>
             {userData?.email ? (
               <>
-                {userData?.role != "admin" && (
+                {userData?.role !== "admin" && (
                   <span className={styles.name}>
                     {userData.name || "Użytkownik" || userData.surname || ""}
                   </span>

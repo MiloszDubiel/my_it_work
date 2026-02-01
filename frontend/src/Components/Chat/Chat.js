@@ -17,10 +17,16 @@ export default function Chat({ conversationId, userId, message }) {
     }
   }, [conversationId]);
 
+  useEffect(() => {
+    if (message) {
+      setNewMessage(message);
+    }
+  }, [message]);
+
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/chat/messages/${conversationId}`
+        `http://localhost:5000/chat/messages/${conversationId}`,
       );
       setMessages(res.data);
 
@@ -86,10 +92,14 @@ export default function Chat({ conversationId, userId, message }) {
         <input
           type="text"
           placeholder="Napisz wiadomość..."
-          value={message || newMessage}
+          value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
         />
-        <button type="submit">Wyślij</button>
+        <button
+          type="submit"
+        >
+          Wyślij
+        </button>
       </form>
     </div>
   );

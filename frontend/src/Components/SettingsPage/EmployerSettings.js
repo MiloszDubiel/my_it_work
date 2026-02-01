@@ -26,7 +26,6 @@ const EmployerSettings = () => {
     repeatPassword: "",
   });
   const [applications, setApplications] = useState([]);
-
   const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
 
@@ -82,8 +81,7 @@ const EmployerSettings = () => {
     window.addEventListener("setting-changed", () => {
       setActiveTab(sessionStorage.getItem("tab"));
     });
-  });
-
+  },[]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     document.querySelector(`.${styles.content}`).scroll(0, 0);
@@ -619,7 +617,7 @@ const EmployerSettings = () => {
                               onClick={() => window.open(app.cv, "_blank")}
                               className={styles.smallBtn}
                             >
-                              📄 CV
+                              CV
                             </button>
                           )}
 
