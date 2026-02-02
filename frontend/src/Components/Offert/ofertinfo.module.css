@@ -275,14 +275,12 @@
 }
 .starFilled {
   color: #ffb800;
-  width: 28px;
-  height: 28px;
+  fill: #ffb800;
 }
 
 .starEmpty {
   color: #ccc;
-  width: 28px;
-  height: 28px;
+  fill: #ccc;
 }
 .closeBtn {
   all: unset;

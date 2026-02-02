@@ -58,6 +58,30 @@ const CandidateSettings = () => {
     remote_preference: "Remote",
   });
 
+  useEffect(() => {
+    if (userData) {
+      setProfielData({
+        name: userData.name || "",
+        surname: userData.surname || "",
+        email: userData.email || "",
+        newPassword: "",
+        repeatPassword: "",
+      });
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setFavorites(res.data);
+      });
+  }, [favorites]);
+
   const [cvFile, setCvFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
@@ -70,7 +94,7 @@ const CandidateSettings = () => {
   const [avatarPreview, setAvatarPreview] = useState(ProfielData.avatar);
   const [customSkill, setCustomSkill] = useState("");
   const [showCustomSkill, setShowCustomSkill] = useState(false);
-
+  const [initialCandidateProfile, setInitialCandidateProfile] = useState(null);
   const [customLanguage, setCustomLanguage] = useState("");
   const [showCustomLanguage, setShowCustomLanguage] = useState(false);
 
@@ -127,17 +151,24 @@ const CandidateSettings = () => {
           });
           setCvPreviewUrl(res.data.candiate[0]?.cv);
           setReferencePreviewUrl(res.data.candiate[0]?.references);
-        }
-      });
 
-    axios
-      .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        setFavorites(res.data);
+          setInitialCandidateProfile({
+            ...candidateProfile,
+            description: res.data.candiate[0]?.description,
+            career_level: res.data.candiate[0]?.exp,
+            languages: safeJsonParse(res.data.candiate[0]?.lang),
+            education: safeJsonParse(res.data.candiate[0]?.edu),
+            location: res.data.candiate[0]?.locations,
+            desired_position: res.data.candiate[0]?.target_job,
+            current_position: res.data.candiate[0]?.present_job,
+            phone_number: res.data.candiate[0]?.phone_number,
+            availability: res.data.candiate[0]?.access,
+            remote_preference: res.data.candiate[0]?.working_mode,
+            skills: safeJsonParse(res.data.candiate[0]?.skills),
+            github: res.data.candiate[0]?.link_git,
+            years_of_experience: res.data.candiate[0]?.years_of_experience,
+          });
+        }
       });
 
     getMyApplayings();
@@ -154,12 +185,25 @@ const CandidateSettings = () => {
           setFavorites(res.data);
         });
     });
-  });
+  }, [favorites]);
+
   useEffect(() => {
     window.addEventListener("applied", () => {
       getMyApplayings();
     });
   });
+  const hasProfileChanged = () => {
+    if (!ProfielData || !userData) return false;
+
+    return (
+      ProfielData.name !== userData.name ||
+      ProfielData.surname !== userData.surname ||
+      ProfielData.email !== userData.email ||
+      ProfielData.newPassword !== "" ||
+      ProfielData.repeatPassword !== "" ||
+      avatarFile !== null
+    );
+  };
 
   const getMyApplayings = async () => {
     const res = await axios.post(
@@ -198,6 +242,34 @@ const CandidateSettings = () => {
     setShowConfirm(false);
   };
 
+  const hasCandidateProfileChanged = () => {
+    if (!candidateProfile || !initialCandidateProfile) return false;
+
+    return (
+      candidateProfile.description !== initialCandidateProfile.description ||
+      candidateProfile.location !== initialCandidateProfile.location ||
+      candidateProfile.phone_number !== initialCandidateProfile.phone_number ||
+      candidateProfile.current_position !==
+        initialCandidateProfile.current_position ||
+      candidateProfile.desired_position !==
+        initialCandidateProfile.desired_position ||
+      candidateProfile.career_level !== initialCandidateProfile.career_level ||
+      candidateProfile.years_of_experience !==
+        initialCandidateProfile.years_of_experience ||
+      candidateProfile.skills?.length !==
+        initialCandidateProfile.skills?.length ||
+      candidateProfile.languages?.length !==
+        initialCandidateProfile.languages?.length ||
+      candidateProfile.education?.length !==
+        initialCandidateProfile.education?.length ||
+      candidateProfile.github !== initialCandidateProfile.github ||
+      candidateProfile.availability !== initialCandidateProfile.availability ||
+      candidateProfile.remote_preference !==
+        initialCandidateProfile.remote_preference ||
+      cvFile !== null ||
+      referenceFile !== null
+    );
+  };
   const handleSubmitUserInfo = async (e) => {
     e.preventDefault();
 
@@ -206,7 +278,9 @@ const CandidateSettings = () => {
 
     if (
       !ProfielData.name?.trim() ||
-      !/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/.test(ProfielData.name?.trim())
+      !/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+$/.test(
+        ProfielData.name?.trim(),
+      )
     ) {
       document.querySelector(`.${styles.content}`).scroll(0, 0);
       return setErorr(
@@ -233,9 +307,15 @@ const CandidateSettings = () => {
       document.querySelector(`.${styles.content}`).scroll(0, 0);
       return setErorr("Podaj poprawny email.");
     }
-    if (ProfielData.newPassword) {
+    if (ProfielData.newPassword || ProfielData.repeatPassword) {
       const passwordRegex =
         /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/;
+
+      if (!ProfielData.newPassword || !ProfielData.repeatPassword) {
+        document.querySelector(`.${styles.content}`).scroll(0, 0);
+        return setErorr("Uzupełnij oba pola hasła.");
+      }
+
       if (!passwordRegex.test(ProfielData.newPassword)) {
         document.querySelector(`.${styles.content}`).scroll(0, 0);
         return setErorr(
@@ -683,7 +763,11 @@ const CandidateSettings = () => {
                   )}
                 </div>
                 <hr />
-                <button type="submit" className={styles.saveBtn}>
+                <button
+                  type="submit"
+                  className={styles.saveBtn}
+                  disabled={!hasProfileChanged()}
+                >
                   Zapisz zmiany
                 </button>
               </form>
@@ -1099,7 +1183,11 @@ const CandidateSettings = () => {
                       <option>On-site</option>
                     </select>
 
-                    <button type="submit" className={styles.saveBtn}>
+                    <button
+                      type="submit"
+                      className={styles.saveBtn}
+                      disabled={!hasCandidateProfileChanged()}
+                    >
                       Zapisz zmiany
                     </button>
                   </>

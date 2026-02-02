@@ -15,7 +15,10 @@ const EmployerSettings = () => {
   );
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreviewUrl, setLogoPreviewUrl] = useState(null);
+
   const [company, setCompany] = useState({});
+  const [initialCompany, setInitialCompany] = useState(null);
+
   const [info, setInfo] = useState("");
   const [error, setError] = useState("");
   const [offers, setOffers] = useState([]);
@@ -47,9 +50,29 @@ const EmployerSettings = () => {
       )
       .then((res) => {
         setCompany(res.data.companyInfo[0]);
+        setInitialCompany(res.data.companyInfo[0]);
       })
       .catch((err) => console.log(err));
   }, []);
+
+  const hasBasicInfoChanged = () => {
+    if (!company || !initialCompany) return false;
+    return (
+      company.companyName !== initialCompany.companyName ||
+      company.nip !== initialCompany.nip
+    );
+  };
+
+  const hasAdditionalInfoChanged = () => {
+    if (!company || !initialCompany) return false;
+    return (
+      company.description !== initialCompany.description ||
+      company.link !== initialCompany.link ||
+      company.email !== initialCompany.email ||
+      company.phone_number !== initialCompany.phone_number ||
+      logoFile !== null
+    );
+  };
 
   const fetchOffers = () => {
     axios
@@ -392,6 +415,17 @@ const EmployerSettings = () => {
 
     setShowDeleteOfferModal(false);
   };
+  const hasUserInfoChanged = () => {
+    if (!dataToChange || !userData) return false;
+
+    return (
+      dataToChange.name !== userData.name ||
+      dataToChange.surname !== userData.surname ||
+      dataToChange.email !== userData.email ||
+      dataToChange.newPassword !== "" ||
+      dataToChange.repeatPassword !== ""
+    );
+  };
   return (
     <div className={styles.container1} id="settings">
       {showCancelModal && (
@@ -494,9 +528,14 @@ const EmployerSettings = () => {
                       setCompany({ ...company, nip: e.target.value })
                     }
                     maxLength={10}
+                    minLength={10}
                   />
 
-                  <button type="submit" className={styles.saveBtn}>
+                  <button
+                    type="submit"
+                    className={styles.saveBtn}
+                    disabled={!hasBasicInfoChanged()}
+                  >
                     Zapisz
                   </button>
                 </form>
@@ -511,25 +550,39 @@ const EmployerSettings = () => {
                       setCompany({ ...company, description: e.target.value })
                     }
                   />
-                  <label>Logo firmy</label>
 
-                  <div className={styles.logoPreview}>
-                    <img
-                      src={logoPreviewUrl || company?.img}
-                      alt="Logo firmy"
-                      className={styles.logo}
-                    />
+                  {logoPreviewUrl || company?.img ? (
+                    <div className={styles.logoPreview}>
+                      <img
+                        src={logoPreviewUrl || company?.img}
+                        alt="Logo firmy"
+                      />
+                    </div>
+                  ) : (
+                    <p>Brak zdjęcia profilowego</p>
+                  )}
+
+                  <div className={styles.fileUploadBox}>
+                    <label className={styles.fileUploadBtn}>
+                      Wybierz plik
+                      <input
+                        type="file"
+                        accept="image/png"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setLogoFile(file);
+                          if (file) {
+                            setLogoPreviewUrl(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {logoFile && (
+                      <span className={styles.fileName}>{logoFile.name}</span>
+                    )}
                   </div>
-
-                  <input
-                    type="file"
-                    accept="image/png"
-                    onChange={(e) => {
-                      setLogoFile(e.target.files[0]);
-                      setLogoPreviewUrl(URL.createObjectURL(e.target.files[0]));
-                    }}
-                  />
-
+                  <hr />
                   <label>Strona internetowa</label>
                   <input
                     type="url"
@@ -556,12 +609,17 @@ const EmployerSettings = () => {
                     placeholder="123456789"
                     value={company?.phone_number}
                     maxLength={9}
+                    minLength={9}
                     onChange={(e) =>
                       setCompany({ ...company, phone_number: e.target.value })
                     }
                   />
 
-                  <button type="submit" className={styles.saveBtn}>
+                  <button
+                    type="submit"
+                    className={styles.saveBtn}
+                    disabled={!hasAdditionalInfoChanged()}
+                  >
                     Zapisz
                   </button>
                 </form>
@@ -785,8 +843,11 @@ const EmployerSettings = () => {
                       })
                     }
                   />
-
-                  <button type="submit" className={styles.saveBtn}>
+                  <button
+                    type="submit"
+                    className={styles.saveBtn}
+                    disabled={!hasUserInfoChanged()}
+                  >
                     Zapisz zmiany
                   </button>
                 </form>

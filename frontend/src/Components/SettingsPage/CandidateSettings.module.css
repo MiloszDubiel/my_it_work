@@ -277,7 +277,10 @@ select:focus {
   object-fit: cover;
   border: 2px solid #ddd;
 }
-
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .appTable {
   width: 100%;
   border-collapse: collapse;
@@ -430,8 +433,6 @@ select option[value="custom"] {
   font-style: italic;
 }
 
-
-
 .fileUploadBox {
   display: flex;
   align-items: center;
@@ -439,11 +440,9 @@ select option[value="custom"] {
   gap: 10px;
 }
 
-
 .fileUploadBtn input[type="file"] {
   display: none;
 }
-
 
 .fileUploadBtn {
   background: #3b82f6;
@@ -465,7 +464,6 @@ select option[value="custom"] {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
-
 
 .fileName {
   font-size: 13px;

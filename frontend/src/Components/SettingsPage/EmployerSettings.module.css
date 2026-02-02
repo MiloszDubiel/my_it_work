@@ -326,7 +326,6 @@ select:focus {
 }
 .acceptBtn:hover {
   background: #26770d !important;
-
 }
 
 .deleteBtn:hover {
@@ -428,9 +427,64 @@ td {
 .logo {
   width: 120px;
   height: 120px;
+  border-radius: 100%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.fileUploadBox {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fileUploadBtn input[type="file"] {
+  display: none;
+}
+
+.fileUploadBtn {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+}
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.logoPreview img {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ddd;
+}
+
+.fileUploadBtn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.fileName {
+  font-size: 13px;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 @media (max-width: 768px) {
   .container1 {

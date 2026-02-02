@@ -3,9 +3,10 @@ import styles from "./ofertinfo.module.css";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import LoadingComponent from "../Loading/LoadingComponent";
-import { CiStar } from "react-icons/ci";
+import { BsStar, BsStarFill } from "react-icons/bs";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import EmployerInfo from "../Employers/EmployerInfo";
+import { useFavorites } from "../../context/FavoriteContext";
 
 const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
@@ -20,76 +21,33 @@ const safeJsonParse = (value, fallback = []) => {
 
 const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [__, setLoading] = useState(true);
   const [userData] = useState(
     safeJsonParse(sessionStorage.getItem("user-data")),
   );
   const [showConfirm, setShowConfirm] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
+  const [_, setShowInfo] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const confirmCallbackRef = useRef(null);
-
-  useEffect(() => {
-    const checkFavorite = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-            },
-          },
-        );
-        setIsFavorite(res.data.isFavorite);
-      } catch (err) {
-        console.error("Błąd przy sprawdzaniu ulubionych:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (offer?.id && userData?.id) checkFavorite();
-  }, [offer?.id, userData?.id]);
-
-  const toggleFavorite = async () => {
-    try {
-      if (isFavorite) {
-        await axios.delete(
-          `http://localhost:5000/api/job-offerts/favorites/${userData.id}/${offer.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-            },
-          },
-        );
-        setIsFavorite(false);
-        sessionStorage.setItem("setIsFavorite", false);
-        window.dispatchEvent(new Event("setIsFavorite"));
-      } else {
-        await axios.post(
-          "http://localhost:5000/api/job-offerts/favorites",
-          {
-            user_id: userData.id,
-            offer_id: offer.id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-            },
-          },
-        );
-        setIsFavorite(true);
-        sessionStorage.setItem("setIsFavorite", true);
-        window.dispatchEvent(new Event("setIsFavorite"));
-      }
-    } catch (err) {
-      console.error("Błąd przy aktualizacji ulubionych:", err);
-    }
-  };
-
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [appliedDate, setAppliedDate] = useState(null);
+
+  const { isFavorite, toggleFavorite, loading } = useFavorites();
+
+  useEffect(() => {
+    checkApplication();
+  }, [userData?.id, offer?.id]);
+
+  useEffect(() => {
+    window.addEventListener("deleted-application", checkApplication);
+    return () =>
+      window.removeEventListener("deleted-application", checkApplication);
+  }, []);
+
+  const open = useCallback(() => {
+    document.querySelector(`#company-info-${offer.employer_id}`).style.display =
+      "flex";
+  }, [offer.owner_id]);
 
   useEffect(() => {
     checkApplication();
@@ -98,6 +56,8 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
   useEffect(() => {
     window.addEventListener("deleted-application", checkApplication);
   });
+
+  if (loading) return null;
 
   const checkApplication = async () => {
     if (!userData?.id || !offer?.id) return;
@@ -165,10 +125,6 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
     };
   };
 
-  const open = useCallback(() => {
-    document.querySelector(`#company-info-${offer.employer_id}`).style.display =
-      "flex";
-  }, [offer.owner_id]);
   return (
     <div
       id="offer-details-container"
@@ -197,12 +153,17 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
         <div className={styles.actionsBar}>
           <div style={{ display: "flex", gap: "10px" }}>
             {userData?.email && userData?.role === "candidate" && (
-              <button onClick={toggleFavorite} className={styles.iconBtn}>
-                {isFavorite ? (
-                  <CiStar className={styles.starFilled} />
-                ) : (
-                  <CiStar className={styles.starEmpty} />
-                )}
+              <button
+                onClick={() => toggleFavorite(offer)}
+                className={styles.iconBtn}
+                aria-label="Dodaj do ulubionych"
+              >
+                <BsStarFill
+                  size={24}
+                  className={
+                    isFavorite(offer.id) ? styles.starFilled : styles.starEmpty
+                  }
+                />
               </button>
             )}
           </div>

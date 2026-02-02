@@ -48,12 +48,39 @@ router.post(
   },
 );
 
+router.get(
+  "/favorites/:user_id",
+  authenticateToken,
+  requireRole("candidate", "admin"),
+  async (req, res) => {
+    const { user_id } = req.params;
+
+    try {
+      const [rows] = await connection.query(
+        `SELECT jo.*
+FROM favorites f
+JOIN job_offers jo ON jo.id = f.offer_id
+WHERE f.user_id = ?`,
+        [user_id],
+      );
+
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Błąd pobierania ulubionych" });
+    }
+  },
+);
+
 router.delete(
   "/favorites/:user_id/:offer_id",
   authenticateToken,
   requireRole("candidate", "admin"),
   async (req, res) => {
     const { user_id, offer_id } = req.params;
+    const offerIdNum = parseInt(offer_id, 10); 
+    if (isNaN(offerIdNum))
+      return res.status(400).json({ error: "Nieprawidłowe offer_id" });
 
     try {
       await connection.query(
