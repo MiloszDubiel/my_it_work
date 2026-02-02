@@ -67,6 +67,7 @@ router.post("/registre", async (req, res) => {
     companyName,
     firstName,
     lastName,
+    nip,
   } = req.body;
 
   if (!email || !password || !repeatPassword || !role) {

@@ -67,6 +67,8 @@ const EmployerSettings = () => {
     if (!company || !initialCompany) return false;
     return (
       company.description !== initialCompany.description ||
+      company.specialization !== initialCompany.specialization ||
+      company.whyus !== initialCompany.whyus ||
       company.link !== initialCompany.link ||
       company.email !== initialCompany.email ||
       company.phone_number !== initialCompany.phone_number ||
@@ -169,6 +171,8 @@ const EmployerSettings = () => {
     formData.append("link", company.link || "");
     formData.append("phone_number", company.phone_number || "");
     formData.append("email", company.email);
+    formData.append("specialization", company.specialization);
+    formData.append("whyus", company.whyus);
     if (logoFile) {
       formData.append("logo", logoFile);
     }
@@ -185,10 +189,7 @@ const EmployerSettings = () => {
     );
 
     if (res.status === 200) {
-      setInfo("Zapisano. Trwa odświeżanie strony...");
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setInfo("Zapisano");
     }
   };
 
@@ -199,11 +200,24 @@ const EmployerSettings = () => {
     setError("");
 
     if (!dataToChange.name?.trim()) {
-      return setError("Imię jest wymagane.");
+      return "Podaj imię";
     }
-
+    if (!/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/.test(dataToChange.name?.trim())) {
+      return setError(
+        "Imię nie moze zawierać cyfr i znaków specjalnych oraz musi się zaczynać z wielkiej litery",
+      );
+    }
     if (!dataToChange.surname?.trim()) {
-      return setError("Nazwisko jest wymagane.");
+      return setError("Podaj nazwisko");
+    }
+    if (
+      !/^[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,}(-[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{2,})?$/.test(
+        dataToChange.surname?.trim(),
+      )
+    ) {
+      return setError(
+        "Nazwisko musi zawierac min. 2 litery oraz może zawierać znak '-'",
+      );
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -241,14 +255,10 @@ const EmployerSettings = () => {
       );
 
       if (res.data.info) {
-        setInfo(res.data.info + "" + ". Trwa odświeżanie strony...");
+        setInfo(res.data.info);
         sessionStorage.setItem("user-data", JSON.stringify(res.data.userData));
         localStorage.setItem("user-data", JSON.stringify(res.data.userData));
         document.querySelector(`.${styles.content}`).scroll(0, 0);
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       }
 
       if (res.data.error) {
@@ -549,6 +559,26 @@ const EmployerSettings = () => {
                     onChange={(e) =>
                       setCompany({ ...company, description: e.target.value })
                     }
+                    rows={6}
+                  />
+
+                  <label>Specjalizacja</label>
+                  <textarea
+                    placeholder="Opisz specjalizacje firmy..."
+                    value={company?.specialization}
+                    onChange={(e) =>
+                      setCompany({ ...company, specialization: e.target.value })
+                    }
+                    rows={6}
+                  />
+                  <label>Dlaczego ty?</label>
+                  <textarea
+                    placeholder="Opisz, dlaczego kandydat ma wybrac Twoją firmę..."
+                    value={company?.whyus}
+                    onChange={(e) =>
+                      setCompany({ ...company, whyus: e.target.value })
+                    }
+                    rows={6}
                   />
 
                   {logoPreviewUrl || company?.img ? (
@@ -813,7 +843,7 @@ const EmployerSettings = () => {
                     onChange={(e) =>
                       setDataToChange({
                         ...dataToChange,
-                        email: e.target.value,
+                        email: e.target.value.toLowerCase(),
                       })
                     }
                   />

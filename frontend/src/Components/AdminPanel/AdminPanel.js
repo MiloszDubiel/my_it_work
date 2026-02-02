@@ -31,7 +31,7 @@ const AdminPanel = () => {
   const [requests, setRequests] = useState([]);
   const [showRequestConfirm, setShowRequestConfirm] = useState(false);
   const [pendingRequestId, setPendingRequestId] = useState(null);
-  const [pendingType, setPendingType] = useState(null); // "approve" | "reject"
+  const [pendingType, setPendingType] = useState(null);
 
   useEffect(() => {
     if (activeTab === "users") loadUsers();
@@ -327,7 +327,7 @@ const AdminPanel = () => {
                   <thead>
                     <tr>
                       <th>Email</th>
-                      <th>Imię</th>
+                      <th>Imię i nazwisko</th>
                       <th>Typ</th>
                       <th>Aktywny</th>
                       <th>Akcje</th>
@@ -341,7 +341,9 @@ const AdminPanel = () => {
                         <td>
                           {u.name} {u.surname}
                         </td>
-                        <td>{u.role}</td>
+                        <td>
+                          {u.role === "employer" ? "Pracodawca" : "Kandydat"}
+                        </td>
                         <td>{u.is_active === "1" ? "Tak" : "Nie"}</td>
                         <td>
                           <div style={{ display: "flex", gap: "10px" }}>
@@ -378,7 +380,7 @@ const AdminPanel = () => {
                       </div>
 
                       <div className={styles.cardRow}>
-                        <span>Imię</span>
+                        <span>Imię i nazwisko</span>
                         <b>
                           {u.name} {u.surname}
                         </b>
@@ -386,7 +388,9 @@ const AdminPanel = () => {
 
                       <div className={styles.cardRow}>
                         <span>Typ</span>
-                        <b>{u.role}</b>
+                        <b>
+                          {u.role === "employer" ? "Pracodawca" : "Kandydat"}
+                        </b>
                       </div>
 
                       <div className={styles.cardRow}>

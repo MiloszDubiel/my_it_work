@@ -214,7 +214,7 @@ router.get(
       const total = countRow.cnt;
       const totalPages = Math.ceil(total / pageSize);
 
-      let dataSql = `SELECT  jo.id, jo.companyName, jo.title, jo.updated_at, jo.is_active, jd.description
+      let dataSql = `SELECT  jo.id, c.companyName AS 'company-name', jo.companyName, jo.title, jo.updated_at, jo.is_active, jd.description
        FROM job_offers jo
        INNER JOIN job_details jd ON jo.id = jd.job_offer_id
        LEFT JOIN companies c ON c.id = jo.company_id`;

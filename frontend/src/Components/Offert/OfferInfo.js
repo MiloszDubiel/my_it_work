@@ -20,6 +20,7 @@ const safeJsonParse = (value, fallback = []) => {
 };
 
 const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
+  console.log(offer);
   const [isLoading, setIsLoading] = useState(false);
   const [__, setLoading] = useState(true);
   const [userData] = useState(
@@ -34,30 +35,10 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
 
   const { isFavorite, toggleFavorite, loading } = useFavorites();
 
-  useEffect(() => {
-    checkApplication();
-  }, [userData?.id, offer?.id]);
-
-  useEffect(() => {
-    window.addEventListener("deleted-application", checkApplication);
-    return () =>
-      window.removeEventListener("deleted-application", checkApplication);
-  }, []);
-
   const open = useCallback(() => {
     document.querySelector(`#company-info-${offer.employer_id}`).style.display =
       "flex";
   }, [offer.owner_id]);
-
-  useEffect(() => {
-    checkApplication();
-  }, [userData?.id, offer?.id]);
-
-  useEffect(() => {
-    window.addEventListener("deleted-application", checkApplication);
-  });
-
-  if (loading) return null;
 
   const checkApplication = async () => {
     if (!userData?.id || !offer?.id) return;
@@ -77,6 +58,15 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
       console.error("Błąd przy sprawdzaniu aplikacji:", err);
     }
   };
+  useEffect(() => {
+    checkApplication();
+  }, [userData?.id, offer?.id]);
+
+  useEffect(() => {
+    window.addEventListener("deleted-application", checkApplication);
+    return () =>
+      window.removeEventListener("deleted-application", checkApplication);
+  }, []);
 
   const applyToOffer = async () => {
     if (!userData?.id) {
@@ -194,7 +184,9 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
             </h1>
             <div className={styles.sub}>
               <div className={styles.company}>
-                <span className={styles.companyName}>{offer?.companyName}</span>
+                <span className={styles.companyName}>
+                  {offer["company-name"]}
+                </span>
               </div>
 
               <div className={styles.meta}>
@@ -202,7 +194,11 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
                 {offer?.salary === "not available" ? (
                   <span className={styles.salary}>Nie podano</span>
                 ) : (
-                  <span className={styles.salary}>{offer?.salary}</span>
+                  <span className={styles.salary}>
+                    {offer?.salary.includes("PLN")
+                      ? offer?.salary
+                      : offer?.salary + " PLN"}
+                  </span>
                 )}
               </div>
             </div>
@@ -255,15 +251,22 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
               <LoadingComponent />
             ) : (
               <>
+                {offer.source !== "scraped" && <h2>Opis</h2>}
                 <div
                   className={styles.description}
                   dangerouslySetInnerHTML={{
                     __html: offer.description?.replaceAll("\\n", ""),
                   }}
                 ></div>
+                {offer.source !== "scraped" && <h2>Wymagania</h2>}
                 <div
                   className={styles.description}
                   dangerouslySetInnerHTML={{ __html: offer.requirements }}
+                ></div>
+                {offer.source !== "scraped" && <h2>Benefity</h2>}
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: offer.benefits }}
                 ></div>
               </>
             )}

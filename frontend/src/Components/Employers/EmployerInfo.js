@@ -169,16 +169,38 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
           <section className={styles.contentGrid}>
             <article className={styles.leftCol}>
               <h3 className={styles.sectionTitle}>Opis firmy</h3>
-              {company?.company_description || company?.description ? (
-                <div
-                  className={styles.description}
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      company?.company_description || company?.description,
-                  }}
-                />
-              ) : (
-                <p>Brak opisu</p>
+              <h2>Opis</h2>
+              <div
+                className={styles.description}
+                dangerouslySetInnerHTML={{
+                  __html: company?.description,
+                }}
+              />
+
+              {company?.specialization && (
+                <>
+                  {" "}
+                  <h2>Opis</h2>
+                  <div
+                    className={styles.description}
+                    dangerouslySetInnerHTML={{
+                      __html: company?.specialization,
+                    }}
+                  />
+                </>
+              )}
+
+              {company?.whyus && (
+                <>
+                  {" "}
+                  <h2>Opis</h2>
+                  <div
+                    className={styles.description}
+                    dangerouslySetInnerHTML={{
+                      __html: company?.whyus,
+                    }}
+                  />
+                </>
               )}
             </article>
 

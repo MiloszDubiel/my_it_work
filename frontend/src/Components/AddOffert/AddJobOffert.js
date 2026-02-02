@@ -325,6 +325,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 setOffer({ ...offer, description: e.target.value })
               }
               placeholder="Opis"
+              rows={6}
             />
 
             <label>Wymagania</label>
@@ -334,6 +335,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 setOffer({ ...offer, requirements: e.target.value })
               }
               placeholder="Wymagania"
+              rows={6}
             />
 
             <label>Zakres obowiązków</label>
@@ -343,6 +345,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 setOffer({ ...offer, responsibilities: e.target.value })
               }
               placeholder="Zakres obowiązków"
+              rows={6}
             />
 
             <label>Benefity</label>
@@ -350,6 +353,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
               value={offer.benefits}
               onChange={(e) => setOffer({ ...offer, benefits: e.target.value })}
               placeholder="Benefity"
+              rows={6}
             />
 
             <button

@@ -31,20 +31,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post(
-  "/get-company-info",
-  authenticateToken,
-  requireRole("employer", "admin"),
-  async (req, res) => {
-    const { id } = req.body;
+router.post("/get-company-info", async (req, res) => {
+  const { id } = req.body;
 
-    if (!id) {
-      return res.json({ error: "Brak id" });
-    }
+  if (!id) {
+    return res.json({ error: "Brak id" });
+  }
 
-    return res.json({ companyInfo: await getCompanyInfo(id) });
-  },
-);
+  return res.json({ companyInfo: await getCompanyInfo(id) });
+});
 
 router.post(
   "/set-company-info",
@@ -53,8 +48,16 @@ router.post(
   requireRole("employer", "admin"),
   async (req, res) => {
     try {
-      const { owner_id, description, link, email, phone_number, company_id } =
-        req.body;
+      const {
+        owner_id,
+        description,
+        link,
+        email,
+        phone_number,
+        company_id,
+        specialization,
+        whyus,
+      } = req.body;
 
       console.log(req.file);
 
@@ -66,15 +69,32 @@ router.post(
         )}`;
 
         await connection.query(
-          "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ? WHERE owner_id=?",
-          [description, link, email, phone_number, logoPath, owner_id],
+          "UPDATE companies SET description=?, link=?, email=?, phone_number=?, img = ?, specialization = ?, whyus = ?  WHERE owner_id=?",
+          [
+            description,
+            link,
+            email,
+            phone_number,
+            logoPath,
+            specialization,
+            whyus,
+            owner_id,
+          ],
         );
         return res.status(200).json({ info: "Zapisano zmiany" });
       }
 
       await connection.query(
-        "UPDATE companies SET description=?, link=?, email=?, phone_number=? WHERE owner_id=?",
-        [description, link, email, phone_number, owner_id],
+        "UPDATE companies SET description=?, link=?, email=?, phone_number=?, specialization = ?, whyus = ?  WHERE owner_id=?",
+        [
+          description,
+          link,
+          email,
+          phone_number,
+          specialization,
+          whyus,
+          owner_id,
+        ],
       );
 
       return res.status(200).json({ info: "Zapisano zmiany" });

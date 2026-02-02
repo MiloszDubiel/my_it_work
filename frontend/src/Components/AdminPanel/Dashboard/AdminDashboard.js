@@ -18,19 +18,35 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/stats/salary-stats")
+      .get("http://localhost:5000/api/stats/salary-stats", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => setSalaryStats(res.data));
 
     axios
-      .get("http://localhost:5000/api/stats/tech-frequency")
+      .get("http://localhost:5000/api/stats/tech-frequency", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => setTechStats(res.data.slice(0, 10)));
 
     axios
-      .get("http://localhost:5000/api/stats/experience-vs-salary")
+      .get("http://localhost:5000/api/stats/experience-vs-salary", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => setExpStats(res.data));
 
     axios
-      .get("http://localhost:5000/api/stats/salary-histogram")
+      .get("http://localhost:5000/api/stats/salary-histogram", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => setData(res.data.histogram))
       .catch((err) => console.error(err));
   }, []);

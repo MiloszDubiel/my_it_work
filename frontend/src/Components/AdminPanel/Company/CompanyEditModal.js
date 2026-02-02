@@ -84,6 +84,8 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
           value={form.nip}
           onChange={handleChange}
           type="text"
+          minLength={10}
+          maxLength={10}
         />
 
         <div className={styles.buttons}>

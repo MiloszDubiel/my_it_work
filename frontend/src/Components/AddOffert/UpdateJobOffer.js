@@ -320,6 +320,7 @@ const UpdateJobOffer = ({ offer }) => {
                 setUpdateOffer({ ...updateOffer, description: e.target.value })
               }
               placeholder="Opis stanowiska"
+              rows={6}
             />
 
             <label>Wymagania</label>
@@ -329,6 +330,7 @@ const UpdateJobOffer = ({ offer }) => {
                 setUpdateOffer({ ...updateOffer, requirements: e.target.value })
               }
               placeholder="Wymagania"
+              rows={6}
             />
 
             <label>Zakres obowiązków</label>
@@ -341,6 +343,7 @@ const UpdateJobOffer = ({ offer }) => {
                 })
               }
               placeholder="Zakres obowiązków"
+              rows={6}
             />
 
             <label>Benefity</label>
@@ -350,6 +353,7 @@ const UpdateJobOffer = ({ offer }) => {
                 setUpdateOffer({ ...updateOffer, benefits: e.target.value })
               }
               placeholder="Benefity"
+              rows={6}
             />
 
             <button

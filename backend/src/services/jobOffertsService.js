@@ -44,11 +44,12 @@ export function getAllOfferts() {
   job_details.description,
   job_details.active_to,
   job_details.requirements,
+  job_details.benefits,
   job_offers.updated_at,
   companies.img AS company_img,
   job_offers.employer_id,
   job_offers.img AS offer_img
-FROM job_offers
+FROM job_offers 
 LEFT JOIN job_details
   ON job_offers.id = job_details.job_offer_id
   AND job_details.active_to >= CURDATE()

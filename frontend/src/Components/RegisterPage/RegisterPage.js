@@ -35,6 +35,9 @@ const RegisterPage = () => {
     }
 
     if (!email) return "Podaj adres e-mail";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "Podaj poprawny email";
+    }
     if (
       password.length < 8 ||
       !/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]{8,}$/.test(
@@ -82,9 +85,13 @@ const RegisterPage = () => {
         "http://localhost:5000/auth/registre",
         payload,
       );
+
       setInfo(res.data.info);
-    } catch (err) {
-      setError(JSON.parse(err.request.response).error);
+    } catch (error) {
+      console.log(error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
+      }
     } finally {
       setLoading(false);
     }
