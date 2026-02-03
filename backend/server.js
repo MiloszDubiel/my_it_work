@@ -71,5 +71,10 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(5001, () => console.log("Server działa na porcie 5001"));
-app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));
+
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(5001, () => console.log("Server działa na porcie 5001"));
+  app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));
+}
+
+export { app };
