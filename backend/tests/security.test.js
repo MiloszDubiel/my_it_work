@@ -35,7 +35,7 @@ describe('Testy Bezpieczeństwa (Security)', () => {
                 .get('/api/stats/salary-stats')
                 .set('Authorization', 'Bearer invalid_token');
 
-            expect(res.statusCode).toBe(403);
+            expect(res.statusCode).toBe(401);
         });
     });
 });

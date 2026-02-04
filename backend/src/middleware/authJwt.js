@@ -11,7 +11,7 @@ export const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ error: "Nieprawidłowy token" });
+      return res.status(401).json({ error: "Nieprawidłowy token" });
     }
 
     req.user = user;
@@ -21,7 +21,7 @@ export const authenticateToken = (req, res, next) => {
 export const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: "Brak uprawnień" });
+      return res.status(401).json({ error: "Brak uprawnień" });
     }
     next();
   };
@@ -29,13 +29,13 @@ export const requireRole = (...allowedRoles) => {
 
 export const isAdmin = (req, res, next) => {
   if (req.user.role !== "admin")
-    return res.status(403).json({ error: "Brak dostępu" });
+    return res.status(401).json({ error: "Brak dostępu" });
   next();
 };
 
 export const isEmployer = (req, res, next) => {
   if (req.user.role !== "employer") {
-    return res.status(403).json({ error: "Brak dostępu" });
+    return res.status(401).json({ error: "Brak dostępu" });
   }
   next();
 };

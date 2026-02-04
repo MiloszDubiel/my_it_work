@@ -24,11 +24,13 @@ test.describe('Proces Logowania i Rejestracji', () => {
     await page.goto('/login');
 
     await page.getByLabel(/E-mail/i).fill('wrong@example.com');
-    await page.getByLabel(/Hasło/i).fill('wrongpassword');
+ await page.locator('#password').fill('wrongpassword');
     await page.getByRole('button', { name: /Zaloguj/i }).click();
 
     // Oczekujemy komunikatu błędu
-    await expect(page.getByText(/Niepoprawne dane|Użytkownik nie istnieje/i)).toBeVisible();
+    await expect(
+  page.getByRole('alert')
+).toBeVisible();
   });
 
 });

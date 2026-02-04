@@ -50,3 +50,34 @@ Testy E2E są skonfigurowane do automatycznego uruchamiania na silnikach trzech 
 1.  **Chromium** (Google Chrome, Microsoft Edge)
 2.  **Firefox** (Mozilla Firefox)
 3.  **WebKit** (Safari, Apple devices)
+
+
+Oto instrukcja jak uruchomić testy w Twoim projekcie:
+
+1. Testy Backendowe (API, Uwierzytelnianie, Baza)
+Weryfikują logikę serwera i metody (GET, POST, PUT, DELETE).
+
+Otwórz terminal w folderze backend.
+Wpisz komendę:
+powershell
+npm test
+2. Testy End-to-End (E2E) - Playwright
+Symulują prawdziwego użytkownika w przeglądarce. Sprawdzają działanie całej aplikacji od strony wizualnej.
+
+Otwórz terminal w głównym folderze projektu (my_it_work).
+Jeśli robisz to pierwszy raz, zainstaluj przeglądarki:
+powershell
+npx playwright install
+Uruchom testy:
+powershell
+npx playwright test
+Możesz też otworzyć interfejs graficzny, aby widzieć jak testy "klikają" na żywo:
+powershell
+npx playwright test --ui
+3. Testy Frontendowe (Komponenty React)
+Otwórz terminal w folderze frontend.
+Wpisz komendę:
+powershell
+npm test
+(Uwaga: w React testy domyślnie uruchamiają się w trybie "watch" - naciskaj q aby wyjść).
+Pełna dokumentacja opisująca co dokładnie testujemy znajduje się w pliku PROJECT_TESTS_DOCS.md oraz w instrukcji TESTING.md. Znajdziesz je w głównym folderze projektu.

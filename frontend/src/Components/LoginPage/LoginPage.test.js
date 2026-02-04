@@ -27,7 +27,7 @@ describe('Komponent LoginPage', () => {
     );
 
     expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Hasło/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Pole hasło/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Zaloguj/i })).toBeInTheDocument();
   });
 
@@ -39,7 +39,7 @@ describe('Komponent LoginPage', () => {
     );
 
     const emailInput = screen.getByLabelText(/E-mail/i);
-    const passwordInput = screen.getByLabelText(/Hasło/i);
+    const passwordInput = screen.getByLabelText(/Pole hasło/i);
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -64,7 +64,7 @@ describe('Komponent LoginPage', () => {
     );
 
     fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/Hasło/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText(/Pole hasło/i), { target: { value: 'password123' } });
     
     // Kliknij przycisk Zaloguj
     fireEvent.click(screen.getByRole('button', { name: /Zaloguj/i }));
@@ -82,20 +82,29 @@ describe('Komponent LoginPage', () => {
   });
 
   it('wyświetla błąd przy nieudanym logowaniu', async () => {
-    mockedAxios.post.mockRejectedValueOnce({
-      response: { data: { error: 'Niepoprawne dane' } },
-    });
-
-    render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>
-    );
-
-    fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/Hasło/i), { target: { value: 'wrong' } });
-    fireEvent.click(screen.getByRole('button', { name: /Zaloguj/i }));
-
-    expect(await screen.findByText('Niepoprawne dane')).toBeInTheDocument();
+  mockedAxios.post.mockRejectedValueOnce({
+    response: { data: { error: 'Niepoprawne dane' } },
   });
+
+  render(
+    <MemoryRouter>
+      <LoginPage />
+    </MemoryRouter>
+  );
+
+  fireEvent.change(screen.getByLabelText(/E-mail/i), {
+    target: { value: 'test@example.com' },
+  });
+
+  fireEvent.change(
+    screen.getByLabelText(/Pole hasło/i),
+    { target: { value: 'wrong' } }
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: /Zaloguj/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText('Niepoprawne dane')).toBeInTheDocument();
+  });
+});
 });

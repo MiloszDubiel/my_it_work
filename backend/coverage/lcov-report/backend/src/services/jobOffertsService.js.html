@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">34.48% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/29</span>
+                <span class='fraction'>10/29</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/36</span>
+                <span class='fraction'>6/36</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>2/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">37.03% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>10/27</span>
             </div>
         
             
@@ -215,7 +215,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,7 +247,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -273,33 +273,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -335,8 +335,8 @@ export function <span class="fstat-no" title="function not covered" >saveOfferts
   });
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >getAllOfferts(</span>) {
-<span class="cstat-no" title="statement not covered" >  return connection.query(`SELECT</span>
+export function getAllOfferts() {
+  return connection.query(`SELECT
   job_offers.source,
   job_offers.id,
   job_offers.title,
@@ -367,8 +367,8 @@ ORDER BY job_offers.updated_at DESC;
 `);
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >getFillteredOfferts(</span>{ title, experience, location }) {
-  let sql = <span class="cstat-no" title="statement not covered" >`SELECT</span>
+export async function getFillteredOfferts({ title, experience, location }) {
+  let sql = `SELECT
   job_offers.source,
   job_offers.id,
   job_offers.title,
@@ -394,14 +394,14 @@ LEFT JOIN job_details
 LEFT JOIN companies 
   ON job_offers.company_id = companies.id
 WHERE job_offers.is_active = 1`;
-  const params = <span class="cstat-no" title="statement not covered" >[];</span>
+  const params = [];
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (title &amp;&amp; title.trim() !== "") {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (title &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >title.trim() !== "")</span> {
 <span class="cstat-no" title="statement not covered" >    sql += " AND title LIKE ?";</span>
 <span class="cstat-no" title="statement not covered" >    params.push(`%${title}%`);</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (experience &amp;&amp; experience.trim() !== "") {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (experience &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >experience.trim() !== "")</span> {
 <span class="cstat-no" title="statement not covered" >    if (experience === "") {</span>
 <span class="cstat-no" title="statement not covered" >      sql += " AND experience LIKE ?";</span>
 <span class="cstat-no" title="statement not covered" >      params.push(`%`);</span>
@@ -411,16 +411,16 @@ WHERE job_offers.is_active = 1`;
     }
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (location &amp;&amp; location.trim() !== "") {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (location &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >location.trim() !== "")</span> {
 <span class="cstat-no" title="statement not covered" >    sql += " AND workingMode LIKE ?";</span>
 <span class="cstat-no" title="statement not covered" >    params.push(`%${location}%`);</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  sql += "ORDER BY job_offers.updated_at DESC";</span>
+  sql += "ORDER BY job_offers.updated_at DESC";
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const [rows] = <span class="cstat-no" title="statement not covered" >await connection.query(sql, params);</span>
-<span class="cstat-no" title="statement not covered" >    return rows;</span>
+  try {
+    const [rows] = await connection.query(sql, params);
+    return rows;
   } catch (err) {
 <span class="cstat-no" title="statement not covered" >    console.error("Błąd w zapytaniu SQL:", err);</span>
 <span class="cstat-no" title="statement not covered" >    throw err;</span>
@@ -433,7 +433,7 @@ WHERE job_offers.is_active = 1`;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-03T12:48:35.211Z
+                at 2026-02-04T12:51:47.342Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

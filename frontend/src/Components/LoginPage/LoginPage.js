@@ -82,7 +82,7 @@ const LoginPage = () => {
             </div>
           )}
 
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="email">
             <span className={styles.label}>E-mail</span>
             <input
               className={styles.input}
@@ -92,10 +92,12 @@ const LoginPage = () => {
               placeholder="Email"
               autoComplete="email"
               required
+              aria-label="Email"
+              id="email"
             />
           </label>
 
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="password">
             <span className={styles.label}>Hasło</span>
             <div className={styles.pwdWrapper}>
               <input
@@ -106,6 +108,8 @@ const LoginPage = () => {
                 placeholder="Hasło"
                 autoComplete="current-password"
                 required
+                aria-label="Pole hasło"
+                id="password"
               />
               <button
                 type="button"
