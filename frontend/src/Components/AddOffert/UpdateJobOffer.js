@@ -61,9 +61,9 @@ const UpdateJobOffer = ({ offer }) => {
     if (
       updateOffer.salary_min &&
       updateOffer.salary_max &&
-      +updateOffer.salary_min > +offer.salary_max
+      +(+updateOffer.salary_min <= 0 || +updateOffer.salary_max <= 0 || updateOffer.salary_min > +offer.salary_max) 
     )
-      return "Minimalne wynagrodzenie nie może być większe niż maksymalne";
+      return "Wynagordzenie musi być większe od 0 oraz minimalne wynagrodzenie nie może być większe niż maksymalne"
 
     if (!updateOffer.date) {
       return "Data wazności oferty jest wymagany";
@@ -361,7 +361,7 @@ const UpdateJobOffer = ({ offer }) => {
               className={styles.submitBtn}
               onClick={handleSubmit}
             >
-              Dodaj ofertę
+              Aktualizuj ofertę
             </button>
           </form>
         </div>

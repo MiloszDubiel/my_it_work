@@ -64,12 +64,12 @@ const AddJobOffer = ({ onOfferAdded }) => {
     if (!offer.title?.trim()) return "Tytuł oferty jest wymagany";
     if (!offer.location?.trim()) return "Lokalizacja jest wymagana";
     if (!offer.description?.trim()) return "Opis oferty nie może być pusty";
-    if (
-      offer.salary_min &&
-      offer.salary_max &&
-      +offer.salary_min > +offer.salary_max
-    )
-      return "Minimalne wynagrodzenie nie może być większe niż maksymalne";
+   if (
+  offer.salary_min &&
+  offer.salary_max &&
+  (+offer.salary_min <= 0 || +offer.salary_max <= 0 || +offer.salary_min > +offer.salary_max)
+)
+      return "Wynagordzenie musi być większe od 0 oraz minimalne wynagrodzenie nie może być większe niż maksymalne";
     if (!offer.date) {
       return "Data wazności oferty jest wymagany";
     }
@@ -235,6 +235,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 <input
                   type="number"
                   value={offer.salary_min}
+                  min={0}
                   onChange={(e) =>
                     setOffer({ ...offer, salary_min: e.target.value })
                   }
@@ -247,6 +248,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 <input
                   type="number"
                   value={offer.salary_max}
+                  min={0}
                   onChange={(e) =>
                     setOffer({ ...offer, salary_max: e.target.value })
                   }

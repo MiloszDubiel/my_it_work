@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mysql:
     image: mysql:8.0
@@ -25,6 +23,8 @@ services:
       - "5001:5001"
     depends_on:
       - mysql
+    volumes:
+      - ./backend/src/uploads:/app/src/uploads
 
   frontend:
     build: ./frontend

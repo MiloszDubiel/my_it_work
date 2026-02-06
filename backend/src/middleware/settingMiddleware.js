@@ -5,8 +5,8 @@ const CvAndRefStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let dir;
 
-    if (file.fieldname === "cv") dir = "uploads/cv";
-    else if (file.fieldname === "references") dir = "uploads/references";
+    if (file.fieldname === "cv") dir = "src/uploads/cv";
+    else if (file.fieldname === "references") dir = "src/uploads/references";
 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -39,7 +39,7 @@ const avatarStorage = multer.diskStorage({
 
 export const avatarUpload = multer({
   storage: avatarStorage,
-  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 3MB
   fileFilter: (req, file, cb) => {
     if (!["image/png"].includes(file.mimetype)) {
       return cb(new Error("Invalid file type"));
@@ -62,7 +62,7 @@ const logoStorage = multer.diskStorage({
 
 export const uploadLogo = multer({
   storage: logoStorage,
-  limits: { fileSize: 3 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!["image/png", "image/jpeg"].includes(file.mimetype)) {
       return cb(new Error("Tylko PNG lub JPG"), false);

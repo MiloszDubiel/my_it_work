@@ -80,6 +80,7 @@ export default function ChatPage() {
 
               {conversations.map((conv) => {
                 const isEmployer = conv.employer_id === user.id;
+                console.log(conv.email)
                 const chatPartner = isEmployer
                   ? `${conv.candidate_name} ${conv.candidate_surname}`
                   : `${conv.employer_name} ${conv.employer_surname}`;
@@ -97,11 +98,17 @@ export default function ChatPage() {
                     </div>
                     <div>
                       <h4>
-                        {conv.companyName && (
+                        {(conv.companyName && !isEmployer) && (
                           <span className={styles.companyName}>
                             {conv.companyName + ", "}
                           </span>
                         )}
+                        {(conv.email && isEmployer) && (
+                          <span className={styles.companyName}>
+                            {conv.email + ", "}
+                          </span>
+                        )}
+
                         <span className={styles.name}>{chatPartner}</span>
                       </h4>
                     </div>

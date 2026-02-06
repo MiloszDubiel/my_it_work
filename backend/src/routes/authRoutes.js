@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
     }
 
     if (result[0].is_active == 0) {
-      return res.status(403).json({ error: "Konto niekatywne " });
+      return res.status(403).json({ error: "Konto nieaktywne " });
     }
 
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {

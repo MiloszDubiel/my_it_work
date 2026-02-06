@@ -375,29 +375,29 @@ const CandidateSettings = () => {
     setInfo("");
     setErorr("");
 
-    if (!candidateProfile.location.trim()) {
+    if (!candidateProfile.location?.trim()) {
       setErorr("Lokalizacja nie może być pusta.");
       e.target.parentElement.scrollTo(0, 0);
 
       return;
     }
-    if (!candidateProfile.description.trim()) {
+    if (!candidateProfile.description?.trim()) {
       setErorr("Opis nie może byc pusty.");
       e.target.parentElement.scrollTo(0, 0);
       return;
     }
-    if (!candidateProfile.current_position.trim()) {
+    if (!candidateProfile.current_position?.trim()) {
       setErorr("Aktualne stanowisko nie może być puste.");
       e.target.parentElement.scrollTo(0, 0);
       return;
     }
-    if (!candidateProfile.desired_position.trim()) {
+    if (!candidateProfile.desired_position?.trim()) {
       setErorr("Stanowisko docelowe nie może być puste.");
       e.target.parentElement.scrollTo(0, 0);
       return;
     }
     const phoneRegex = /^[0-9]{9}$/;
-    if (!phoneRegex.test(candidateProfile.phone_number)) {
+    if (!phoneRegex.test(candidateProfile?.phone_number)) {
       setErorr("Numer telefonu musi składać się z 9 cyfr.");
       e.target.parentElement.scrollTo(0, 0);
       return;

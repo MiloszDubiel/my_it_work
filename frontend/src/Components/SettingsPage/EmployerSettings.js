@@ -31,10 +31,11 @@ const EmployerSettings = () => {
     newPassword: "",
     repeatPassword: "",
   });
+  
+  console.log(selectedApp)
   const [applications, setApplications] = useState([]);
   const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
-
   useEffect(() => {
     axios
       .post(
@@ -314,7 +315,7 @@ const EmployerSettings = () => {
     if (!selectedApp.length) return;
 
     const res = await axios.put(
-      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`,
+      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`, {},
       {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
@@ -358,8 +359,11 @@ const EmployerSettings = () => {
     setInfo("");
     if (!selectedApp.length) return;
 
+
+
+
     const res = await axios.put(
-      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`,
+      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`, {},
       {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,

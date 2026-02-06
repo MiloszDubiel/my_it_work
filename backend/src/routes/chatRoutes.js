@@ -22,7 +22,8 @@ router.get("/conversations/:userId", async (req, res) => {
             u2.name AS candidate_name,
             u1.surname AS employer_surname,
             u2.surname AS candidate_surname,
-            com.companyName
+            com.companyName,
+            u2.email
       FROM conversations c
       JOIN users u1 ON u1.id = c.employer_id
       JOIN users u2 ON u2.id = c.candidate_id

@@ -213,24 +213,28 @@ router.post(
 
       if (rows.length === 0) {
         await connection.query(
-          "INSERT INTO candidate_info (user_id, cv, `references`, locations, skills, lang, edu, exp, link_git, working_mode, present_job, target_job, phone_number, access, career_level, description, years_of_experience) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          `INSERT INTO candidate_info (
+    user_id, cv, \`references\`, locations, skills, lang, edu, 
+    link_git, working_mode, present_job, target_job, 
+    phone_number, access, career_level, description, years_of_experience
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
           [
             user_id,
-            cvPath,
-            refPath,
-            locations,
-            skills,
-            lang,
-            edu,
-            link_git,
-            working_mode,
-            present_job,
-            target_job,
-            phone_number,
-            access,
-            career_level,
-            description,
-            years_of_experience,
+            cvPath || null,
+            refPath || null,
+            locations || null,
+            skills || "[]",
+            lang || "[]",
+            edu || "[]",
+            link_git || null,
+            working_mode || null,
+            present_job || null,
+            target_job || null,
+            phone_number || null,
+            access || null,
+            career_level || null,
+            description || null,
+            years_of_experience || 0,
           ],
         );
 

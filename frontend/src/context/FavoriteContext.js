@@ -49,9 +49,7 @@ useEffect(() => {
 
       setFavorites(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      if (err.response?.status !== 401) {
         console.error("Błąd pobierania ulubionych:", err);
-      }
     } finally {
       setLoading(false);
     }
