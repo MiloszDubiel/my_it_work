@@ -56,7 +56,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const save = () => {
+  const save = (e) => {
     if (!validate()) return;
 
     setErrors("");
@@ -70,6 +70,7 @@ const UserEditModal = ({ user, onClose, onSave }) => {
       })
       .then((res) => {
         setInfo(res.data.info);
+        e.target.parentElement.parentElement.scrollTo(0,0)
         setTimeout(() => {
           onSave();
           onClose();
@@ -81,68 +82,62 @@ const UserEditModal = ({ user, onClose, onSave }) => {
   if (!user) return null;
 
   return (
-    <div className={styles.modalBackground}>
-      <div className={styles.modal}>
-        <h2>Edytuj użytkownika</h2>
-        <p className={styles.error}>{errors}</p>
-        <p className={styles.info}>{info}</p>
+<div className={styles.modalBackground}>
+  <div className={styles.modal}>
+    <h2>Szczegóły użytkownika</h2>
 
-        {user.role != "employer" && (
-          <>
-            <label>Imię</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              type="text"
-            />
+    {errors && <p className={styles.error}>{errors}</p>}
+    {info && <p className={styles.info}>{info}</p>}
 
-            <label>Nazwisko</label>
-            <input
-              name="surname"
-              value={form.surname}
-              onChange={handleChange}
-              type="text"
-            />
-          </>
-        )}
+    <div className={styles.readOnlySection}>
+      <p><span>ID:</span> {user.id}</p>
+      <p><span>Rola:</span> {user.role == 'employer' ? "Pracodawca" : "Kandydat"}</p>
+      <p><span>Imię:</span> {user.name || "Brak"}</p>
+      <p><span>Nazwisko:</span> {user.surname || "Brak"}</p>
+          <p><span>Telefon:</span> {user.phone_number || "Brak"}</p>
+          {user.companyName && <p><span>Firma:</span> {user.companyName}</p>}
 
-        <label>Email</label>
-        <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          type="email"
-        />
-        {user.role !== "admin" && (
-          <>
-            <label>Aktywny</label>
-            <select
-              name="is_active"
-              value={form.is_active}
-              onChange={handleChange}
-            >
-              <option value="1">Tak</option>
-              <option value="0">Nie</option>
-            </select>
-          </>
-        )}
-        <div className={styles.buttons}>
-          <button className={styles.cancelBtn} onClick={onClose}>
-            Anuluj
-          </button>
-
-          <button
-            className={styles.saveBtn}
-            onClick={save}
-            disabled={errors.length > 0 ? true : false}
-          >
-            Zapisz
-          </button>
+      {user.avatar && (
+        <div className={styles.avatarWrapper}>
+          <label>Avatar</label>
+          <img src={user.avatar} alt="Avatar użytkownika" />
         </div>
-      </div>
+      )}
     </div>
-  );
+
+
+    <label>Email</label>
+    <input
+      type="email"
+      name="email"
+      value={form.email}
+      onChange={handleChange}
+    />
+
+    <label>Aktywny</label>
+    <select
+      name="is_active"
+      value={form.is_active}
+      onChange={handleChange}
+    >
+      <option value="1">Tak</option>
+      <option value="0">Nie</option>
+    </select>
+
+    <div className={styles.buttons}>
+      <button className={styles.cancelBtn} onClick={onClose}>
+        Zamknij
+      </button>
+      <button
+        className={styles.saveBtn}
+        onClick={save}
+        disabled={errors?.length > 0}
+      >
+        Zapisz
+      </button>
+    </div>
+  </div>
+</div>)
 };
 
 export default UserEditModal;

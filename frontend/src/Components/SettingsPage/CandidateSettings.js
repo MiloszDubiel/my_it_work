@@ -4,6 +4,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
+import { io } from "socket.io-client";
 
 const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
@@ -17,7 +18,7 @@ const safeJsonParse = (value, fallback = []) => {
 };
 
 
-
+let socket;
 
 const isUniqueItem = (list, newName = "") => {
   if (!Array.isArray(list)) return true;
@@ -63,32 +64,7 @@ const CandidateSettings = () => {
     years_of_experience: "",
     remote_preference: "Remote",
   });
-
-  useEffect(() => {
-    if (userData) {
-      setProfielData({
-        name: userData.name || "",
-        surname: userData.surname || "",
-        email: userData.email || "",
-        newPassword: "",
-        repeatPassword: "",
-      });
-    }
-  }, [userData]);
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        setFavorites(res.data);
-      });
-  }, [favorites]);
-
-  const [cvFile, setCvFile] = useState(null);
+   const [cvFile, setCvFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
   const [referenceFile, setReferenceFile] = useState(null);
@@ -103,6 +79,75 @@ const CandidateSettings = () => {
   const [initialCandidateProfile, setInitialCandidateProfile] = useState(null);
   const [customLanguage, setCustomLanguage] = useState("");
   const [showCustomLanguage, setShowCustomLanguage] = useState(false);
+
+  console.log(applications)
+
+  useEffect(() => {
+    if (userData) {
+      setProfielData({
+        name: userData.name || "",
+        surname: userData.surname || "",
+        email: userData.email || "",
+        newPassword: "",
+        repeatPassword: "",
+      });
+    }
+  }, [userData]);
+ 
+    useEffect(() => {
+    if (!socket) {
+      socket = io("http://localhost:5001");
+    }
+
+    socket.emit("join_user_room", userData.id);
+
+    const handleUpdate = (updatedApp) => {
+      setApplications((prev) =>
+        prev.map((a) => (a.id === updatedApp.id ? updatedApp : a))
+      );
+    };
+
+    socket.on("application_updated", handleUpdate);
+
+
+    const fetchApplications = async () => {
+      try {
+        const res = await axios.post(
+      `http://localhost:5000/user/get-user-applications`,
+      {
+        user_id: userData.id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      },
+    );
+        setApplications(res.data);
+      } catch (err) {
+        console.error("Błąd pobierania aplikacji:", err);
+      }
+    };
+
+    fetchApplications();
+
+    return () => {
+      socket.off("application_updated", handleUpdate);
+    };
+  }, [userData.id]);
+
+useEffect(() => {
+  axios
+    .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+      },
+    })
+    .then((res) => {
+      setFavorites(res.data);
+    });
+}, [userData?.id]);
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -179,25 +224,30 @@ const CandidateSettings = () => {
 
     getMyApplayings();
   }, []);
-  useEffect(() => {
-    window.addEventListener("setIsFavorite", () => {
-      axios
-        .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-          },
-        })
-        .then((res) => {
-          setFavorites(res.data);
-        });
-    });
-  }, [favorites]);
+ useEffect(() => {
+  const handler = () => {
+    axios
+      .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setFavorites(res.data);
+      });
+  };
 
-  useEffect(() => {
-    window.addEventListener("applied", () => {
-      getMyApplayings();
-    });
-  });
+  window.addEventListener("setIsFavorite", handler);
+  return () => window.removeEventListener("setIsFavorite", handler);
+}, [userData?.id]);
+
+useEffect(() => {
+  const handler = () => getMyApplayings();
+  window.addEventListener("applied", handler);
+  return () => window.removeEventListener("applied", handler);
+}, []);
+  
+  
   const hasProfileChanged = () => {
     if (!ProfielData || !userData) return false;
 
@@ -465,7 +515,6 @@ const CandidateSettings = () => {
     if (res.status == 200) {
       setInfo("Usunięto aplikacje");
       window.dispatchEvent(new Event("deleted-application"));
-      getMyApplayings();
     }
 
     setShowCancelModal(false);
@@ -875,7 +924,7 @@ const CandidateSettings = () => {
                       <option>4+</option>
                     </select>
                     <hr />
-                    <label>Umiejętności</label>
+                    <label>Umiejętności <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
 
                     <div className={styles.skill}>
                       <select onChange={addSkillWithLevel} defaultValue="">
@@ -990,7 +1039,7 @@ const CandidateSettings = () => {
                       ))}
                     </div>
                     <hr />
-                    <label>Języki</label>
+                    <label>Języki    <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
 
                     <div className={styles.skill}>
                       <select onChange={addLanguageWithLevel} defaultValue="">
@@ -1059,7 +1108,7 @@ const CandidateSettings = () => {
                       ))}
                     </div>
                     <hr />
-                    <label>Edukacja</label>
+                    <label>Edukacja    <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
 
                     <div className={styles.skill}>
                       <input type="text" placeholder="Szkoła..." />

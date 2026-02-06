@@ -275,7 +275,9 @@ const AddJobOffer = ({ onOfferAdded }) => {
 
             <label>
               Technologie
-              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>
+              <span className={styles.span}>
+                <br />
+                Kliknij podwójnie, aby usunąć</span>
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>
@@ -292,24 +294,64 @@ const AddJobOffer = ({ onOfferAdded }) => {
               </div>
 
               <select name="skills" onChange={(e) => addSkillorLanguage(e)}>
-                <option>JavaScript</option>
-                <option>TypeScript</option>
-                <option>Java</option>
-                <option>C</option>
-                <option>C++</option>
-                <option>C#</option>
-                <option>Python</option>
-                <option>Kotlin</option>
-                <option>Rust</option>
-                <option>Node.js</option>
-                <option>React.js</option>
-                <option>Angular.js</option>
-                <option>Vue.js</option>
+                
+                        <option>HTML</option>
+                        <option>CSS</option>
+                        <option>JavaScript</option>
+                        <option>TypeScript</option>
+                        <option>React.js</option>
+                        <option>Next.js</option>
+                        <option>Angular</option>
+                        <option>Vue.js</option>
+                        <option>Svelte</option>
+
+                        <option>Node.js</option>
+                        <option>Express.js</option>
+                        <option>NestJS</option>
+                        <option>Python</option>
+                        <option>Django</option>
+                        <option>Flask</option>
+                        <option>FastAPI</option>
+                        <option>Java</option>
+                        <option>Spring Boot</option>
+                        <option>C#</option>
+                        <option>.NET</option>
+                        <option>PHP</option>
+                        <option>Laravel</option>
+                        <option>Ruby on Rails</option>
+                        <option>Go</option>
+                        <option>Rust</option>
+
+                        <option>MySQL</option>
+                        <option>PostgreSQL</option>
+                        <option>SQLite</option>
+                        <option>MongoDB</option>
+                        <option>Redis</option>
+                        <option>Firebase</option>
+
+                        <option>Docker</option>
+                        <option>Kubernetes</option>
+                        <option>Linux</option>
+                        <option>Nginx</option>
+                        <option>AWS</option>
+                        <option>Azure</option>
+                        <option>Google Cloud</option>
+                        <option>Git</option>
+
+                        <option>React Native</option>
+                        <option>Flutter</option>
+                        <option>Swift</option>
+                        <option>Kotlin</option>
+
+                        <option>GraphQL</option>
+                        <option>Webpack</option>
+                        <option>Vite</option>
+                        <option>Three.js</option>
               </select>
               <input
                 type="text"
                 name="add_skill"
-                placeholder="IInna technologia niż podane..."
+                placeholder="Inna technologia niż podane..."
               />
               <button
                 type="button"

@@ -6,6 +6,9 @@ import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
 import CandidateInfo from "../Candidate/CandidateInfo";
 import ConfirmModal from "../PromptModals/ConfirmModal";
+import { io } from "socket.io-client";
+
+let socket;
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
@@ -31,11 +34,80 @@ const EmployerSettings = () => {
     newPassword: "",
     repeatPassword: "",
   });
-  
-  console.log(selectedApp)
+
   const [applications, setApplications] = useState([]);
   const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
+
+  
+   const handleAccept = (app) => {
+    socket.emit("accept_application", {
+      app_id: app.app_id,
+      candidate_id: app.user_id,
+      employer_id: userData.id,
+    });
+
+    setApplications((prev) =>
+      prev.map((a) =>
+        a.app_id === app.app_id ? { ...a, status: "zaakceptowana" } : a
+      )
+    );
+  };
+
+  const handleReject = (app) => {
+    socket.emit("reject_application", {
+      app_id: app.app_id,
+      candidate_id: app.user_id,
+      employer_id: userData.id,
+    });
+
+    setApplications((prev) =>
+      prev.map((a) =>
+        a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
+      )
+    );
+  };
+
+
+  useEffect(() => {
+    if (!socket) {
+      socket = io("http://localhost:5001");
+    }
+
+    socket.emit("join_user_room", userData.id);
+
+    const handleUpdate = (updatedApp) => {
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.app_id === updatedApp.id ? updatedApp : a
+        )
+      );
+    };
+
+    socket.on("application_updated", handleUpdate);
+
+    const fetchApplications = async () => {
+      const res = await axios.post(
+        "http://localhost:5000/api/employers/get-my-applications",
+        { employer_id: userData.id },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setApplications(res.data);
+    };
+
+    fetchApplications();
+
+    return () => {
+      socket.off("application_updated", handleUpdate);
+    };
+  }, [userData.id]);
+
+ 
   useEffect(() => {
     axios
       .post(
@@ -76,6 +148,8 @@ const EmployerSettings = () => {
       logoFile !== null
     );
   };
+
+
 
   const fetchOffers = () => {
     axios
@@ -359,9 +433,6 @@ const EmployerSettings = () => {
     setInfo("");
     if (!selectedApp.length) return;
 
-
-
-
     const res = await axios.put(
       `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`, {},
       {
@@ -370,6 +441,8 @@ const EmployerSettings = () => {
         },
       },
     );
+
+      handleAccept(selectedApp[2])
 
     if (res.status == 200) {
       setInfo("Przyjęto aplikacje");
@@ -787,7 +860,7 @@ const EmployerSettings = () => {
                           <button
                             className={styles.deleteBtn}
                             onClick={() => {
-                              setSelectedApp([app.app_id, app.user_id]);
+                              setSelectedApp([app.app_id, app.user_id, app]);
                               setShowCancelModal(true);
                             }}
                           >
@@ -797,7 +870,7 @@ const EmployerSettings = () => {
                           <button
                             className={styles.acceptBtn}
                             onClick={() => {
-                              setSelectedApp([app.app_id, app.user_id]);
+                              setSelectedApp([app.app_id, app.user_id, app]);
                               setShowAcceptModal(true);
                             }}
                           >

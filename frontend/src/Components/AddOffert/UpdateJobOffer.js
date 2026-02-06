@@ -268,7 +268,7 @@ const UpdateJobOffer = ({ offer }) => {
 
             <label>
               Technologie
-              <span className={styles.span}>Kliknij podwójnie aby usunąć</span>
+              <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span>
             </label>
             <div className={styles.skill}>
               <div className={styles.skillsList}>

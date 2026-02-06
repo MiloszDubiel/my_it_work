@@ -10,12 +10,25 @@
 
 .modal {
   width: 400px;
+  max-height: 80vh; /* maksymalnie 80% wysokości okna */
   background: white;
   padding: 25px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow-y: auto; /* scroll jeśli treść większa niż 80% ekranu */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2); /* lekki cień dla efektu */
+}
+
+/* scroll w nowoczesny sposób (opcjonalnie) */
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
 }
 
 label {
@@ -24,10 +37,16 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
+}
+
+textarea {
+  resize: vertical; /* użytkownik może zmieniać wysokość */
+  min-height: 100px;
 }
 
 .buttons {
@@ -57,6 +76,7 @@ select {
 .saveBtn:hover {
   background: #0065d4;
 }
+
 .error {
   color: red;
   font-size: 12px;

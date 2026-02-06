@@ -41,7 +41,7 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const save = () => {
+  const save = (e) => {
     if (!validate()) return;
 
     setError("");
@@ -55,6 +55,8 @@ const CompanyEditModal = ({ company, onClose, onSave }) => {
       })
       .then((res) => {
         setInfo(res.data.info);
+
+        e.target.parentElement.parentElement.scrollTo(0,0)
         setTimeout(() => {
           onSave();
           onClose();

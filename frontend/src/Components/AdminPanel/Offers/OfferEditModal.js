@@ -45,7 +45,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const save = () => {
+  const save = (e) => {
     if (!validate()) return;
 
     axios
@@ -63,7 +63,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
       )
       .then((res) => {
         setInfo(res.data.info);
-        console.log(res);
+        e.target.parentElement.parentElement.scrollTo(0,0)
 
         setTimeout(() => {
           onSave();
@@ -76,45 +76,65 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
   if (!offer) return null;
 
   return (
-    <div className={styles.modalBackground}>
-      <div className={styles.modal}>
-        <h2>Edytuj ofertę</h2>
-        <p className={styles.error}>{errors}</p>
-        <p className={styles.info}>{info}</p>
+  <div className={styles.modalBackground}>
+  <div className={styles.modal}>
+    <h2>Szczegóły oferty</h2>
 
-        <label>Tytuł</label>
-        <input
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          type="text"
-        />
+    {errors && <p className={styles.error}>{errors}</p>}
+    {info && <p className={styles.info}>{info}</p>}
 
-        <label>Opis</label>
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          style={{ height: "300px" }}
-        ></textarea>
-
-        <label>Aktywny</label>
-        <select name="is_active" value={form.is_active} onChange={handleChange}>
-          <option value="1">Tak</option>
-          <option value="0">Nie</option>
-        </select>
-
-        <div className={styles.buttons}>
-          <button className={styles.cancelBtn} onClick={onClose}>
-            Anuluj
-          </button>
-
-          <button className={styles.saveBtn} onClick={save}>
-            Zapisz
-          </button>
-        </div>
-      </div>
+    {/* ===== PODGLĄD (READ ONLY) ===== */}
+    <div className={styles.readOnlySection}>
+      <p><span>ID oferty:</span> {offer.id}</p>
+      <p><span>Nazwa firmy:</span> {offer.companyName}</p>
+      <p><span>Tytuł stanowiska:</span> {offer.title}</p>
+      <p><span>Wynagrodzenie:</span> {offer.salary || "-"}</p>
+      <p><span>Ważna do:</span> {offer.active_to || "-"}</p>
+      <p>
+        <span>Status:</span>{" "}
+        {offer.is_active == "1" ? "Aktywna" : "Nieaktywna"}
+      </p>
+      <p><span>Ostatnia aktualizacja:</span> {new Date(offer.updated_at).toLocaleString()}</p>
     </div>
+
+    {/* ===== PODGLĄD OPISOWY ===== */}
+    <div className={styles.readOnlySection}>
+      <p><span>Zakres obowiązków:</span></p>
+      <p>{offer.responsibilities || "-"}</p>
+      <p><span>Benefity:</span></p>
+      <p>{offer.benefits || "-"}</p>
+    </div>
+
+    {/* ===== EDYCJA ===== */}
+    <label>Opis oferty</label>
+    <textarea
+      name="description"
+      value={form.description}
+      onChange={handleChange}
+      style={{ height: "300px" }}
+    />
+
+    <label>Aktywna</label>
+    <select
+      name="is_active"
+      value={form.is_active}
+      onChange={handleChange}
+    >
+      <option value="1">Tak</option>
+      <option value="0">Nie</option>
+    </select>
+
+    <div className={styles.buttons}>
+      <button className={styles.cancelBtn} onClick={onClose}>
+        Anuluj
+      </button>
+
+      <button className={styles.saveBtn} onClick={(e)=> save(e)}>
+        Zapisz
+      </button>
+    </div>
+  </div>
+</div>
   );
 };
 

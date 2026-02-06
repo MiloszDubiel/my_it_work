@@ -118,12 +118,14 @@ select:focus {
 
 .skillsList span {
   background: #e5e7eb;
-  padding: 6px 10px;
+  padding: 6px 6px;
   border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
 }
-
+label .span{
+  font-size: 10px;
+}
 
 .submitBtn,
 .saveBtn {
