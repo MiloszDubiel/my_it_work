@@ -122,14 +122,14 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                 <div className={styles.company} style={{ fontSize: "14px" }}>
                   Strona internetowa:
                   <span className={styles.companyName}>
-                    {company?.link || "Nie podano"}
+                    {company?.link?.toLowerCase() || "Nie podano"}
                   </span>
                 </div>
 
                 <div className={styles.company} style={{ fontSize: "13px" }}>
                   Email:
                   <span className={styles.companyName}>
-                    {company?.email || "Nie podano"}
+                    {company?.email?.toLowerCase() || "Nie podano"}
                   </span>
                 </div>
 
@@ -139,6 +139,12 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                     {company?.nip || "Nie podano"}
                   </span>
                 </div>
+                <div className={styles.meta} style={{ fontSize: "12px" }}>
+                  Tel: 
+                  <span className={styles.salary}>
+                  {company?.phone_number}
+                  </span>
+                  </div>
               </div>
             </div>
 
@@ -153,23 +159,13 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
                   Strona firmy
                 </a>
               )}
-              {company?.phone_number && (
-                <span style={{ color: "#475569", fontSize: "14px" }}>
-                  Tel: {company?.phone_number}
-                </span>
-              )}
-              {company?.email && (
-                <span style={{ color: "#475569", fontSize: "14px" }}>
-                  Email: {company?.email}
-                </span>
-              )}
+              
             </div>
           </section>
 
           <section className={styles.contentGrid}>
             <article className={styles.leftCol}>
-              <h3 className={styles.sectionTitle}>Opis firmy</h3>
-              <h2>Opis</h2>
+              <h2 style={{margin: "1rem"}}>Opis</h2>
               <div
                 className={styles.description}
                 dangerouslySetInnerHTML={{
@@ -180,7 +176,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
               {company?.specialization && (
                 <>
                   {" "}
-                  <h2>Opis</h2>
+                  <h2 style={{margin: "1rem"}}>Specjalizacja</h2>
                   <div
                     className={styles.description}
                     dangerouslySetInnerHTML={{
@@ -193,7 +189,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
               {company?.whyus && (
                 <>
                   {" "}
-                  <h2>Opis</h2>
+                  <h2 style={{margin: "1rem"}}>Dlaczego my?</h2>
                   <div
                     className={styles.description}
                     dangerouslySetInnerHTML={{

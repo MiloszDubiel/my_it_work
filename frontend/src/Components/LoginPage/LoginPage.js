@@ -13,7 +13,6 @@ const LoginPage = () => {
   const [info, setInfo] = useState("");
   const navigate = useNavigate();
 
-  // Przy starcie strony sprawdzamy czy jest zalogowany użytkownik w localStorage
   useEffect(() => {
     const rememberedUser = localStorage.getItem("user-data");
     const token = localStorage.getItem("token");
@@ -41,14 +40,15 @@ const LoginPage = () => {
       const user = res.data.user;
       const token = res.data.token;
 
-      // Jeśli zaznaczono "zapamiętaj mnie" -> zapis w localStorage
+
       if (remember) {
         localStorage.setItem("user-data", JSON.stringify(user));
         localStorage.setItem("token", token);
+        window.dispatchEvent(new Event("storage-changed"));
       } else {
-        // W przeciwnym razie tylko sesja
         sessionStorage.setItem("user-data", JSON.stringify(user));
         sessionStorage.setItem("token", token);
+        window.dispatchEvent(new Event("storage-changed"));
       }
 
       setInfo(res.data.info);

@@ -132,6 +132,7 @@
   display: grid;
   place-items: center;
   font-weight: bold;
+  display: none;
 }
 
 /* CHAT AREA */
@@ -207,6 +208,11 @@
 
   .applyBtn {
     width: 100%;
+  }
+  .avatarPlaceholder{
+    display: flex ;
+    justify-content: center;
+    align-items: center
   }
 }
 

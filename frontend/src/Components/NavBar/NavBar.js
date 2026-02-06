@@ -19,17 +19,6 @@ const Navbar = ({ employersPage }) => {
     );
   });
 
-  useEffect(() => {
-    const handler = () => {
-      setUserData(
-        JSON.parse(sessionStorage.getItem("user-data")) ||
-          JSON.parse(localStorage.getItem("user-data")),
-      );
-    };
-
-    window.addEventListener("storage-changed", handler);
-    return () => window.removeEventListener("storage-changed", handler);
-  }, []);
 
   return (
     <>
@@ -183,7 +172,7 @@ const Navbar = ({ employersPage }) => {
                   <button
                     className={styles.logOut}
                     onClick={() => {
-                      // Usuń dane z obu storage
+          
                       sessionStorage.clear();
                       localStorage.clear();
                       setUserData(null);

@@ -154,8 +154,6 @@ router.post(
 
 router.post(
   "/get-my-offers",
-  authenticateToken,
-  requireRole("employer", "admin"),
   async (req, res) => {
     try {
       const { owner_id } = req.body;

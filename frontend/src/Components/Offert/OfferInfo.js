@@ -19,13 +19,15 @@ const safeJsonParse = (value, fallback = []) => {
   }
 };
 
+
 const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
-  console.log(offer);
   const [isLoading, setIsLoading] = useState(false);
   const [__, setLoading] = useState(true);
-  const [userData] = useState(
-    safeJsonParse(sessionStorage.getItem("user-data")),
-  );
+const userData =
+  JSON.parse(sessionStorage.getItem("user-data")) ||
+    JSON.parse(localStorage.getItem("user-data"));
+  
+  
   const [showConfirm, setShowConfirm] = useState(false);
   const [_, setShowInfo] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -142,20 +144,19 @@ const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
       <main className={styles.wrapper} aria-labelledby="job-title">
         <div className={styles.actionsBar}>
           <div style={{ display: "flex", gap: "10px" }}>
-            {userData?.email && userData?.role === "candidate" && (
-              <button
-                onClick={() => toggleFavorite(offer)}
-                className={styles.iconBtn}
-                aria-label="Dodaj do ulubionych"
-              >
-                <BsStarFill
-                  size={24}
-                  className={
-                    isFavorite(offer.id) ? styles.starFilled : styles.starEmpty
-                  }
-                />
-              </button>
-            )}
+          {userData?.role === "candidate" && !loading &&  (
+  <button
+    onClick={() => toggleFavorite(offer)}
+    className={styles.iconBtn}
+    aria-label="Dodaj do ulubionych"
+  >
+    {!loading && isFavorite(offer.id) ? (
+      <BsStarFill size={24} className={styles.starFilled} />
+    ) : (
+      <BsStar size={24} className={styles.starEmpty} />
+    )}
+  </button>
+)}
           </div>
 
           <button

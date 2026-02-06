@@ -5,20 +5,26 @@ import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
 
-const safeJsonParse = (value, fallback = null) => {
+const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
 
   try {
     const parsed = JSON.parse(value);
-    return parsed ?? fallback;
+    return Array.isArray(parsed) ? parsed : fallback;
   } catch {
     return fallback;
   }
 };
 
-const isUniqueItem = (list = [], newName = "") => {
+
+
+
+const isUniqueItem = (list, newName = "") => {
+  if (!Array.isArray(list)) return true;
+
   return !list.some(
-    (item) => item?.name?.trim().toLowerCase() === newName.trim().toLowerCase(),
+    (item) =>
+      item?.name?.trim().toLowerCase() === newName.trim().toLowerCase(),
   );
 };
 
@@ -1321,7 +1327,9 @@ const CandidateSettings = () => {
                           ).style.display = "flex";
                         }}
                       >
-                        <img src={offer.img} alt={offer.title} />
+                        {offer.img ? <img src={offer.img} alt={offer.title} /> :    <div className={styles.logoFallback}>
+                      {offer?.companyName?.charAt(0)?.toUpperCase() || "?"}
+                    </div> }
                         <div>
                           <h4>{offer.title}</h4>
                           <p>{offer.company_name}</p>
