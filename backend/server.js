@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
-import jobOffertsRoutes from "./src/routes//jobOffertsRoutes.js";
+import http from "http";
+import path from "path";
+import { Server } from "socket.io";
+import { connection } from "./src/config/db.js";
+import jobOffertsRoutes from "./src/routes/jobOffertsRoutes.js";
 import employersRoutes from "./src/routes/employersRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import settingRoute from "./src/routes/settingRoutes.js";
@@ -8,11 +12,6 @@ import chatRoutes from "./src/routes/chatRoutes.js";
 import candidateRoutes from "./src/routes/candidateRoutes.js";
 import statsRoutes from "./src/routes/statsRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
-import http from "http";
-import { connection } from "./src/config/db.js";
-import path from "path";
-
-import { Server } from "socket.io";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,9 +24,8 @@ app.use("/api/employers", employersRoutes);
 app.use("/api/candidates", candidateRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", settingRoute);
-app.use("/messager", chatRoutes);
-app.use("/admin", adminRoutes);
 app.use("/chat", chatRoutes);
+app.use("/admin", adminRoutes);
 app.use("/api/stats", statsRoutes);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
@@ -41,43 +39,55 @@ const io = new Server(server, {
   },
 });
 
+
 io.on("connection", (socket) => {
-  console.log("🟢 Użytkownik połączony:", socket.id);
-
-  socket.on("join_conversation", (conversationId) => {
-    socket.join(conversationId);
-    console.log(`👥 Użytkownik dołączył do konwersacji ${conversationId}`);
-  });
-
-  socket.on("send_message", async ({ conversation_id, sender_id, content }) => {
-    const [result] = await connection.query(
-      "INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)",
-      [conversation_id, sender_id, content],
-    );
-
-    const message = {
-      id: result.insertId,
-      conversation_id,
-      sender_id,
-      content,
-      created_at: new Date(),
-    };
-
-    io.to(conversation_id).emit("receive_message", message);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("🔴 Użytkownik odłączony:", socket.id);
-  });
-
- io.on("connection", (socket) => {
-  console.log("🟢 Użytkownik połączony:", socket.id);
+  console.log("🟢 Socket connected:", socket.id);
 
   socket.on("join_user_room", (userId) => {
     socket.join(`user_${userId}`);
   });
 
-  socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) => {
+  socket.on("join_conversation", (conversationId) => {
+    socket.join(`conversation_${conversationId}`);
+  });
+
+  socket.on(
+    "send_message",
+    async ({ conversation_id, sender_id, content }) => {
+      try {
+        const [result] = await connection.query(
+          `INSERT INTO messages 
+           (conversation_id, sender_id, content, is_read)
+           VALUES (?, ?, ?, false)`,
+          [conversation_id, sender_id, content]
+        );
+
+        const message = {
+          id: result.insertId,
+          conversation_id,
+          sender_id,
+          content,
+          is_read: false,
+          created_at: new Date(),
+        };
+
+        io.to(`conversation_${conversation_id}`).emit(
+          "receive_message",
+          message
+        );
+
+        io.emit("new_message_notification", {
+          conversationId: conversation_id,
+          senderId: sender_id,
+        });
+      } catch (err) {
+        console.error("❌ send_message error:", err);
+      }
+    }
+  );
+
+
+socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) => {
     try {
       await connection.query(
         "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
@@ -128,18 +138,23 @@ io.on("connection", (socket) => {
       console.error("Błąd przy odrzuceniu aplikacji:", err);
     }
   });
-
+  
+  socket.on("leave_conversation", (conversationId) => {
+    socket.leave(`conversation_${conversationId}`);
+  });
+  
   socket.on("disconnect", () => {
-    console.log("🔴 Użytkownik odłączony:", socket.id);
+    console.log("🔴 Socket disconnected:", socket.id);
   });
 });
-});
 
-
-
-if (process.env.NODE_ENV !== 'test') {
-  server.listen(5001, () => console.log("Server działa na porcie 5001"));
-  app.listen(PORT, () => console.log(`Serwer działa na porcie: ${PORT}`));
+if (process.env.NODE_ENV !== "test") {
+  server.listen(5001, () =>
+    console.log("🧠 Socket server działa na 5001")
+  );
+  app.listen(PORT, () =>
+    console.log(`🚀 API działa na porcie ${PORT}`)
+  );
 }
 
 export { app };

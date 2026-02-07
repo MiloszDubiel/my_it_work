@@ -25,7 +25,22 @@
   background: linear-gradient(180deg, #f5f5f5 0%, #fbfbfb 100%);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+.unread {
+  background: #eef3ff;
+  font-weight: 600;
+}
 
+.unread::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: red;
+  border-radius: 50%;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .actionsBar {
   display: flex;
   justify-content: flex-end;
@@ -124,16 +139,35 @@
 }
 
 .avatarPlaceholder {
+  position: relative;
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 50px;
+  max-height: 50px;
   border-radius: 50%;
   background: #3b82f6;
   color: white;
   display: grid;
   place-items: center;
   font-weight: bold;
-  display: none;
+  font-size: 18px;
+  flex-shrink: 0; 
 }
+
+.unreadDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+
 
 /* CHAT AREA */
 .chatArea {
@@ -209,11 +243,6 @@
   .applyBtn {
     width: 100%;
   }
-  .avatarPlaceholder{
-    display: flex ;
-    justify-content: center;
-    align-items: center
-  }
 }
 
 @media (max-width: 480px) {
@@ -242,5 +271,22 @@
   .skillItem {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* MEDIA QUERIES */
+@media (max-width: 1000px) {
+  .avatarPlaceholder {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatarPlaceholder {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
   }
 }

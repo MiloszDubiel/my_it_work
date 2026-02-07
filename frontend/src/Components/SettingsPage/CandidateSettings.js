@@ -154,76 +154,55 @@ useEffect(() => {
     setCandidateProfile({ ...candidateProfile, [name]: value });
   };
 
-  useEffect(() => {
-    axios
-      .post(
+useEffect(() => {
+  const fetchCandidateProfile = async () => {
+    try {
+      const hasProfile = await axios.post(
         "http://localhost:5000/user/has-candiate-profile",
-        {
-          id: userData?.id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-          },
-        },
-      )
-      .then((res) => {
-        return res.data.info?.length > 0 ? setIsCreate(true) : "";
-      });
-    axios
-      .post(
+        { id: userData?.id },
+        { headers: { Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}` } }
+      );
+      if (hasProfile.data.info?.length > 0) setIsCreate(true);
+
+      const res = await axios.post(
         "http://localhost:5000/user/get-candiate-info",
-        {
-          id: userData?.id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-          },
-        },
-      )
-      .then((res) => {
-        if (res.data.candiate) {
-          setCandidateProfile({
-            ...candidateProfile,
-            description: res.data.candiate[0]?.description,
-            career_level: res.data.candiate[0]?.exp,
-            languages: safeJsonParse(res.data.candiate[0]?.lang),
-            education: safeJsonParse(res.data.candiate[0]?.edu),
-            location: res.data.candiate[0]?.locations,
-            desired_position: res.data.candiate[0]?.target_job,
-            current_position: res.data.candiate[0]?.present_job,
-            phone_number: res.data.candiate[0]?.phone_number,
-            availability: res.data.candiate[0]?.access,
-            remote_preference: res.data.candiate[0]?.working_mode,
-            skills: safeJsonParse(res.data.candiate[0]?.skills),
-            github: res.data.candiate[0]?.link_git,
-            years_of_experience: res.data.candiate[0]?.years_of_experience,
-          });
-          setCvPreviewUrl(res.data.candiate[0]?.cv);
-          setReferencePreviewUrl(res.data.candiate[0]?.references);
+        { id: userData?.id },
+        { headers: { Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}` } }
+      );
 
-          setInitialCandidateProfile({
-            ...candidateProfile,
-            description: res.data.candiate[0]?.description,
-            career_level: res.data.candiate[0]?.exp,
-            languages: safeJsonParse(res.data.candiate[0]?.lang),
-            education: safeJsonParse(res.data.candiate[0]?.edu),
-            location: res.data.candiate[0]?.locations,
-            desired_position: res.data.candiate[0]?.target_job,
-            current_position: res.data.candiate[0]?.present_job,
-            phone_number: res.data.candiate[0]?.phone_number,
-            availability: res.data.candiate[0]?.access,
-            remote_preference: res.data.candiate[0]?.working_mode,
-            skills: safeJsonParse(res.data.candiate[0]?.skills),
-            github: res.data.candiate[0]?.link_git,
-            years_of_experience: res.data.candiate[0]?.years_of_experience,
-          });
-        }
-      });
+      if (res.data.candiate) {
+        const data = res.data.candiate[0];
+        const profile = {
+          description: data.description || "",
+          career_level: data.exp || "Junior",
+          languages: safeJsonParse(data.lang),
+          education: safeJsonParse(data.edu),
+          location: data.locations || "",
+          desired_position: data.target_job || "",
+          current_position: data.present_job || "",
+          phone_number: data.phone_number || "",
+          availability: data.access || "Od zaraz",
+          remote_preference: data.working_mode || "Remote",
+          skills: safeJsonParse(data.skills),
+          github: data.link_git || "",
+          years_of_experience: data.years_of_experience || "",
+        };
 
-    getMyApplayings();
-  }, []);
+        setCandidateProfile(profile);
+        setInitialCandidateProfile(profile);
+
+        setCvPreviewUrl(data.cv);
+        setReferencePreviewUrl(data.references);
+      }
+
+      getMyApplayings();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchCandidateProfile();
+}, [userData?.id]);
  useEffect(() => {
   const handler = () => {
     axios

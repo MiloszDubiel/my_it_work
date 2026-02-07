@@ -3,6 +3,7 @@ import Chat from "./Chat";
 import axios from "axios";
 import styles from "./ChatPage.module.css";
 import { IoMdClose } from "react-icons/io";
+import { socket } from "../../socket"; 
 
 export default function ChatPage() {
   const [conversations, setConversations] = useState([]);
@@ -10,13 +11,14 @@ export default function ChatPage() {
   const [message, setMessage] = useState("");
 
   const user = JSON.parse(
-    sessionStorage.getItem("user-data") || localStorage.getItem("user-data"),
+    sessionStorage.getItem("user-data") ||
+      localStorage.getItem("user-data")
   );
 
   const fetchConversations = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5001/chat/conversations/${user.id}`,
+        `http://localhost:5001/chat/conversations/${user.id}`
       );
       setConversations(res.data);
     } catch (err) {
@@ -28,22 +30,66 @@ export default function ChatPage() {
     fetchConversations();
   }, []);
 
+ 
+  const openConversation = async (conv) => {
+    setSelectedConversation(conv);
+
+    // oznacz jako przeczytane
+    if (conv.unreadCount > 0) {
+      await axios.put(
+        `http://localhost:5001/chat/read/${conv.id}`,
+        { userId: user.id }
+      );
+      fetchConversations();
+    }
+  };
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const handleNewMessage = ({ conversationId, senderId }) => {
+      if (senderId === user.id) return; 
+
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === conversationId
+            ? {
+                ...conv,
+                unreadCount:
+                  selectedConversation?.id === conversationId
+                    ? 0
+                    : (conv.unreadCount || 0) + 1,
+              }
+            : conv
+        )
+      );
+    };
+
+    socket.on("new_message_notification", handleNewMessage);
+
+    return () => {
+      socket.off("new_message_notification", handleNewMessage);
+    };
+  }, [user, selectedConversation]);
+
   useEffect(() => {
     const handleOpen = async (e) => {
       const convId = e.detail.conversationId;
-
       setMessage(e.detail.message);
 
-      if (!conversations.find((c) => c.id == convId)) {
+      let conv = conversations.find((c) => c.id == convId);
+
+      if (!conv) {
         await fetchConversations();
+        conv = conversations.find((c) => c.id == convId);
       }
 
-      const updated = conversations.find((c) => c.id == convId);
-      if (updated) setSelectedConversation(updated);
+      if (conv) openConversation(conv);
     };
 
     window.addEventListener("openConversation", handleOpen);
-    return () => window.removeEventListener("openConversation", handleOpen);
+    return () =>
+      window.removeEventListener("openConversation", handleOpen);
   }, [conversations]);
 
   return (
@@ -59,7 +105,8 @@ export default function ChatPage() {
             <button
               className={styles.closeBtn}
               onClick={() => {
-                document.querySelector(`#chatContainer`).style.display = "none";
+                document.querySelector("#chatContainer").style.display =
+                  "none";
                 document.querySelector("#root").style.overflow = "auto";
               }}
             >
@@ -68,7 +115,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* CONTENT GRID */}
+        {/* CONTENT */}
         <section className={styles.contentGrid}>
           <article className={styles.leftCol}>
             <div className={styles.inbox}>
@@ -80,7 +127,6 @@ export default function ChatPage() {
 
               {conversations.map((conv) => {
                 const isEmployer = conv.employer_id === user.id;
-                console.log(conv.email)
                 const chatPartner = isEmployer
                   ? `${conv.candidate_name} ${conv.candidate_surname}`
                   : `${conv.employer_name} ${conv.employer_surname}`;
@@ -88,29 +134,46 @@ export default function ChatPage() {
                 return (
                   <div
                     key={conv.id}
-                    className={`${styles.conversation} ${
-                      selectedConversation?.id === conv.id ? styles.active : ""
-                    }`}
-                    onClick={() => setSelectedConversation(conv)}
+                    className={`${styles.conversation}
+                      ${
+                        selectedConversation?.id === conv.id
+                          ? styles.active
+                          : ""
+                      }
+                      ${conv.unreadCount > 0 ? styles.unread : ""}
+                    `}
+                    onClick={() => openConversation(conv)}
                   >
                     <div className={styles.avatarPlaceholder}>
                       {chatPartner?.[0]?.toUpperCase()}
+
+                      {conv.unreadCount > 0 && (
+                        <span className={styles.unreadDot}></span>
+                      )}
                     </div>
+
                     <div>
                       <h4>
-                        {(conv.companyName && !isEmployer) && (
+                        {conv.companyName && !isEmployer && (
                           <span className={styles.companyName}>
-                            {conv.companyName + ", "}
+                            {conv.companyName},{" "}
                           </span>
                         )}
-                        {(conv.email && isEmployer) && (
+
+                        {conv.email && isEmployer && (
                           <span className={styles.companyName}>
-                            {conv.email + ", "}
+                            {conv.email},{" "}
                           </span>
                         )}
 
                         <span className={styles.name}>{chatPartner}</span>
                       </h4>
+
+                      {conv.unreadCount > 0 && (
+                        <span className={styles.unreadBadge}>
+                          {conv.unreadCount}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -129,7 +192,7 @@ export default function ChatPage() {
                 />
               ) : (
                 <div className={styles.placeholder}>
-                  <p>Wybierz rozmowę z listy, aby rozpocząć czat</p>
+                  <p>Wybierz rozmowę z listy</p>
                 </div>
               )}
             </div>

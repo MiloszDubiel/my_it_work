@@ -1,32 +1,42 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./Chat.module.css";
 import axios from "axios";
-import { io } from "socket.io-client";
-
-const socket = io("http://localhost:5001", { transports: ["websocket"] });
+import { socket } from "../../socket"; // <- ścieżka do socket.js
 
 export default function Chat({ conversationId, userId, message }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
+  /* =====================
+     JOIN / LEAVE ROOM
+  ===================== */
   useEffect(() => {
-    if (conversationId) {
-      socket.emit("join_conversation", conversationId);
-      fetchMessages();
-    }
+    if (!conversationId) return;
+
+    socket.emit("join_conversation", conversationId);
+
+    fetchMessages();
+
+    return () => {
+      socket.emit("leave_conversation", conversationId);
+    };
   }, [conversationId]);
 
+  /* =====================
+     PREFILL MESSAGE
+  ===================== */
   useEffect(() => {
-    if (message) {
-      setNewMessage(message);
-    }
+    if (message) setNewMessage(message);
   }, [message]);
 
+  /* =====================
+     FETCH MESSAGES
+  ===================== */
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/chat/messages/${conversationId}`,
+        `http://localhost:5001/chat/messages/${conversationId}`
       );
       setMessages(res.data);
     } catch (err) {
@@ -34,33 +44,43 @@ export default function Chat({ conversationId, userId, message }) {
     }
   };
 
+  /* =====================
+     SOCKET LISTENER
+  ===================== */
   useEffect(() => {
-    socket.on("receive_message", (message) => {
-      if (message.conversation_id === conversationId) {
-        setMessages((prev) => [...prev, message]);
+    const handler = (msg) => {
+      if (msg.conversation_id === conversationId) {
+        setMessages((prev) => [...prev, msg]);
       }
-    });
+    };
+
+    socket.on("receive_message", handler);
 
     return () => {
-      socket.off("receive_message");
+      socket.off("receive_message", handler);
     };
   }, [conversationId]);
 
+  /* =====================
+     AUTOSCROLL
+  ===================== */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /* =====================
+     SEND MESSAGE
+  ===================== */
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    const messageData = {
+    socket.emit("send_message", {
       conversation_id: conversationId,
       sender_id: userId,
       content: newMessage,
-    };
+    });
 
-    socket.emit("send_message", messageData);
     setNewMessage("");
   };
 
@@ -83,7 +103,7 @@ export default function Chat({ conversationId, userId, message }) {
             </span>
           </div>
         ))}
-        <div ref={messagesEndRef}></div>
+        <div ref={messagesEndRef} />
       </div>
 
       <form onSubmit={handleSend} className={styles.inputArea}>

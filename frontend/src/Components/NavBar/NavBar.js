@@ -1,17 +1,19 @@
 import { IoPersonOutline } from "react-icons/io5";
 import styles from "./navbar.module.css";
 import { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EmployerSettings from "../SettingsPage/EmployerSettings";
 import CandidateSettings from "../SettingsPage/CandidateSettings";
 import { FiMessageSquare } from "react-icons/fi";
 import ChatPage from "../Chat/ChatPage";
+import { socket } from "../../socket";
+import { RxHamburgerMenu } from "react-icons/rx";
 
 const Navbar = ({ employersPage }) => {
   const account = useRef(null);
   const navigate = useNavigate();
 
+  const [hasUnread, setHasUnread] = useState(false);
   const [userData, setUserData] = useState(() => {
     return (
       JSON.parse(sessionStorage.getItem("user-data")) ||
@@ -19,6 +21,25 @@ const Navbar = ({ employersPage }) => {
     );
   });
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (!userData?.id) return;
+
+    socket.emit("join_user_room", userData.id);
+
+    const handleNotification = ({ senderId }) => {
+      if (senderId !== userData.id) {
+        setHasUnread(true);
+      }
+    };
+
+    socket.on("new_message_notification", handleNotification);
+
+    return () => {
+      socket.off("new_message_notification", handleNotification);
+    };
+  }, [userData]);
 
   return (
     <>
@@ -37,82 +58,103 @@ const Navbar = ({ employersPage }) => {
 
       <header className={styles.headerElement}>
         <nav className={styles.navBar}>
+          {/* LOGO */}
           <div className={styles.header}>
             <h3 onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
               MyITWork
             </h3>
           </div>
 
+          {/* MENU */}
           <div className={styles.list}>
             {userData?.role !== "admin" && (
               <ul>
                 <li>
-                  <Link
-                    to="/job-offers"
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    Oferty pracy
-                  </Link>
+                  <Link to="/job-offers">Oferty pracy</Link>
                 </li>
                 <li>
-                  <Link
-                    to="/employers"
-                    style={{ textDecoration: "none", color: "black" }}
-                  >
-                    Pracodawcy IT
-                  </Link>
+                  <Link to="/employers">Pracodawcy IT</Link>
                 </li>
                 {userData?.role === "employer" && (
                   <li>
-                    <Link
-                      to="/candidates"
-                      style={{ textDecoration: "none", color: "black" }}
-                    >
-                      Kandydaci IT
-                    </Link>
+                    <Link to="/candidates">Kandydaci IT</Link>
                   </li>
                 )}
               </ul>
             )}
           </div>
 
+          {/* HAMBURGER MENU */}
+          <div className={styles.hamburgerWrapper}>
+            <button
+              className={styles.hamburger}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <RxHamburgerMenu className={styles.icon} />
+              <span className={styles.hamburgerText}>Dostępne strony</span>
+            </button>
+
+            {dropdownOpen && (
+              <div className={styles.dropdownMenu}>
+                {userData?.role !== "admin" && (
+                  <>
+                    <Link to="/job-offers">Oferty pracy</Link>
+                    <Link to="/employers">Pracodawcy IT</Link>
+                    {userData?.role === "employer" && (
+                      <Link to="/candidates">Kandydaci IT</Link>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ACCOUNT */}
           <div className={styles.account}>
             {userData?.email ? (
               <>
                 <span className={styles.userName}>
                   <span className={styles.firstName}>
-                    {userData?.role === "admin"
+                    {userData.role === "admin"
                       ? "Administrator"
-                      : userData?.name || ""}
+                      : userData.name}
                   </span>
-                  {userData?.role !== "admin" && userData?.surname && (
+                  {userData?.surname && (
                     <span className={styles.lastName}>{userData.surname}</span>
                   )}
                 </span>
 
+                {/* AVATAR */}
                 <button
                   onClick={() =>
                     account.current.classList.toggle(styles.accountDivHide)
                   }
                   style={{
-                    background: `url(${userData?.avatar})`,
+                    background: userData.avatar
+                      ? `url(${userData.avatar})`
+                      : "none",
                     backgroundSize: "cover",
                   }}
                 >
-                  {!userData?.avatar && (
+                  {!userData.avatar && (
                     <IoPersonOutline className={styles.icon} />
                   )}
                 </button>
 
+                {/* CHAT BUTTON */}
                 {userData.role !== "admin" && (
                   <button
                     onClick={() => {
+                      setHasUnread(false);
                       const chat = document.querySelector("#chatContainer");
                       chat.style.display =
                         chat.style.display === "none" ? "flex" : "none";
                     }}
                   >
-                    <FiMessageSquare className={styles.icon} />
+                    <div className={styles.chatIconWrapper}>
+                      <FiMessageSquare className={styles.icon} />
+                      {hasUnread && <span className={styles.unreadDot} />}
+                    </div>
                   </button>
                 )}
               </>
@@ -126,21 +168,20 @@ const Navbar = ({ employersPage }) => {
               </button>
             )}
 
+            {/* ACCOUNT DROPDOWN */}
             <div
               className={`${styles.accountDiv} ${styles.accountDivHide}`}
               ref={account}
-              id="accountDiv"
             >
               {userData?.email ? (
                 <>
-                  {userData?.role !== "admin" && (
+                  {userData.role !== "admin" && (
                     <Link
                       onClick={() => {
                         document.querySelector("#settings").style.display =
                           "flex";
                         document.querySelector("#root").style.overflow =
                           "hidden";
-
                         sessionStorage.setItem("tab", "company");
                         window.dispatchEvent(new Event("setting-changed"));
                       }}
@@ -149,9 +190,9 @@ const Navbar = ({ employersPage }) => {
                     </Link>
                   )}
 
-                  {userData?.role === "employer" && (
+                  {userData.role === "employer" && (
                     <>
-                      {employersPage ? <Link>Dodaj swoją firmę</Link> : null}
+                      {employersPage && <Link>Dodaj swoją firmę</Link>}
                       <Link
                         onClick={() => {
                           document.querySelector("#settings").style.display =
@@ -160,23 +201,21 @@ const Navbar = ({ employersPage }) => {
                           window.dispatchEvent(new Event("setting-changed"));
                         }}
                       >
-                        Zarządzaj ogłoszeniami o pracę
+                        Zarządzaj ofertami
                       </Link>
                     </>
                   )}
 
-                  {userData?.role === "admin" && (
+                  {userData.role === "admin" && (
                     <Link to="/admin">Panel administratora</Link>
                   )}
 
                   <button
                     className={styles.logOut}
                     onClick={() => {
-          
                       sessionStorage.clear();
                       localStorage.clear();
                       setUserData(null);
-                      window.dispatchEvent(new Event("storage-changed"));
                       account.current.classList.add(styles.accountDivHide);
                       navigate("/");
                     }}

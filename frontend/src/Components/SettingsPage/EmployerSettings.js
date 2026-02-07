@@ -399,6 +399,7 @@ const EmployerSettings = () => {
 
     if (res.status == 200) {
       setInfo("Odrzucono aplikacje");
+      handleReject(selectedApp[2])
       fetchApplications();
     }
 

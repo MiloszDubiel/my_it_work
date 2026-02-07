@@ -12,6 +12,22 @@ router.get("/messages/:conversationId", async (req, res) => {
   res.json(rows);
 });
 
+router.put("/read/:conversationId", async (req, res) => {
+  const { conversationId } = req.params;
+  const { userId } = req.body;
+
+  await connection.query(
+    `UPDATE messages
+SET is_read = true
+WHERE conversation_id = ?
+AND sender_id != ?`,
+    [conversationId, userId]
+  );
+
+  res.json({ success: true });
+});
+
+
 router.get("/conversations/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
