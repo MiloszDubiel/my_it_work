@@ -90,7 +90,6 @@ const UserEditModal = ({ user, onClose, onSave }) => {
     {info && <p className={styles.info}>{info}</p>}
 
     <div className={styles.readOnlySection}>
-      <p><span>ID:</span> {user.id}</p>
       <p><span>Rola:</span> {user.role == 'employer' ? "Pracodawca" : "Kandydat"}</p>
       <p><span>Imię:</span> {user.name || "Brak"}</p>
       <p><span>Nazwisko:</span> {user.surname || "Brak"}</p>

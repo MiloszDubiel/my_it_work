@@ -395,6 +395,14 @@ useEffect(() => {
       }
     } catch (err) {
       console.log(err);
+             
+  if (err.response && err.response.data && err.response.data.error) {
+    setErorr(err.response.data.error); 
+    document.querySelector(`.${styles.content}`).scroll(0, 0);
+  } else {
+    setErorr("Wystąpił nieoczekiwany błąd.");
+    console.error(err);
+  }
     }
   };
 

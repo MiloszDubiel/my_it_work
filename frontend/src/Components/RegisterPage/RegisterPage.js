@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./register.module.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const RegisterPage = () => {
   const [info, setInfo] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
+  const navigate = useNavigate();
   const validate = () => {
     if (!firstName) {
       return "Podaj imię";
@@ -87,8 +88,11 @@ const RegisterPage = () => {
       );
 
       setInfo(res.data.info);
+
+         setTimeout(() => navigate("/login", { replace: true }), 1000);
     } catch (error) {
       console.log(error);
+      e.target.parentElement.parentElement.scrollTo(0,0)
       if (error.response && error.response.data && error.response.data.error) {
         setError(error.response.data.error);
       }
@@ -107,18 +111,30 @@ const RegisterPage = () => {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <label className={styles.field}>
             <span className={styles.label}>Utwórz konto jako:</span>
-            <select
-              className={styles.input}
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                -- Wybierz --
-              </option>
-              <option value="candidate">Kandydat</option>
-              <option value="employer">Pracodawca</option>
-            </select>
+           <select
+  className={styles.input}
+  value={role}
+  onChange={(e) => {
+    const newRole = e.target.value;
+    setRole(newRole);
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    setRepeatPassword("");
+    setCompanyName("");
+    setNIP(null);
+    setError("");
+    setInfo("");
+  }}
+  required
+>
+  <option value="" disabled>
+    -- Wybierz --
+  </option>
+  <option value="candidate">Kandydat</option>
+  <option value="employer">Pracodawca</option>
+</select>
           </label>
 
           <h2 className={styles.title}>Zarejestruj się</h2>

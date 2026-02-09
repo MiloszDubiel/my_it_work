@@ -124,7 +124,6 @@ router.post(
     const {
       employer_id,
       title,
-      company,
       location,
       salary_min,
       salary_max,
@@ -143,12 +142,19 @@ router.post(
       return res.status(400).json({ error: "Brak wymaganych pól!" });
     }
 
+    const [rows] = await connection.query(
+        "SELECT companyName FROM companies WHERE id = ? AND owner_id = ?",
+        [company_id, employer_id],
+    );
+    const companyName = rows[0].companyName;
+    
+
     const conn = await connection.getConnection();
     await conn.beginTransaction();
 
     try {
       const [jobOfferResult] = await conn.query(
-        `
+      `
       INSERT INTO job_offers 
       (title, company_id, companyName, workingMode, contractType, experience, technologies, salary, is_active, type, source, employer_id)
       VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?, ?)
@@ -156,7 +162,7 @@ router.post(
         [
           title,
           company_id,
-          company,
+          companyName,
           JSON.stringify([location ? location : ""]),
           JSON.stringify([contract_type ? contract_type : ""]),
           JSON.stringify([experience ? experience : ""]),

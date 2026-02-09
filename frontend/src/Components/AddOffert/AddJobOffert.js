@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
@@ -15,6 +15,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
     JSON.parse(sessionStorage.getItem("user-data")) ||
       JSON.parse(localStorage.getItem("user-data")),
   );
+  const inputRef = useRef(null);
   const [offer, setOffer] = useState({
     title: "",
     company: "",
@@ -111,9 +112,10 @@ const AddJobOffer = ({ onOfferAdded }) => {
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
         setMessage(
-          "Oferta została przesłana do weryfikacji przez administratora",
+          "Oferta została przesłana do weryfikacji przez Administratora",
         );
         onOfferAdded();
+        inputRef.current.value = "";
         setOffer({...offer, 
           title: "",
           location: "",
@@ -125,7 +127,6 @@ const AddJobOffer = ({ onOfferAdded }) => {
           requirements: "",
           responsibilities: "",
           benefits: "",
-   
         });
       }
     } catch (err) {
@@ -348,6 +349,7 @@ const AddJobOffer = ({ onOfferAdded }) => {
                 type="text"
                 name="add_skill"
                 placeholder="Inna technologia niż podane..."
+                ref={inputRef}
               />
               <button
                 type="button"

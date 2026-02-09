@@ -170,10 +170,10 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
 
 if (process.env.NODE_ENV !== "test") {
   server.listen(5001, () =>
-    console.log("🧠 Socket server działa na 5001")
+    console.log("Socket server działa na 5001")
   );
   app.listen(PORT, () =>
-    console.log(`🚀 API działa na porcie ${PORT}`)
+    console.log(`API działa na porcie ${PORT}`)
   );
 }
 

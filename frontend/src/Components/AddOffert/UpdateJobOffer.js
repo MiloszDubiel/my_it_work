@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import styles from "./AddJobOffer.module.css";
 import { IoMdClose } from "react-icons/io";
@@ -52,6 +52,7 @@ const UpdateJobOffer = ({ offer }) => {
     salary_min: salary?.salaryMin ?? "",
     salary_max: salary?.salaryMax ?? "",
   });
+  const inputRef = useRef(null);
 
   const validate = () => {
     if (!updateOffer.title?.trim()) return "Tytuł oferty jest wymagany";
@@ -106,9 +107,10 @@ const UpdateJobOffer = ({ offer }) => {
       if (res.status === 200) {
         e.target.parentElement.parentElement.scrollTo(0, 0);
         setMessage(
-          "Oferta została przesłana do weryfikacji przez administratora",
+          "Oferta została przesłana do weryfikacji przez Administratora",
         );
         window.dispatchEvent(new Event("updated-offer"));
+        inputRef.current.value = "";
       }
     } catch (err) {
       console.error(err);
@@ -303,6 +305,7 @@ const UpdateJobOffer = ({ offer }) => {
                 type="text"
                 name="add_skill"
                 placeholder="Inna technologia..."
+                ref={inputRef}
               />
               <button
                 type="button"

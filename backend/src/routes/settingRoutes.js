@@ -18,14 +18,21 @@ router.post(
   requireRole("employer", "admin", "candidate"),
   async (req, res) => {
     try {
-      const { id, name, surname, email, newPassword, repeatPassword } =
-        req.body;
+      const { id, name, surname, email, newPassword, repeatPassword } = req.body;
 
       if (!id || !email) {
-        return { error: "Brak id lub email" };
+        return res.status(400).json({ error: "Brak id lub email" });
       }
-      let avatarPath = null;
+      const [existing] = await connection.query(
+        "SELECT id FROM users WHERE email = ? AND id != ?",
+        [email, id]
+      );
 
+      if (existing.length > 0) {
+        return res.status(400).json({ error: "Ten adres e-mail jest już używany przez innego użytkownika." });
+      }
+
+      let avatarPath = null;
       if (req.file) {
         avatarPath = `http://localhost:5000/uploads/avatars/avatar_${id}.png`;
       }
@@ -45,18 +52,14 @@ router.post(
         fields.push("email = ?");
         values.push(email);
       }
-
       if (avatarPath) {
         fields.push("avatar = ?");
         values.push(avatarPath);
       }
-
       if (newPassword && newPassword === repeatPassword) {
         fields.push("password = ?");
-
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(newPassword, salt);
-
         values.push(hash);
       }
 
@@ -64,23 +67,24 @@ router.post(
 
       await connection.query(
         `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
-        values,
+        values
       );
 
       const [user] = await connection.query(
-        "SELECT name, surname, email, id, avatar, role FROM users WHERE id = ? ",
-        [id],
+        "SELECT name, surname, email, id, avatar, role FROM users WHERE id = ?",
+        [id]
       );
 
       res.status(200).json({
         info: "Profil zaktualizowany",
         userData: user[0],
       });
+
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Błąd serwera" });
     }
-  },
+  }
 );
 
 router.post(

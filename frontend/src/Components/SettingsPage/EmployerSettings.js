@@ -342,6 +342,14 @@ const EmployerSettings = () => {
       }
     } catch (err) {
       console.error(err);
+       
+  if (err.response && err.response.data && err.response.data.error) {
+    setError(err.response.data.error); 
+    document.querySelector(`.${styles.content}`).scroll(0, 0);
+  } else {
+    setError("Wystąpił nieoczekiwany błąd.");
+    console.error(err);
+  }
     }
   };
 

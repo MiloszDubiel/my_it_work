@@ -82,7 +82,6 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
 
     {/* ===== PODGLĄD (READ ONLY) ===== */}
     <div className={styles.readOnlySection}>
-      <p><span>ID oferty:</span> {offer.id}</p>
       <p><span>Nazwa firmy:</span> {offer.companyName}</p>
       <p><span>Tytuł stanowiska:</span> {offer.title}</p>
       <p><span>Wynagrodzenie:</span> {offer.salary || "-"}</p>
