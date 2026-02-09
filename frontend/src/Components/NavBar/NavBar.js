@@ -23,23 +23,23 @@ const Navbar = ({ employersPage }) => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  useEffect(() => {
-    if (!userData?.id) return;
+useEffect(() => {
+  if (!userData?.id) return;
 
-    socket.emit("join_user_room", userData.id);
+  socket.emit("join_user_room", userData.id);
 
-    const handleNotification = ({ senderId }) => {
-      if (senderId !== userData.id) {
-        setHasUnread(true);
-      }
-    };
+  const handleNotification = ({ senderId }) => {
+    if (senderId !== userData.id) {
+      setHasUnread(true);
+    }
+  };
 
-    socket.on("new_message_notification", handleNotification);
+  socket.on("new_message_notification", handleNotification);
 
-    return () => {
-      socket.off("new_message_notification", handleNotification);
-    };
-  }, [userData]);
+  return () => {
+    socket.off("new_message_notification", handleNotification);
+  };
+}, [userData]);
 
   return (
     <>

@@ -45,7 +45,8 @@ io.on("connection", (socket) => {
 
   socket.on("join_user_room", (userId) => {
     socket.join(`user_${userId}`);
-  });
+    console.log(`User ${userId} joined room user_${userId}`);
+  });;
 
   socket.on("join_conversation", (conversationId) => {
     socket.join(`conversation_${conversationId}`);
@@ -76,10 +77,12 @@ io.on("connection", (socket) => {
           message
         );
 
-        io.emit("new_message_notification", {
-          conversationId: conversation_id,
+ 
+
+        io.to(`user_${receiverId}`).emit("new_message_notification", {
+  conversationId: conversation_id,
           senderId: sender_id,
-        });
+});
       } catch (err) {
         console.error("❌ send_message error:", err);
       }
