@@ -27,19 +27,66 @@ AND sender_id != ?`,
   res.json({ success: true });
 });
 
+router.get("/has-unread/:userId", async (req, res) => {
+  const { userId } = req.params;
 
+  try {
+    const [[result]] = await connection.query(
+      `
+      SELECT COUNT(m.id) AS unreadCount
+      FROM messages m
+      JOIN conversations c ON c.id = m.conversation_id
+      WHERE m.is_read = false
+        AND (
+          (c.employer_id = ? AND m.sender_id != ?)
+          OR
+          (c.candidate_id = ? AND m.sender_id != ?)
+        )
+      `,
+      [userId, userId, userId, userId]
+    );
+
+    res.json({ hasUnread: result.unreadCount > 0 });
+  } catch (err) {
+    console.error("has-unread error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+
+});
 router.get("/conversations/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
     const [rows] = await connection.query(
       `
       SELECT c.*, 
-            u1.name AS employer_name, 
-            u2.name AS candidate_name,
-            u1.surname AS employer_surname,
-            u2.surname AS candidate_surname,
-            com.companyName,
-            u2.email
+             u1.name AS employer_name, 
+             u2.name AS candidate_name,
+             u1.surname AS employer_surname,
+             u2.surname AS candidate_surname,
+             com.companyName,
+             u2.email,
+
+             -- liczba nieprzeczytanych wiadomości dla zalogowanego usera
+             (SELECT COUNT(*) 
+              FROM messages m
+              WHERE m.conversation_id = c.id
+                AND m.is_read = 0
+                AND m.sender_id != ?) AS unreadCount,
+
+             -- ostatnia wiadomość w konwersacji
+             (SELECT m.sender_id
+              FROM messages m
+              WHERE m.conversation_id = c.id
+              ORDER BY m.created_at DESC
+              LIMIT 1) AS lastMessageSenderId,
+
+             (SELECT u.name
+              FROM messages m
+              JOIN users u ON u.id = m.sender_id
+              WHERE m.conversation_id = c.id
+              ORDER BY m.created_at DESC
+              LIMIT 1) AS lastMessageSenderName
+
       FROM conversations c
       JOIN users u1 ON u1.id = c.employer_id
       JOIN users u2 ON u2.id = c.candidate_id
@@ -47,7 +94,7 @@ router.get("/conversations/:userId", async (req, res) => {
       WHERE c.employer_id = ? OR c.candidate_id = ?
       ORDER BY c.created_at DESC
       `,
-      [userId, userId],
+      [userId, userId, userId] 
     );
 
     res.json(rows);

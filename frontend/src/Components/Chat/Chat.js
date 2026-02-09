@@ -23,16 +23,11 @@ export default function Chat({ conversationId, userId, message }) {
     };
   }, [conversationId]);
 
-  /* =====================
-     PREFILL MESSAGE
-  ===================== */
+
   useEffect(() => {
     if (message) setNewMessage(message);
   }, [message]);
 
-  /* =====================
-     FETCH MESSAGES
-  ===================== */
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
@@ -44,9 +39,7 @@ export default function Chat({ conversationId, userId, message }) {
     }
   };
 
-  /* =====================
-     SOCKET LISTENER
-  ===================== */
+
   useEffect(() => {
     const handler = (msg) => {
       if (msg.conversation_id === conversationId) {
@@ -61,16 +54,12 @@ export default function Chat({ conversationId, userId, message }) {
     };
   }, [conversationId]);
 
-  /* =====================
-     AUTOSCROLL
-  ===================== */
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* =====================
-     SEND MESSAGE
-  ===================== */
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -84,6 +73,28 @@ export default function Chat({ conversationId, userId, message }) {
     setNewMessage("");
   };
 
+  useEffect(() => {
+  if (!conversationId || !userId) return;
+
+  const markAsRead = async () => {
+    try {
+
+      await axios.put(
+        `http://localhost:5001/chat/read/${conversationId}`,
+        { userId }
+      );
+
+      window.dispatchEvent(new CustomEvent("messages-read"));
+    } catch (err) {
+      console.error("Błąd oznaczania wiadomości jako przeczytanych:", err);
+    }
+  };
+
+  markAsRead();
+  }, [conversationId, userId]);
+  
+
+  
   return (
     <div className={styles.chatContainer}>
       <div className={styles.messagesContainer}>

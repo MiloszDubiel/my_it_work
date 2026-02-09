@@ -23,6 +23,16 @@ const Navbar = ({ employersPage }) => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+
+  useEffect(() => {
+  const handleMessagesRead = () => setHasUnread(false);
+
+  window.addEventListener("messages-read", handleMessagesRead);
+
+  return () => {
+    window.removeEventListener("messages-read", handleMessagesRead);
+  };
+}, []);
 useEffect(() => {
   if (!userData?.id) return;
 
@@ -40,7 +50,27 @@ useEffect(() => {
     socket.off("new_message_notification", handleNotification);
   };
 }, [userData]);
+  
+  
+useEffect(() => {
+  if (!userData?.id) return;
 
+  const checkUnread = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5001/chat/has-unread/${userData.id}`
+      );
+      const data = await res.json();
+      setHasUnread(data.hasUnread);
+    } catch (err) {
+      console.error("Błąd sprawdzania unread:", err);
+    }
+  };
+
+  checkUnread();
+}, [userData]);
+  
+  
   return (
     <>
       {userData?.role === "employer" && (

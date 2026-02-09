@@ -44,33 +44,41 @@ export default function ChatPage() {
     }
   };
 
-  useEffect(() => {
-    if (!user?.id) return;
+useEffect(() => {
+  if (!user?.id) return;
 
-   const handleNewMessage = ({ conversationId, senderId }) => {
-  if (senderId === user.id) return; 
+  const handleNewMessage = ({ conversationId, senderId, receiverId }) => {
+    if (receiverId !== user.id) return;
 
-  setConversations((prev) =>
-    prev.map((conv) =>
-      conv.id === conversationId
-        ? {
-            ...conv,
-            unreadCount:
-              selectedConversation?.id === conversationId
-                ? 0
-                : (conv.unreadCount || 0) + 1,
-          }
-        : conv
-    )
-  );
-};
+    setConversations((prev) => {
+      const exists = prev.find(c => c.id === conversationId);
 
-    socket.on("new_message_notification", handleNewMessage);
 
-    return () => {
-      socket.off("new_message_notification", handleNewMessage);
-    };
-  }, [user, selectedConversation]);
+      if (exists) {
+        return prev.map((conv) =>
+          conv.id === conversationId
+            ? {
+                ...conv,
+                unreadCount:
+                  selectedConversation?.id === conversationId
+                    ? 0
+                    : (conv.unreadCount || 0) + 1,
+              }
+            : conv
+        );
+      }
+
+      fetchConversations();
+      return prev;
+    });
+  };
+
+  socket.on("new_message_notification", handleNewMessage);
+
+  return () => {
+    socket.off("new_message_notification", handleNewMessage);
+  };
+}, [user, selectedConversation]);
 
   useEffect(() => {
     const handleOpen = async (e) => {
@@ -99,7 +107,7 @@ export default function ChatPage() {
       style={{ display: "none" }}
     >
       <main className={styles.wrapper}>
-        {/* ACTION BAR */}
+
         <div className={styles.actionsBar}>
           <div className={styles.rightActions}>
             <button
@@ -115,7 +123,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* CONTENT */}
+
         <section className={styles.contentGrid}>
           <article className={styles.leftCol}>
             <div className={styles.inbox}>
@@ -126,61 +134,50 @@ export default function ChatPage() {
               )}
 
               {conversations.map((conv) => {
-                const isEmployer = conv.employer_id === user.id;
-                const chatPartner = isEmployer
-                  ? `${conv.candidate_name} ${conv.candidate_surname}`
-                  : `${conv.employer_name} ${conv.employer_surname}`;
+  const isEmployer = conv.employer_id === user.id;
+  const chatPartner = isEmployer
+    ? `${conv.candidate_name} ${conv.candidate_surname}`
+    : `${conv.employer_name} ${conv.employer_surname}`;
 
-                return (
-                  <div
-                    key={conv.id}
-                    className={`${styles.conversation}
-                      ${
-                        selectedConversation?.id === conv.id
-                          ? styles.active
-                          : ""
-                      }
-                      ${conv.unreadCount > 0 ? styles.unread : ""}
-                    `}
-                    onClick={() => openConversation(conv)}
-                  >
-                    <div className={styles.avatarPlaceholder}>
-                      {chatPartner?.[0]?.toUpperCase()}
+  return (
+    <div
+      key={conv.id}
+      className={`${styles.conversation} ${
+        selectedConversation?.id === conv.id ? styles.active : ""
+      }`}
+      onClick={() => openConversation(conv)}
+    >
+      {/* AVATAR */}
+      <div className={styles.avatarPlaceholder}>
+        {chatPartner?.[0]?.toUpperCase()}
 
-                      {conv.unreadCount > 0 && (
-                        <span className={styles.unreadDot}></span>
-                      )}
-                    </div>
 
-                    <div>
-                      <h4>
-                        {conv.companyName && !isEmployer && (
-                          <span className={styles.companyName}>
-                            {conv.companyName},{" "}
-                          </span>
-                        )}
+        {conv.unreadCount > 0 && <span className={styles.unreadDot}></span>}
+      </div>
 
-                        {conv.email && isEmployer && (
-                          <span className={styles.companyName}>
-                            {conv.email},{" "}
-                          </span>
-                        )}
+      <div className={styles.conversationContent}>
+        <h4>
+          {conv.companyName && !isEmployer && (
+            <span className={styles.companyName}>{conv.companyName}, </span>
+          )}
 
-                        <span className={styles.name}>{chatPartner}</span>
-                      </h4>
+          {conv.email && isEmployer && (
+            <span className={styles.companyName}>{conv.email}, </span>
+          )}
 
-                     {conv.unreadCount > 0 && (
-  <div className={styles.unreadInfo}>
-    <span className={styles.unreadText}>Nowe</span>
-    <span className={styles.unreadBadge}>
-      {conv.unreadCount}
-    </span>
-  </div>
-)}
-                    </div>
-                  </div>
-                );
-              })}
+          <span className={styles.name}>{chatPartner}</span>
+        </h4>
+
+        {conv.unreadCount > 0 && (
+          <div className={styles.unreadInfo}>
+            <span className={styles.unreadText}>Nowe</span>
+            <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+})}
             </div>
           </article>
 
