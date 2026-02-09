@@ -114,22 +114,18 @@ const AddJobOffer = ({ onOfferAdded }) => {
           "Oferta została przesłana do weryfikacji przez administratora",
         );
         onOfferAdded();
-        setOffer({
+        setOffer({...offer, 
           title: "",
-          company: "",
           location: "",
           salary_min: "",
           salary_max: "",
-          experience: "",
           technologies: [],
           contract_type: "",
           description: "",
           requirements: "",
           responsibilities: "",
           benefits: "",
-          company_id: "",
-          employer_id: userData.id,
-          date: "",
+   
         });
       }
     } catch (err) {

@@ -25,10 +25,7 @@ const OfferEditModal = ({ offer, onClose, onSave }) => {
   }, [offer]);
 
   const validate = () => {
-    if (form.title.length < 3) {
-      setErrors("Tytuł musi mieć co najmniej 3 znaki.");
-      return false;
-    }
+
     if (!form.description?.length) {
       setErrors("Brak opisu oferty");
       return false;
