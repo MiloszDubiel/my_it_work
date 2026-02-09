@@ -169,15 +169,14 @@ export default function ChatPage() {
                         <span className={styles.name}>{chatPartner}</span>
                       </h4>
 
-                      {conv.unreadCount > 0 && (
-                        <>
-                        <br/>
-                        Liczba nowych wiadomości:
-                        <span className={styles.unreadBadge}>
-                          {conv.unreadCount}
-                        </span>
-                        </>
-                      )}
+                     {conv.unreadCount > 0 && (
+  <div className={styles.unreadInfo}>
+    <span className={styles.unreadText}>Nowe</span>
+    <span className={styles.unreadBadge}>
+      {conv.unreadCount}
+    </span>
+  </div>
+)}
                     </div>
                   </div>
                 );

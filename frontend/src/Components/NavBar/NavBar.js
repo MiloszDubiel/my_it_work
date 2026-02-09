@@ -28,8 +28,8 @@ useEffect(() => {
 
   socket.emit("join_user_room", userData.id);
 
-  const handleNotification = ({ senderId }) => {
-    if (senderId !== userData.id) {
+  const handleNotification = ({ receiverId }) => {
+    if (receiverId === userData.id) {
       setHasUnread(true);
     }
   };

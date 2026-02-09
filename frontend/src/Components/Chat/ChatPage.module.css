@@ -168,7 +168,33 @@
 }
 
 
+.unreadInfo {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
 
+.unreadText {
+  font-weight: 500;
+}
+
+.unreadBadge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  background-color: #2563eb; 
+  color: white;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
 /* CHAT AREA */
 .chatArea {
   flex: 1;

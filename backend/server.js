@@ -53,41 +53,58 @@ io.on("connection", (socket) => {
   });
 
   socket.on(
-    "send_message",
-    async ({ conversation_id, sender_id, content }) => {
-      try {
-        const [result] = await connection.query(
-          `INSERT INTO messages 
-           (conversation_id, sender_id, content, is_read)
-           VALUES (?, ?, ?, false)`,
-          [conversation_id, sender_id, content]
-        );
+  "send_message",
+  async ({ conversation_id, sender_id, content }) => {
+    try {
+      // 1️⃣ Zapis wiadomości
+      const [result] = await connection.query(
+        `INSERT INTO messages 
+         (conversation_id, sender_id, content, is_read)
+         VALUES (?, ?, ?, false)`,
+        [conversation_id, sender_id, content]
+      );
 
-        const message = {
-          id: result.insertId,
-          conversation_id,
-          sender_id,
-          content,
-          is_read: false,
-          created_at: new Date(),
-        };
+      const message = {
+        id: result.insertId,
+        conversation_id,
+        sender_id,
+        content,
+        is_read: false,
+        created_at: new Date(),
+      };
 
-        io.to(`conversation_${conversation_id}`).emit(
-          "receive_message",
-          message
-        );
+      // 2️⃣ Wyślij wiadomość do pokoju rozmowy (chat realtime)
+      io.to(`conversation_${conversation_id}`).emit(
+        "receive_message",
+        message
+      );
 
- 
+      // 3️⃣ Ustal ODBIORCĘ (nie nadawcę!)
+      const [[conversation]] = await connection.query(
+        `
+        SELECT employer_id, candidate_id
+        FROM conversations
+        WHERE id = ?
+        `,
+        [conversation_id]
+      );
 
-        io.to(`user_${receiverId}`).emit("new_message_notification", {
+      const receiverId =
+        conversation.employer_id === sender_id
+          ? conversation.candidate_id
+          : conversation.employer_id;
+
+io.to(`user_${receiverId}`).emit("new_message_notification", {
   conversationId: conversation_id,
-          senderId: sender_id,
+  senderId: sender_id,
+  receiverId,
 });
-      } catch (err) {
-        console.error("❌ send_message error:", err);
-      }
+
+    } catch (err) {
+      console.error("❌ send_message error:", err);
     }
-  );
+  }
+);
 
 
 socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) => {
