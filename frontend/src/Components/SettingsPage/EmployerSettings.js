@@ -6,9 +6,7 @@ import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
 import CandidateInfo from "../Candidate/CandidateInfo";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-import { io } from "socket.io-client";
-
-let socket;
+import {socket} from "../../socket";
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
@@ -71,14 +69,13 @@ const EmployerSettings = () => {
 
 
 useEffect(() => {
-  if (!socket) {
-    socket = io("http://localhost:5001");
-  }
 
   socket.emit("join_user_room", userData.id);
 
   const handleUpdate = (updatedApplications) => {
-    setApplications(updatedApplications); 
+
+    console.log(updatedApplications)
+    setApplications(updatedApplications)
   };
 
   socket.on("application_updated", handleUpdate);

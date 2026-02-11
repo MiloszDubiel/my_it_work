@@ -4,7 +4,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
-import { io } from "socket.io-client";
+import {socket} from "../../socket";
 
 const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
@@ -18,7 +18,7 @@ const safeJsonParse = (value, fallback = []) => {
 };
 
 
-let socket;
+
 
 const isUniqueItem = (list, newName = "") => {
   if (!Array.isArray(list)) return true;
@@ -96,7 +96,7 @@ const CandidateSettings = () => {
  
     useEffect(() => {
     if (!socket) {
-      socket = io("http://localhost:5001");
+      return;
     }
 
     socket.emit("join_user_room", userData.id);

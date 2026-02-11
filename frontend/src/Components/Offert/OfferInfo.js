@@ -5,8 +5,9 @@ import axios from "axios";
 import LoadingComponent from "../Loading/LoadingComponent";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-import EmployerInfo from "../Employers/EmployerInfo";
+
 import { useFavorites } from "../../context/FavoriteContext";
+import { socket } from "../../socket";
 
 const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
@@ -18,6 +19,8 @@ const safeJsonParse = (value, fallback = []) => {
     return fallback;
   }
 };
+
+
 
 
 const OfferInfo = ({ offer, id, is_favorite, in_company_info, onClose }) => {
@@ -38,7 +41,6 @@ const userData =
   const [appliedDate, setAppliedDate] = useState(null);
 
   const { isFavorite, toggleFavorite, loading } = useFavorites();
-
 
   const checkApplication = async () => {
     if (!userData?.id || !offer?.id) return;
@@ -102,7 +104,12 @@ const userData =
             },
           },
         );
-
+        
+        socket.emit("application_submitted", {
+          candidate_id: userData.id,
+          company_id: offer.company_id,
+          offer_id: offer.id,
+        });
         setModalMessage(res.data.message);
         setShowInfo(true);
         setAlreadyApplied(true);
@@ -119,11 +126,8 @@ const userData =
     <div
       id="offer-details-container"
       className={
-        styles.container +
-        " " +
-        (is_favorite
-          ? `favorite${offer.id}`
-          : `offer-details-container${offer.id}`)
+        styles.container
+        
       }
     >
       

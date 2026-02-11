@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
   "send_message",
   async ({ conversation_id, sender_id, content }) => {
     try {
-      // 1️⃣ Zapis wiadomości
+      
       const [result] = await connection.query(
         `INSERT INTO messages 
          (conversation_id, sender_id, content, is_read)
@@ -73,13 +73,12 @@ io.on("connection", (socket) => {
         created_at: new Date(),
       };
 
-      // 2️⃣ Wyślij wiadomość do pokoju rozmowy (chat realtime)
+
       io.to(`conversation_${conversation_id}`).emit(
         "receive_message",
         message
       );
 
-      // 3️⃣ Ustal ODBIORCĘ (nie nadawcę!)
       const [[conversation]] = await connection.query(
         `
         SELECT employer_id, candidate_id
@@ -132,13 +131,14 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
       console.error("Błąd przy akceptowaniu aplikacji:", err);
     }
 });
-  socket.on("application_submitted", async ({ application_id, offer_id, candidate_id }) => {
+  socket.on("application_submitted", async ({ candidate_id, company_id, offer_id }) => {
   try {
     const [[offer]] = await connection.query(
       `SELECT employer_id FROM job_offers WHERE id = ?`,
       [offer_id]
     );
     const employerId = offer.employer_id;
+
 
     const [applications] = await connection.query(
       `SELECT
@@ -178,9 +178,10 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
        ORDER BY ja.created_at DESC`,
       [employerId]
     );
-
-
-    io.to(`user_${employerId}`).emit("application_updated", applications);
+   
+    console.log(applications)
+    console.log("wysyłam do pokoju user_" +  `${employerId}`)
+    io.to(`user_${employerId}`).emit("application_updated",  applications );
 
   } catch (err) {
     console.error("Błąd przy zgłaszaniu nowej aplikacji:", err);
