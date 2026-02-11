@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import OfferInfo from "../Offert/OfferInfo";
 
-const EmployerInfo = ({ companyOwner = 0, id }) => {
+const EmployerInfo = ({ companyOwner = 0, id, onClose }) => {
   const [company, setCompany] = useState(null);
-  const [offers, setOffers] = useState([]);
+  const [offers, setOffers] = useState([])
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   const fetchCompanyInfo = async () => {
     try {
@@ -56,13 +57,6 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
     fetchCompanyOffers();
   }, [companyOwner]);
 
-  const parseList = (value) => {
-    if (!value) return [];
-    return value
-      .split(",")
-      .map((v) => v.trim())
-      .filter(Boolean);
-  };
 
   const safeParseArray = (value) => {
     if (!value) return [];
@@ -74,19 +68,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
     }
   };
 
-  const close = useCallback(() => {
-    document.querySelector(`#company-info-${companyOwner}`).style.display =
-      "none";
-  });
 
-  const openWindow = useCallback((id) => {
-    console.log(id);
-
-    document.querySelector(`.offer-details-container${id}`).style.display =
-      "flex";
-
-    document.querySelector("#root").style.overflow = "hidden";
-  });
 
   return (
     <div>
@@ -94,7 +76,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
         <main className={styles.wrapper}>
           <div className={styles.actionsBar}>
             <div className={styles.rightActions}>
-              <button className={styles.closeBtn} onClick={close}>
+              <button className={styles.closeBtn} onClick={onClose}>
                 <IoMdClose />
               </button>
             </div>
@@ -210,12 +192,6 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
 
                     return (
                       <>
-                        <OfferInfo
-                          offer={offer}
-                          id={index}
-                          is_favorite={false}
-                          in_company_info={true}
-                        />
                         <div key={offer.id} className={styles.offerCard}>
                           <h4 className={styles.offerTitle}>{offer.title}</h4>
 
@@ -251,7 +227,7 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
 
                           <a
                             className={styles.offerBtn}
-                            onClick={() => openWindow(id)}
+                            onClick={() => setSelectedOffer(offer)}
                           >
                             Przejdź do oferty
                           </a>
@@ -269,6 +245,14 @@ const EmployerInfo = ({ companyOwner = 0, id }) => {
           </section>
         </main>
       </div>
+      {selectedOffer && (
+  <OfferInfo
+    offer={selectedOffer}
+    is_favorite={false}
+    in_company_info={true}
+    onClose={() => setSelectedOffer(null)}
+  />
+)}
     </div>
   );
 };

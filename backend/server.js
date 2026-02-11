@@ -131,7 +131,61 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
     } catch (err) {
       console.error("Błąd przy akceptowaniu aplikacji:", err);
     }
-  });
+});
+  socket.on("application_submitted", async ({ application_id, offer_id, candidate_id }) => {
+  try {
+    const [[offer]] = await connection.query(
+      `SELECT employer_id FROM job_offers WHERE id = ?`,
+      [offer_id]
+    );
+    const employerId = offer.employer_id;
+
+    const [applications] = await connection.query(
+      `SELECT
+          ja.id AS app_id,
+          jo.id AS offer_id,
+          jo.title,
+          jo.employer_id,
+          u.id AS user_id,
+          u.name,
+          u.surname,
+          u.email,
+          u.avatar,
+          u.phone_number,
+          ci.cv,
+          ci.references,
+          ci.locations,
+          ci.skills,
+          ci.lang,
+          ci.edu,
+          ci.link_git,
+          ci.working_mode,
+          ci.present_job,
+          ci.target_job,
+          ci.phone_number AS candidate_phone_number,
+          ci.access,
+          ci.career_level,
+          ci.description AS candidate_description,
+          ci.years_of_experience,
+          ja.status,
+          ja.created_at
+       FROM job_applications ja
+       JOIN job_offers jo ON ja.offer_id = jo.id
+       JOIN users u ON ja.user_id = u.id
+       JOIN candidate_info ci ON u.id = ci.user_id
+       WHERE jo.employer_id = ? 
+         AND ja.status NOT IN ('odrzucono', 'anulowana', 'zaakceptowana')
+       ORDER BY ja.created_at DESC`,
+      [employerId]
+    );
+
+
+    io.to(`user_${employerId}`).emit("application_updated", applications);
+
+  } catch (err) {
+    console.error("Błąd przy zgłaszaniu nowej aplikacji:", err);
+  }
+});
 
   socket.on("reject_application", async ({ app_id, candidate_id, employer_id }) => {
     try {

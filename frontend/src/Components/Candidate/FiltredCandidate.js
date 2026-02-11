@@ -34,14 +34,18 @@ const FiltredCandidate = () => {
 
         const res = await axios.post(
           "http://localhost:5000/api/candidates/filltred",
-          state
+          state,
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          }
         );
 
         setIsLoading(false);
         setCandidates(res.data);
       } catch (err) {
         setIsLoading(false);
-        setInfo("Brak kandydatów");
         console.error("Błąd podczas pobierania ofert:", err);
       }
 

@@ -12,6 +12,7 @@ let socket;
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
+  const [isSelectedCandidate, setIsSelectedCandidate] = useState(null);
   const [userData] = useState(
     JSON.parse(sessionStorage.getItem("user-data")) ||
       JSON.parse(localStorage.getItem("user-data")),
@@ -69,43 +70,39 @@ const EmployerSettings = () => {
   };
 
 
-  useEffect(() => {
-    if (!socket) {
-      socket = io("http://localhost:5001");
-    }
+useEffect(() => {
+  if (!socket) {
+    socket = io("http://localhost:5001");
+  }
 
-    socket.emit("join_user_room", userData.id);
+  socket.emit("join_user_room", userData.id);
 
-    const handleUpdate = (updatedApp) => {
-      setApplications((prev) =>
-        prev.map((a) =>
-          a.app_id === updatedApp.id ? updatedApp : a
-        )
-      );
-    };
+  const handleUpdate = (updatedApplications) => {
+    setApplications(updatedApplications); 
+  };
 
-    socket.on("application_updated", handleUpdate);
+  socket.on("application_updated", handleUpdate);
 
-    const fetchApplications = async () => {
-      const res = await axios.post(
-        "http://localhost:5000/api/employers/get-my-applications",
-        { employer_id: userData.id },
-        {
-          headers: {
-            Authorization:
-              `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setApplications(res.data);
-    };
+  const fetchApplications = async () => {
+    const res = await axios.post(
+      "http://localhost:5000/api/employers/get-my-applications",
+      { employer_id: userData.id },
+      {
+        headers: {
+          Authorization: `Bearer ${
+            sessionStorage.getItem("token") || localStorage.getItem("token")
+          }`,
+        },
+      }
+    );
+    setApplications(res.data);
+  };
 
-    fetchApplications();
-
-    return () => {
-      socket.off("application_updated", handleUpdate);
-    };
-  }, [userData.id]);
+  fetchApplications();
+  return () => {
+    socket.off("application_updated", handleUpdate);
+  };
+}, [userData.id]);
 
  
   useEffect(() => {
@@ -842,7 +839,6 @@ const EmployerSettings = () => {
                         </span>
 
                         <span className={styles.appActions}>
-                          <CandidateInfo candidate={app} />
 
                           {app.cv && (
                             <button
@@ -856,11 +852,7 @@ const EmployerSettings = () => {
                           <button
                             className={styles.smallBtnOutline}
                             onClick={() => {
-                              document.querySelector(
-                                `.candidate-details-container${app.user_id}`,
-                              ).style.display = "flex";
-                              document.querySelector("#root").style.overflow =
-                                "hidden";
+                              setIsSelectedCandidate(app);
                             }}
                           >
                             Profil
@@ -972,6 +964,7 @@ const EmployerSettings = () => {
           </div>
         </div>
       </div>
+       {isSelectedCandidate && <CandidateInfo candidate={isSelectedCandidate} onClose={() => setIsSelectedCandidate(null)} />}
     </div>
   );
 };

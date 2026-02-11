@@ -5,7 +5,7 @@ import axios from "axios";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import { io } from "socket.io-client";
 
-const CandidateInfo = ({ candidate }) => {
+const CandidateInfo = ({ candidate, onClose }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmCallbackRef = useRef(null);
 
@@ -31,13 +31,11 @@ const CandidateInfo = ({ candidate }) => {
   const references = parseList(candidate.references);
   const cv = parseList(candidate.cv);
 
-  console.log(experiences);
+
   return (
     <div
       className={
-        styles.container +
-        " " +
-        `candidate-details-container${candidate.user_id || candidate.id}`
+        styles.container
       }
     >
       {showConfirm && (
@@ -57,12 +55,7 @@ const CandidateInfo = ({ candidate }) => {
           <div className={styles.rightActions}>
             <button
               className={styles.closeBtn}
-              onClick={() => {
-                document.querySelector(
-                  `.candidate-details-container${candidate.user_id}`,
-                ).style.display = "none";
-                document.querySelector("#root").style.overflow = "auto";
-              }}
+              onClick={onClose}
             >
               <IoMdClose />
             </button>

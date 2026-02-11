@@ -18,7 +18,7 @@ const safeJsonParse = (value, fallback = null) => {
 
 const MainPage = () => {
   const [offers, setOffers] = useState([]);
-
+const [selectedOffer, setSelectedOffer] = useState(null);
   const userData = JSON.parse(
     sessionStorage.getItem("user-data") || localStorage.getItem("user-data"),
   );
@@ -65,31 +65,32 @@ const MainPage = () => {
       <section className={styles.jobsSection}>
         <h2>Najnowsze oferty</h2>
         <div className={styles.jobsGrid}>
-          {offers?.map((el) => {
-            return (
-              <>
-                <OfferInfo offer={el} />
-                <div className={styles.jobCard}>
-                  <h3>{el.title}</h3>
-                  <p>{el.companyName}</p>
-                  <span>{safeJsonParse(el.contractType[0])}</span>
-                  <div className={styles.divButton}>
-                    <button
-                      className={styles.detailsBtn}
-                      onClick={() => {
-                        document.querySelector(
-                          `.offer-details-container${el.id}`,
-                        ).style.display = "flex";
-                      }}
-                    >
-                      Szczegóły
-                    </button>
-                  </div>
-                </div>
-              </>
-            );
-          })}
-        </div>
+  {offers?.map((el) => (
+    <div key={el.id} className={styles.jobCard}>
+      <h3>{el.title}</h3>
+      <p>{el.companyName}</p>
+      <span>
+        {safeJsonParse(el.contractType)?.[0] || "Nie podano"}
+      </span>
+
+      <div className={styles.divButton}>
+        <button
+          className={styles.detailsBtn}
+          onClick={() => setSelectedOffer(el)}
+        >
+          Szczegóły
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+{selectedOffer && (
+  <OfferInfo
+    offer={selectedOffer}
+    onClose={() => setSelectedOffer(null)}
+  />
+)}
       </section>
     </div>
   );

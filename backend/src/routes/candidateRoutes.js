@@ -26,6 +26,7 @@ router.post(
   async (req, res) => {
     const { location, technologia } = req.body;
 
+
     let sql = `
     SELECT *
     FROM candidate_info
@@ -47,7 +48,7 @@ router.post(
 
     try {
       const [rows] = await connection.query(sql, params);
-      res.json(rows); // ✅ TO JEST KLUCZ
+      res.json(rows); 
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Błąd serwera" });

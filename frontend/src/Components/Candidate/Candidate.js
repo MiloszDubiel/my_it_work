@@ -3,6 +3,8 @@ import styles from "./candidate.module.css";
 import { useState } from "react";
 
 const Candidate = ({ candidate, index }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const parseList = (value) => {
     if (!value) return [];
     try {
@@ -19,7 +21,7 @@ const Candidate = ({ candidate, index }) => {
 
   return (
     <>
-      <CandidateInfo candidate={candidate} />
+  
 
       <div className={styles.offerRow}>
         <div className={styles.logoSection}>
@@ -62,15 +64,12 @@ const Candidate = ({ candidate, index }) => {
 
         <div
           className={styles.actions}
-          onClick={() => {
-            document.querySelector(
-              `.candidate-details-container${candidate.user_id}`,
-            ).style.display = "flex";
-          }}
+          onClick={() => setIsOpen(true)}
         >
           <a className={styles.detailsBtn}>Szczegóły</a>
         </div>
       </div>
+      {isOpen && <CandidateInfo candidate={candidate} onClose={() => setIsOpen(false)} />}
     </>
   );
 };

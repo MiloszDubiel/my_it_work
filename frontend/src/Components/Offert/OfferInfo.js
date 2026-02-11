@@ -20,8 +20,10 @@ const safeJsonParse = (value, fallback = []) => {
 };
 
 
-const OfferInfo = ({ offer, id, is_favorite, in_company_info }) => {
+const OfferInfo = ({ offer, id, is_favorite, in_company_info, onClose }) => {
+
   const [isLoading, setIsLoading] = useState(false);
+    const [selectedEmployer, setSelectedEmployer] = useState(null);
   const [__, setLoading] = useState(true);
 const userData =
   JSON.parse(sessionStorage.getItem("user-data")) ||
@@ -37,10 +39,6 @@ const userData =
 
   const { isFavorite, toggleFavorite, loading } = useFavorites();
 
-  const open = useCallback(() => {
-    document.querySelector(`#company-info-${offer.employer_id}`).style.display =
-      "flex";
-  }, [offer.owner_id]);
 
   const checkApplication = async () => {
     if (!userData?.id || !offer?.id) return;
@@ -128,7 +126,7 @@ const userData =
           : `offer-details-container${offer.id}`)
       }
     >
-      {!in_company_info && <EmployerInfo companyOwner={offer.employer_id} />}
+      
       {showConfirm && (
         <ConfirmModal
           message={modalMessage}
@@ -159,23 +157,12 @@ const userData =
 )}
           </div>
 
-          <button
-            className={styles.closeBtn}
-            onClick={() => {
-              if (is_favorite) {
-                document.querySelector(`.favorite${offer.id}`).style.display =
-                  "none";
-                document.querySelector("#root").style.overflow = "auto";
-                return;
-              }
-              document.querySelector(
-                `.offer-details-container${offer.id}`,
-              ).style.display = "none";
-              document.querySelector("#root").style.overflow = "auto";
-            }}
-          >
-            <IoMdClose />
-          </button>
+       <button
+  className={styles.closeBtn}
+  onClick={onClose}
+>
+  <IoMdClose />
+</button>
         </div>
 
         <section className={styles.hero}>
@@ -304,9 +291,12 @@ const userData =
               {offer.source !== "scraped" && (
                 <div className={styles.compActions}>
                   {!in_company_info && (
-                    <button className={styles.compBtn} onClick={open}>
-                      Zobacz profil firmy
-                    </button>
+                    <button
+  className={styles.compBtn}
+  onClick={() => setSelectedEmployer(offer.employer_id)}
+>
+  Zobacz profil firmy
+</button>
                   )}
 
                   {userData?.email && userData?.role !== "employer" && (

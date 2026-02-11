@@ -7,25 +7,17 @@ import Filter from "../Filter/Filter";
 import { useLocation } from "react-router-dom";
 import EmployerInfo from "./EmployerInfo";
 
-const safeParse = (value) => {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return [];
-  }
-};
+
 
 const FilltredEmployers = () => {
   const [offers, setOffers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedEmployer, setSelectedEmployer] = useState(null);
   const offersPerPage = 9;
 
   const { state } = useLocation();
 
-  const open = useCallback((id) => {
-    if (id)
-      document.querySelector(`#company-info-${id}`).style.display = "flex";
-  });
+ 
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -53,7 +45,6 @@ const FilltredEmployers = () => {
   const currentOffers = offers.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(offers.length / offersPerPage);
 
-  console.log(currentOffers);
 
   return (
     <>
@@ -69,7 +60,6 @@ const FilltredEmployers = () => {
             currentOffers.map((offer) => {
               return (
                 <>
-                  <EmployerInfo companyOwner={offer.owner_id} />
                   <div className={styles.offerRow} key={offer.id || offer._id}>
                     <div className={styles.logoSection}>
                       {offer.img ? (
@@ -106,14 +96,12 @@ const FilltredEmployers = () => {
                       </div>
                     </div>
 
-                    <div
-                      className={styles.actions + " " + styles.detailsBtn}
-                      onClick={() => {
-                        open(offer.owner_id);
-                      }}
-                    >
-                      Szczegóły
-                    </div>
+                     <div
+                        className={styles.actions + " " + styles.detailsBtn}
+                      onClick={() => setSelectedEmployer(offer)}
+                      >
+                        Szczegóły
+                      </div>
                   </div>
                 </>
               );
@@ -147,6 +135,12 @@ const FilltredEmployers = () => {
           </div>
         )}
       </div>
+       {selectedEmployer && (
+        <EmployerInfo
+          companyOwner={selectedEmployer.owner_id}
+          onClose={() => setSelectedEmployer(null)}
+        />
+      )}
     </>
   );
 };

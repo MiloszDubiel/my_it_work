@@ -59,7 +59,7 @@ const JobOffersPage = () => {
     });
   });
 
-  // Paginacja
+  
   const indexOfLast = currentPage * offersPerPage;
   const indexOfFirst = indexOfLast - offersPerPage;
   const currentOffers = offers.slice(indexOfFirst, indexOfLast);

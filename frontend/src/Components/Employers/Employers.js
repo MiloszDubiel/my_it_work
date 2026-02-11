@@ -14,6 +14,7 @@ const EmployersComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+ const [selectedEmployer, setSelectedEmployer] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -89,18 +90,8 @@ const EmployersComponent = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
-  const safeParse = (value) => {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return [];
-    }
-  };
-
-  const open = useCallback((id) => {
-    if (id)
-      document.querySelector(`#company-info-${id}`).style.display = "flex";
-  });
+ 
+ 
 
   return (
     <>
@@ -114,13 +105,13 @@ const EmployersComponent = () => {
         {loading && <p>Ładowanie ofert…</p>}
         {error && <p className={styles.noOffers}>{error}</p>}
 
+        
         {!loading && !error && (
           <div className={styles.offersList}>
             {currentOffers.length > 0 ? (
               currentOffers.map((offer) => {
                 return (
                   <>
-                    <EmployerInfo companyOwner={offer.owner_id} />
                     <div
                       className={styles.offerRow}
                       key={offer.id || offer._id}
@@ -163,7 +154,7 @@ const EmployersComponent = () => {
 
                       <div
                         className={styles.actions + " " + styles.detailsBtn}
-                        onClick={() => open(offer.owner_id)}
+                      onClick={() => setSelectedEmployer(offer)}
                       >
                         Szczegóły
                       </div>
@@ -199,6 +190,13 @@ const EmployersComponent = () => {
           </div>
         )}
       </div>
+
+      {selectedEmployer && (
+        <EmployerInfo
+          companyOwner={selectedEmployer.owner_id}
+          onClose={() => setSelectedEmployer(null)}
+        />
+      )}
     </>
   );
 };

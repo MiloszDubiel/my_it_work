@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import OfferInfo from "./OfferInfo";
 import styles from "./offer.module.css";
 
@@ -9,7 +10,7 @@ const Offer = ({ offer, index }) => {
       return [];
     }
   };
-
+  const [isOpen, setIsOpen] = useState(false);
   const technologies = parseJSON(offer.technologies);
   const firstTechnologies = technologies.slice(0, 2);
 
@@ -22,8 +23,6 @@ const Offer = ({ offer, index }) => {
 
   return (
     <>
-      <OfferInfo offer={offer} id={index} is_favorite={false} />
-
       <div className={styles.offerRow}>
         <div className={styles.logoSection}>
           <img
@@ -69,19 +68,21 @@ const Offer = ({ offer, index }) => {
             </div>
           </div>
         </div>
-        <div
-          className={styles.actions}
-          onClick={() => {
-            document.querySelector(
-              `.offer-details-container${offer.id}`,
-            ).style.display = "flex";
-
-            document.querySelector("#root").style.overflow = "hidden";
-          }}
-        >
-          <a className={styles.detailsBtn}>Szczegóły</a>
-        </div>
+       <div
+  className={styles.actions}
+  onClick={() => setIsOpen(true)}
+>
+  <a className={styles.detailsBtn}>Szczegóły</a>
+</div>
       </div>
+          {isOpen && (
+  <OfferInfo
+    offer={offer}
+    id={index}
+    is_favorite={false}
+    onClose={() => setIsOpen(false)}
+  />
+)}
     </>
   );
 };

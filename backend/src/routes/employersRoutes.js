@@ -233,7 +233,8 @@ router.post(
       users.email,
       users.avatar,
       users.phone_number,
-      candidate_info.*
+      candidate_info.*,
+      job_applications.created_at
       FROM job_applications
       JOIN  job_offers ON job_applications.offer_id = job_offers.id
       JOIN users ON job_applications.user_id = users.id
