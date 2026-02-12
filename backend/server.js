@@ -32,13 +32,13 @@ app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
-
+app.set("io", io);
 
 io.on("connection", (socket) => {
   console.log("🟢 Socket connected:", socket.id);
@@ -179,8 +179,6 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
       [employerId]
     );
    
-    console.log(applications)
-    console.log("wysyłam do pokoju user_" +  `${employerId}`)
     io.to(`user_${employerId}`).emit("application_updated",  applications );
 
   } catch (err) {
@@ -231,5 +229,6 @@ if (process.env.NODE_ENV !== "test") {
     console.log(`API działa na porcie ${PORT}`)
   );
 }
+
 
 export { app };

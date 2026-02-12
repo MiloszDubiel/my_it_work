@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./AdminSettings.module.css";
+import { socket } from "../../../socket";
+
 
 const AdminSettings = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [lastScrap, setLastScrap] = useState(null);
   const [message, setMessage] = useState("");
+  const [scraperStatus, setScraperStatus] = useState("");
 
   useEffect(() => {
     axios
@@ -19,6 +22,15 @@ const AdminSettings = () => {
         setLastScrap(res.data.date);
       });
   }, []);
+useEffect(() => {
+  socket.on("scraper_status", (data) => {
+    setScraperStatus(data.message);
+  });
+
+  return () => {
+    socket.off("scraper_status");
+  };
+}, []);
 
   const changePassword = () => {
     setMessage("");
@@ -58,8 +70,6 @@ const AdminSettings = () => {
   };
 
   const runScraper = async () => {
-    setMessage("Scrapowanie uruchomione…");
-
     try {
       await axios.get(
         `http://localhost:5000/admin/scrap/${new Date().toISOString()}`,
@@ -70,11 +80,9 @@ const AdminSettings = () => {
           timeout: 5000,
         },
       );
-
-      setMessage("Scraper działa w tle 🚀");
       setLastScrap(new Date().toISOString());
-    } catch {
-      setMessage("Nie udało się uruchomić scrapera");
+    } catch (err) {
+      console.log(err)
     }
   };
 
@@ -121,6 +129,36 @@ const AdminSettings = () => {
         <button onClick={runScraper} className={styles.scrapBtn}>
           Uruchom scrapowanie teraz
         </button>
+        <button
+          onClick={() => {
+            axios.post("http://localhost:5000/admin/scrap/stop", {}, {
+              headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+              },
+            })
+  }}
+  style={{
+    background: "red",
+    color: "white",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginLeft: "10px"
+  }}
+>
+  ⛔ Zatrzymaj scrapowanie
+</button>
+       {scraperStatus && (
+  <div style={{
+    marginTop: "20px",
+    padding: "12px",
+    color: "rgba(22, 134, 22, 1)",
+    borderRadius: "6px"
+  }}>
+    {scraperStatus}
+  </div>
+)}
       </div>
     </div>
   );

@@ -396,6 +396,14 @@ router.post(
   },
 );
 
+
+router.post("/scrap/stop", authenticateToken,
+  requireRole("admin"),async (req, res) => {
+  await stopScraping(req.app.get("io"));
+  res.json({ message: "Zatrzymywanie..." });
+});
+
+
 router.get(
   "/scrap/:scrap_when",
   authenticateToken,
@@ -403,27 +411,29 @@ router.get(
   async (req, res) => {
     const { scrap_when } = req.params;
 
-    console.log("Inicjacja scrapowania:", scrap_when);
+
 
     try {
       await connection.query("INSERT INTO scrap_data(date) VALUES(?)", [
         scrap_when,
       ]);
+
       res.json({ message: "Scraper uruchomiony w tle" });
-      scrapeAll()
+
+      scrapeAll(req.app.get("io")) // 👈 przekaż io
         .then(() => {
           console.log("Zakończono scrapowanie pomyślnie");
         })
         .catch((err) => {
-          console.error("Błąd podczas scrapowania w tle:", err);
+          console.error("Błąd podczas scrapowania:", err);
         });
+
     } catch (error) {
-      console.error(error);
       if (!res.headersSent) {
         res.status(500).json({ error: error.message });
       }
     }
-  },
+  }
 );
 
 router.get(
