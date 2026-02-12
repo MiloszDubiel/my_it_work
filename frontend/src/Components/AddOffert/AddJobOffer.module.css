@@ -118,10 +118,13 @@ select:focus {
 
 .skillsList span {
   background: #e5e7eb;
-  padding: 6px 6px;
   border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
+  display: flex ; 
+  justify-content: center ;
+  align-items: center ;
+  padding: 6px;
 }
 label .span{
   font-size: 10px;

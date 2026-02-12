@@ -224,23 +224,40 @@ router.post(
     try {
       const [rows] = await connection.query(
         `SELECT
-      job_applications.id AS app_id,
-      job_offers.title,
-      job_offers.employer_id,
-      users.id AS 'user_id',
-      users.name,
-      users.surname,
-      users.email,
-      users.avatar,
-      users.phone_number,
-      candidate_info.*,
-      job_applications.created_at
-      FROM job_applications
-      JOIN  job_offers ON job_applications.offer_id = job_offers.id
-      JOIN users ON job_applications.user_id = users.id
-      JOIN candidate_info ON users.id = candidate_info.user_id
-      WHERE job_offers.employer_id = ? AND  job_applications.status NOT IN('odrzucono', 'anulowana', 'zaakceptowana')
-      ORDER BY job_applications.created_at DESC`,
+  ja.id AS app_id,
+  jo.id AS offer_id,
+  jo.title,
+  jo.employer_id,
+  u.id AS user_id,
+  u.name,
+  u.surname,
+  u.email,
+  u.avatar,
+  u.phone_number,
+  ci.cv,
+  ci.\`references\`,
+  ci.locations,
+  ci.skills,
+  ci.lang,
+  ci.edu,
+  ci.link_git,
+  ci.working_mode,
+  ci.present_job,
+  ci.target_job,
+  ci.phone_number AS candidate_phone_number,
+  ci.access,
+  ci.career_level,
+  ci.description AS candidate_description,
+  ci.years_of_experience,
+  ja.status,
+  ja.created_at
+FROM job_applications ja
+JOIN job_offers jo ON ja.offer_id = jo.id
+JOIN users u ON ja.user_id = u.id
+LEFT JOIN candidate_info ci ON u.id = ci.user_id
+WHERE jo.employer_id = ? 
+  AND ja.status NOT IN ('odrzucono', 'anulowana', 'zaakceptowana')
+ORDER BY ja.created_at DESC`,
         [employer_id],
       );
 
