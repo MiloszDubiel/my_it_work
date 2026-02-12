@@ -122,10 +122,9 @@ socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) =>
        ORDER BY created_at DESC`,
         [candidate_id]
       );
-      const updatedApp = rows[0];
 
-      io.to(`user_${candidate_id}`).emit("application_updated", updatedApp);
-      io.to(`user_${employer_id}`).emit("application_updated", updatedApp);
+      io.to(`user_${candidate_id}`).emit("application_updated", rows[0]);
+      io.to(`user_${employer_id}`).emit("application_updated", rows);
 
     } catch (err) {
       console.error("Błąd przy akceptowaniu aplikacji:", err);

@@ -54,17 +54,24 @@ const EmployerSettings = () => {
   };
 
   const handleReject = (app) => {
-    socket.emit("reject_application", {
-      app_id: app.app_id,
-      candidate_id: app.user_id,
+    socket.emit("accept_application", {
+      app_id: selectedApp[0],
+      candidate_id: selectedApp[1],
       employer_id: userData.id,
     });
 
+
     setApplications((prev) =>
-      prev.map((a) =>
-        a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
-      )
+      console.log(prev)
+      // prev.map((a) =>
+      //   a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
+      // )
     );
+    // setApplications((prev) =>
+    //   prev.map((a) =>
+    //     a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
+    //   )
+    // );
   };
 
 
@@ -435,7 +442,7 @@ useEffect(() => {
   const acceptApplication = async () => {
     setInfo("");
     if (!selectedApp.length) return;
-
+    
     const res = await axios.put(
       `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`, {},
       {
