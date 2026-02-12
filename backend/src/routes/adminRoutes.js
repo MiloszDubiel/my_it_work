@@ -2,7 +2,7 @@ import express from "express";
 import { connection } from "../config/db.js";
 import { authenticateToken, requireRole } from "../middleware/authJwt.js";
 import bcrypt from "bcryptjs";
-import { scrapeAll } from "../scrappers/jobOffertsScraper.js";
+import { scrapeAll, stopScraping } from "../scrappers/jobOffertsScraper.js";
 
 const router = express.Router();
 

@@ -125,7 +125,7 @@ useEffect(() => {
               : "Brak danych"}
           </strong>
         </p>
-
+        <div style={{ display: 'flex', gap: '10px' }}>
         <button onClick={runScraper} className={styles.scrapBtn}>
           Uruchom scrapowanie teraz
         </button>
@@ -137,30 +137,25 @@ useEffect(() => {
               },
             })
   }}
-  style={{
-    background: "red",
-    color: "white",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    marginLeft: "10px"
-  }}
+  className={styles.cancelScrapBtn}
 >
-  ⛔ Zatrzymaj scrapowanie
-</button>
+  Zatrzymaj scrapowanie
+          </button>
+            </div>
        {scraperStatus && (
   <div style={{
     marginTop: "20px",
     padding: "12px",
-    color: "rgba(22, 134, 22, 1)",
+    color: "rgba(0, 0, 0, 1)",
     borderRadius: "6px"
-  }}>
+            }}>
     {scraperStatus}
-  </div>
-)}
+            </div>
+            
+          )}
+          </div>
       </div>
-    </div>
+  
   );
 };
 

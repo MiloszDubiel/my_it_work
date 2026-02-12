@@ -45,6 +45,15 @@ input {
   border-radius: 8px;
   cursor: pointer;
 }
+.cancelScrapBtn {
+  margin-top: 10px;
+  padding: 12px 15px;
+  background: #c92f14;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
 .message {
   padding: 10px;
