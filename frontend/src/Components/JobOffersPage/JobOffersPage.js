@@ -49,17 +49,20 @@ const JobOffersPage = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("changed-sort-option", () => {
+    const handleSortChange = () => {
       const copyOfOferts = [...offers];
-      console.log(copyOfOferts);
-
       const type = sessionStorage.getItem("sort-option");
       setOffers(Sort(copyOfOferts, type));
       setCurrentPage(1);
-    });
-  });
+    };
 
-  
+    window.addEventListener("changed-sort-option", handleSortChange);
+
+    return () => {
+      window.removeEventListener("changed-sort-option", handleSortChange);
+    };
+  }, [offers]);
+
   const indexOfLast = currentPage * offersPerPage;
   const indexOfFirst = indexOfLast - offersPerPage;
   const currentOffers = offers.slice(indexOfFirst, indexOfLast);

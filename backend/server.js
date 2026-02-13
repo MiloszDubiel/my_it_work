@@ -46,22 +46,19 @@ io.on("connection", (socket) => {
   socket.on("join_user_room", (userId) => {
     socket.join(`user_${userId}`);
     console.log(`User ${userId} joined room user_${userId}`);
-  });;
+  });
 
   socket.on("join_conversation", (conversationId) => {
     socket.join(`conversation_${conversationId}`);
   });
 
-  socket.on(
-  "send_message",
-  async ({ conversation_id, sender_id, content }) => {
+  socket.on("send_message", async ({ conversation_id, sender_id, content }) => {
     try {
-      
       const [result] = await connection.query(
         `INSERT INTO messages 
          (conversation_id, sender_id, content, is_read)
          VALUES (?, ?, ?, false)`,
-        [conversation_id, sender_id, content]
+        [conversation_id, sender_id, content],
       );
 
       const message = {
@@ -73,11 +70,7 @@ io.on("connection", (socket) => {
         created_at: new Date(),
       };
 
-
-      io.to(`conversation_${conversation_id}`).emit(
-        "receive_message",
-        message
-      );
+      io.to(`conversation_${conversation_id}`).emit("receive_message", message);
 
       const [[conversation]] = await connection.query(
         `
@@ -85,7 +78,7 @@ io.on("connection", (socket) => {
         FROM conversations
         WHERE id = ?
         `,
-        [conversation_id]
+        [conversation_id],
       );
 
       const receiverId =
@@ -93,55 +86,54 @@ io.on("connection", (socket) => {
           ? conversation.candidate_id
           : conversation.employer_id;
 
-io.to(`user_${receiverId}`).emit("new_message_notification", {
-  conversationId: conversation_id,
-  senderId: sender_id,
-  receiverId,
-});
-
+      io.to(`user_${receiverId}`).emit("new_message_notification", {
+        conversationId: conversation_id,
+        senderId: sender_id,
+        receiverId,
+      });
     } catch (err) {
       console.error("❌ send_message error:", err);
     }
-  }
-);
+  });
 
+  socket.on(
+    "accept_application",
+    async ({ app_id, candidate_id, employer_id }) => {
+      try {
+        await connection.query(
+          "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
+          [app_id],
+        );
 
-socket.on("accept_application", async ({ app_id, candidate_id, employer_id }) => {
-    try {
-      await connection.query(
-        "UPDATE job_applications SET status = 'zaakceptowana' WHERE id = ?",
-        [app_id]
-      );
-
-      const [rows] = await connection.query(
-        `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status, companies.owner_id
+        const [rows] = await connection.query(
+          `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status, companies.owner_id
        FROM job_applications
        JOIN job_offers ON job_applications.offer_id = job_offers.id
        JOIN companies ON job_offers.company_id = companies.id
        WHERE job_applications.user_id = ?
        ORDER BY created_at DESC`,
-        [candidate_id]
-      );
+          [candidate_id],
+        );
 
-      io.to(`user_${candidate_id}`).emit("application_updated", rows[0]);
-      io.to(`user_${employer_id}`).emit("application_updated", rows);
+        io.to(`user_${candidate_id}`).emit("application_updated", rows[0]);
+        io.to(`user_${employer_id}`).emit("application_updated", rows);
+      } catch (err) {
+        console.error("Błąd przy akceptowaniu aplikacji:", err);
+      }
+    },
+  );
+  socket.on(
+    "application_submitted",
+    async ({ candidate_id, company_id, offer_id }) => {
+      try {
+        const [[offer]] = await connection.query(
+          `SELECT employer_id FROM job_offers WHERE id = ?`,
+          [offer_id],
+        );
+        const employerId = offer.employer_id;
 
-    } catch (err) {
-      console.error("Błąd przy akceptowaniu aplikacji:", err);
-    }
-});
-  socket.on("application_submitted", async ({ candidate_id, company_id, offer_id }) => {
-  try {
-    const [[offer]] = await connection.query(
-      `SELECT employer_id FROM job_offers WHERE id = ?`,
-      [offer_id]
-    );
-    const employerId = offer.employer_id;
-
- 
-
-    const [applications] = await connection.query(
-      `SELECT
+        const [applications] = await connection.query(
+          `SELECT
   ja.id AS app_id,
   jo.id AS offer_id,
   jo.title,
@@ -176,64 +168,56 @@ LEFT JOIN candidate_info ci ON u.id = ci.user_id
 WHERE jo.employer_id = ? 
   AND ja.status NOT IN ('odrzucono', 'anulowana', 'zaakceptowana')
 ORDER BY ja.created_at DESC`,
-      [employerId]
-    );
-   
+          [employerId],
+        );
 
-    io.to(`user_${employerId}`).emit("application_updated",  applications );
+        io.to(`user_${employerId}`).emit("application_updated", applications);
+      } catch (err) {
+        console.error("Błąd przy zgłaszaniu nowej aplikacji:", err);
+      }
+    },
+  );
 
+  socket.on(
+    "reject_application",
+    async ({ app_id, candidate_id, employer_id }) => {
+      try {
+        await connection.query(
+          "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
+          [app_id],
+        );
 
-
-
-
-  } catch (err) {
-    console.error("Błąd przy zgłaszaniu nowej aplikacji:", err);
-  }
-});
-
-  socket.on("reject_application", async ({ app_id, candidate_id, employer_id }) => {
-    try {
-      await connection.query(
-        "UPDATE job_applications SET status = 'odrzucono' WHERE id = ?",
-        [app_id]
-      );
-
-       const [rows] = await connection.query(
-        `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status, companies.owner_id
+        const [rows] = await connection.query(
+          `SELECT  job_applications.id, job_offers.title, job_offers.companyName, job_applications.created_at, job_applications.status, companies.owner_id
        FROM job_applications
        JOIN job_offers ON job_applications.offer_id = job_offers.id
        JOIN companies ON job_offers.company_id = companies.id
        WHERE job_applications.user_id = ?
        ORDER BY created_at DESC`,
-        [candidate_id]
-      );
-      const updatedApp = rows[0];
+          [candidate_id],
+        );
+        const updatedApp = rows[0];
 
-      io.to(`user_${candidate_id}`).emit("application_updated", updatedApp);
-      io.to(`user_${employer_id}`).emit("application_updated", updatedApp);
+        io.to(`user_${candidate_id}`).emit("application_updated", updatedApp);
+        io.to(`user_${employer_id}`).emit("application_updated", updatedApp);
+      } catch (err) {
+        console.error("Błąd przy odrzuceniu aplikacji:", err);
+      }
+    },
+  );
 
-    } catch (err) {
-      console.error("Błąd przy odrzuceniu aplikacji:", err);
-    }
-  });
-  
   socket.on("leave_conversation", (conversationId) => {
     socket.leave(`conversation_${conversationId}`);
   });
-  
+
   socket.on("disconnect", () => {
     console.log("🔴 Socket disconnected:", socket.id);
   });
 });
 
 if (process.env.NODE_ENV !== "test") {
-  server.listen(5001, () =>
-    console.log("Socket server działa na 5001")
-  );
-  app.listen(PORT, () =>
-    console.log(`API działa na porcie ${PORT}`)
-  );
+  server.listen(5001, () => console.log("Socket server działa na 5001"));
+  app.listen(PORT, () => console.log(`API działa na porcie ${PORT}`));
 }
-
 
 export { app };

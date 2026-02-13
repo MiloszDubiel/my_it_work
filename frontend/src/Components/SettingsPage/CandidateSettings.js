@@ -4,7 +4,7 @@ import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
-import {socket} from "../../socket";
+import { socket } from "../../socket";
 
 const safeJsonParse = (value, fallback = []) => {
   if (!value || typeof value !== "string") return fallback;
@@ -17,15 +17,11 @@ const safeJsonParse = (value, fallback = []) => {
   }
 };
 
-
-
-
 const isUniqueItem = (list, newName = "") => {
   if (!Array.isArray(list)) return true;
 
   return !list.some(
-    (item) =>
-      item?.name?.trim().toLowerCase() === newName.trim().toLowerCase(),
+    (item) => item?.name?.trim().toLowerCase() === newName.trim().toLowerCase(),
   );
 };
 
@@ -64,7 +60,7 @@ const CandidateSettings = () => {
     years_of_experience: "",
     remote_preference: "Remote",
   });
-   const [cvFile, setCvFile] = useState(null);
+  const [cvFile, setCvFile] = useState(null);
   const [isCreated, setIsCreate] = useState(false);
   const [cvPreviewUrl, setCvPreviewUrl] = useState(null);
   const [referenceFile, setReferenceFile] = useState(null);
@@ -80,7 +76,7 @@ const CandidateSettings = () => {
   const [customLanguage, setCustomLanguage] = useState("");
   const [showCustomLanguage, setShowCustomLanguage] = useState(false);
 
-  console.log(applications)
+  console.log(applications);
 
   useEffect(() => {
     if (userData) {
@@ -93,36 +89,33 @@ const CandidateSettings = () => {
       });
     }
   }, [userData]);
- 
-    useEffect(() => {
+
+  useEffect(() => {
     if (!socket) {
       return;
     }
 
     socket.emit("join_user_room", userData.id);
 
-    const handleUpdate = (updatedApp) => {
-      setApplications((prev) =>
-        prev.map((a) => (a.id === updatedApp.id ? updatedApp : a))
-      );
+    const handleUpdate = () => {
+      fetchApplications();
     };
 
     socket.on("application_updated", handleUpdate);
 
-
     const fetchApplications = async () => {
       try {
         const res = await axios.post(
-      `http://localhost:5000/user/get-user-applications`,
-      {
-        user_id: userData.id,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-        },
-      },
-    );
+          `http://localhost:5000/user/get-user-applications`,
+          {
+            user_id: userData.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
         setApplications(res.data);
       } catch (err) {
         console.error("Błąd pobierania aplikacji:", err);
@@ -136,75 +129,7 @@ const CandidateSettings = () => {
     };
   }, [userData.id]);
 
-useEffect(() => {
-  axios
-    .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
-      },
-    })
-    .then((res) => {
-      setFavorites(res.data);
-    });
-}, [userData?.id]);
- 
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCandidateProfile({ ...candidateProfile, [name]: value });
-  };
-
-useEffect(() => {
-  const fetchCandidateProfile = async () => {
-    try {
-      const hasProfile = await axios.post(
-        "http://localhost:5000/user/has-candiate-profile",
-        { id: userData?.id },
-        { headers: { Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}` } }
-      );
-      if (hasProfile.data.info?.length > 0) setIsCreate(true);
-
-      const res = await axios.post(
-        "http://localhost:5000/user/get-candiate-info",
-        { id: userData?.id },
-        { headers: { Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}` } }
-      );
-
-      if (res.data.candiate) {
-        const data = res.data.candiate[0];
-        const profile = {
-          description: data.description || "",
-          career_level: data.exp || "Junior",
-          languages: safeJsonParse(data.lang),
-          education: safeJsonParse(data.edu),
-          location: data.locations || "",
-          desired_position: data.target_job || "",
-          current_position: data.present_job || "",
-          phone_number: data.phone_number || "",
-          availability: data.access || "Od zaraz",
-          remote_preference: data.working_mode || "Remote",
-          skills: safeJsonParse(data.skills),
-          github: data.link_git || "",
-          years_of_experience: data.years_of_experience || "",
-        };
-
-        setCandidateProfile(profile);
-        setInitialCandidateProfile(profile);
-
-        setCvPreviewUrl(data.cv);
-        setReferencePreviewUrl(data.references);
-      }
-
-      getMyApplayings();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  fetchCandidateProfile();
-}, [userData?.id]);
- useEffect(() => {
-  const handler = () => {
+  useEffect(() => {
     axios
       .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
         headers: {
@@ -214,19 +139,93 @@ useEffect(() => {
       .then((res) => {
         setFavorites(res.data);
       });
+  }, [userData?.id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCandidateProfile({ ...candidateProfile, [name]: value });
   };
 
-  window.addEventListener("setIsFavorite", handler);
-  return () => window.removeEventListener("setIsFavorite", handler);
-}, [userData?.id]);
+  useEffect(() => {
+    const fetchCandidateProfile = async () => {
+      try {
+        const hasProfile = await axios.post(
+          "http://localhost:5000/user/has-candiate-profile",
+          { id: userData?.id },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
+        if (hasProfile.data.info?.length > 0) setIsCreate(true);
 
-useEffect(() => {
-  const handler = () => getMyApplayings();
-  window.addEventListener("applied", handler);
-  return () => window.removeEventListener("applied", handler);
-}, []);
-  
-  
+        const res = await axios.post(
+          "http://localhost:5000/user/get-candiate-info",
+          { id: userData?.id },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        if (res.data.candiate) {
+          const data = res.data.candiate[0];
+          const profile = {
+            description: data.description || "",
+            career_level: data.exp || "Junior",
+            languages: safeJsonParse(data.lang),
+            education: safeJsonParse(data.edu),
+            location: data.locations || "",
+            desired_position: data.target_job || "",
+            current_position: data.present_job || "",
+            phone_number: data.phone_number || "",
+            availability: data.access || "Od zaraz",
+            remote_preference: data.working_mode || "Remote",
+            skills: safeJsonParse(data.skills),
+            github: data.link_git || "",
+            years_of_experience: data.years_of_experience || "",
+          };
+
+          setCandidateProfile(profile);
+          setInitialCandidateProfile(profile);
+
+          setCvPreviewUrl(data.cv);
+          setReferencePreviewUrl(data.references);
+        }
+
+        getMyApplayings();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCandidateProfile();
+  }, [userData?.id]);
+  useEffect(() => {
+    const handler = () => {
+      axios
+        .get(`http://localhost:5000/user/favorites/${userData?.id}`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          setFavorites(res.data);
+        });
+    };
+
+    window.addEventListener("setIsFavorite", handler);
+    return () => window.removeEventListener("setIsFavorite", handler);
+  }, [userData?.id]);
+
+  useEffect(() => {
+    const handler = () => getMyApplayings();
+    window.addEventListener("applied", handler);
+    return () => window.removeEventListener("applied", handler);
+  }, []);
+
   const hasProfileChanged = () => {
     if (!ProfielData || !userData) return false;
 
@@ -395,14 +394,14 @@ useEffect(() => {
       }
     } catch (err) {
       console.log(err);
-             
-  if (err.response && err.response.data && err.response.data.error) {
-    setErorr(err.response.data.error); 
-    document.querySelector(`.${styles.content}`).scroll(0, 0);
-  } else {
-    setErorr("Wystąpił nieoczekiwany błąd.");
-    console.error(err);
-  }
+
+      if (err.response && err.response.data && err.response.data.error) {
+        setErorr(err.response.data.error);
+        document.querySelector(`.${styles.content}`).scroll(0, 0);
+      } else {
+        setErorr("Wystąpił nieoczekiwany błąd.");
+        console.error(err);
+      }
     }
   };
 
@@ -911,7 +910,14 @@ useEffect(() => {
                       <option>4+</option>
                     </select>
                     <hr />
-                    <label>Umiejętności <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
+                    <label>
+                      Umiejętności{" "}
+                      <span className={styles.span}>
+                        {" "}
+                        <br />
+                        Kliknij podwójnie, aby usunąć
+                      </span>
+                    </label>
 
                     <div className={styles.skill}>
                       <select onChange={addSkillWithLevel} defaultValue="">
@@ -1026,7 +1032,14 @@ useEffect(() => {
                       ))}
                     </div>
                     <hr />
-                    <label>Języki    <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
+                    <label>
+                      Języki{" "}
+                      <span className={styles.span}>
+                        {" "}
+                        <br />
+                        Kliknij podwójnie, aby usunąć
+                      </span>
+                    </label>
 
                     <div className={styles.skill}>
                       <select onChange={addLanguageWithLevel} defaultValue="">
@@ -1095,7 +1108,14 @@ useEffect(() => {
                       ))}
                     </div>
                     <hr />
-                    <label>Edukacja    <span className={styles.span}>  <br />Kliknij podwójnie, aby usunąć</span></label>
+                    <label>
+                      Edukacja{" "}
+                      <span className={styles.span}>
+                        {" "}
+                        <br />
+                        Kliknij podwójnie, aby usunąć
+                      </span>
+                    </label>
 
                     <div className={styles.skill}>
                       <input type="text" placeholder="Szkoła..." />
@@ -1363,9 +1383,14 @@ useEffect(() => {
                           ).style.display = "flex";
                         }}
                       >
-                        {offer.img ? <img src={offer.img} alt={offer.title} /> :    <div className={styles.logoFallback}>
-                      {offer?.companyName?.charAt(0)?.toUpperCase() || "?"}
-                    </div> }
+                        {offer.img ? (
+                          <img src={offer.img} alt={offer.title} />
+                        ) : (
+                          <div className={styles.logoFallback}>
+                            {offer?.companyName?.charAt(0)?.toUpperCase() ||
+                              "?"}
+                          </div>
+                        )}
                         <div>
                           <h4>{offer.title}</h4>
                           <p>{offer.company_name}</p>

@@ -6,7 +6,7 @@ import AddJobOffer from "../AddOffert/AddJobOffert";
 import UpdateJobOffer from "../AddOffert/UpdateJobOffer";
 import CandidateInfo from "../Candidate/CandidateInfo";
 import ConfirmModal from "../PromptModals/ConfirmModal";
-import {socket} from "../../socket";
+import { socket } from "../../socket";
 
 const EmployerSettings = () => {
   const [activeTab, setActiveTab] = useState("company");
@@ -38,8 +38,7 @@ const EmployerSettings = () => {
   const [showDeleteOfferModal, setShowDeleteOfferModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
 
-  
-   const handleAccept = (app) => {
+  const handleAccept = (app) => {
     socket.emit("accept_application", {
       app_id: app.app_id,
       candidate_id: app.user_id,
@@ -48,67 +47,56 @@ const EmployerSettings = () => {
 
     setApplications((prev) =>
       prev.map((a) =>
-        a.app_id === app.app_id ? { ...a, status: "zaakceptowana" } : a
-      )
+        a.app_id === app.app_id ? { ...a, status: "zaakceptowana" } : a,
+      ),
     );
   };
 
   const handleReject = (app) => {
-    socket.emit("accept_application", {
+    socket.emit("reject_application", {
       app_id: selectedApp[0],
       candidate_id: selectedApp[1],
       employer_id: userData.id,
     });
 
-
     setApplications((prev) =>
-      console.log(prev)
-      // prev.map((a) =>
-      //   a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
-      // )
+      prev.map((a) =>
+        a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a,
+      ),
     );
-    // setApplications((prev) =>
-    //   prev.map((a) =>
-    //     a.app_id === app.app_id ? { ...a, status: "odrzucono" } : a
-    //   )
-    // );
   };
 
+  useEffect(() => {
+    socket.emit("join_user_room", userData.id);
 
-useEffect(() => {
+    const handleUpdate = (updatedApplications) => {
+      console.log(updatedApplications);
+      setApplications(updatedApplications);
+    };
 
-  socket.emit("join_user_room", userData.id);
+    socket.on("application_updated", handleUpdate);
 
-  const handleUpdate = (updatedApplications) => {
-
-    console.log(updatedApplications)
-    setApplications(updatedApplications)
-  };
-
-  socket.on("application_updated", handleUpdate);
-
-  const fetchApplications = async () => {
-    const res = await axios.post(
-      "http://localhost:5000/api/employers/get-my-applications",
-      { employer_id: userData.id },
-      {
-        headers: {
-          Authorization: `Bearer ${
-            sessionStorage.getItem("token") || localStorage.getItem("token")
-          }`,
+    const fetchApplications = async () => {
+      const res = await axios.post(
+        "http://localhost:5000/api/employers/get-my-applications",
+        { employer_id: userData.id },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              sessionStorage.getItem("token") || localStorage.getItem("token")
+            }`,
+          },
         },
-      }
-    );
-    setApplications(res.data);
-  };
+      );
+      setApplications(res.data);
+    };
 
-  fetchApplications();
-  return () => {
-    socket.off("application_updated", handleUpdate);
-  };
-}, [userData.id]);
+    fetchApplications();
+    return () => {
+      socket.off("application_updated", handleUpdate);
+    };
+  }, [userData.id]);
 
- 
   useEffect(() => {
     axios
       .post(
@@ -149,8 +137,6 @@ useEffect(() => {
       logoFile !== null
     );
   };
-
-
 
   const fetchOffers = () => {
     axios
@@ -343,14 +329,14 @@ useEffect(() => {
       }
     } catch (err) {
       console.error(err);
-       
-  if (err.response && err.response.data && err.response.data.error) {
-    setError(err.response.data.error); 
-    document.querySelector(`.${styles.content}`).scroll(0, 0);
-  } else {
-    setError("Wystąpił nieoczekiwany błąd.");
-    console.error(err);
-  }
+
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+        document.querySelector(`.${styles.content}`).scroll(0, 0);
+      } else {
+        setError("Wystąpił nieoczekiwany błąd.");
+        console.error(err);
+      }
     }
   };
 
@@ -398,7 +384,8 @@ useEffect(() => {
     if (!selectedApp.length) return;
 
     const res = await axios.put(
-      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`, {},
+      `http://localhost:5000/api/employers/revoke-application/${selectedApp[0]}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
@@ -408,7 +395,7 @@ useEffect(() => {
 
     if (res.status == 200) {
       setInfo("Odrzucono aplikacje");
-      handleReject(selectedApp[2])
+      handleReject(selectedApp[2]);
       fetchApplications();
     }
 
@@ -442,9 +429,10 @@ useEffect(() => {
   const acceptApplication = async () => {
     setInfo("");
     if (!selectedApp.length) return;
-    
+
     const res = await axios.put(
-      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`, {},
+      `http://localhost:5000/api/employers/accept-application/${selectedApp[0]}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
@@ -452,7 +440,7 @@ useEffect(() => {
       },
     );
 
-      handleAccept(selectedApp[2])
+    handleAccept(selectedApp[2]);
 
     if (res.status == 200) {
       setInfo("Przyjęto aplikacje");
@@ -843,7 +831,6 @@ useEffect(() => {
                         </span>
 
                         <span className={styles.appActions}>
-
                           {app.cv && (
                             <button
                               onClick={() => window.open(app.cv, "_blank")}
@@ -968,7 +955,12 @@ useEffect(() => {
           </div>
         </div>
       </div>
-       {isSelectedCandidate && <CandidateInfo candidate={isSelectedCandidate} onClose={() => setIsSelectedCandidate(null)} />}
+      {isSelectedCandidate && (
+        <CandidateInfo
+          candidate={isSelectedCandidate}
+          onClose={() => setIsSelectedCandidate(null)}
+        />
+      )}
     </div>
   );
 };
