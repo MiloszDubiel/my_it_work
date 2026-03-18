@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./CandidateSettings.module.css";
 import axios from "axios";
 import { IoMdClose } from "react-icons/io";
 import ConfirmModal from "../PromptModals/ConfirmModal";
 import OfferInfo from "../Offert/OfferInfo";
+
 import { socket } from "../../socket";
 
 const safeJsonParse = (value, fallback = []) => {
@@ -27,6 +28,8 @@ const isUniqueItem = (list, newName = "") => {
 
 const CandidateSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const [showOffer, setShowOffer] = useState(false);
+  const [offer, setOffer] = useState(null);
   const [userData] = useState(
     JSON.parse(sessionStorage.getItem("user-data")) ||
       JSON.parse(localStorage.getItem("user-data")),
@@ -1367,34 +1370,27 @@ const CandidateSettings = () => {
                 {favorites.length === 0 ? (
                   <p>Brak zapisanych ofert.</p>
                 ) : (
-                  favorites.map((offer) => (
+                  favorites.map((o) => (
                     <>
-                      <OfferInfo
-                        offer={offer}
-                        id={offer.id}
-                        is_favorite={true}
-                      />
                       <div
-                        key={offer.id}
+                        key={o.id}
                         className={styles.offerCard}
                         onClick={() => {
-                          document.querySelector(
-                            `.favorite${offer.id}`,
-                          ).style.display = "flex";
+                          setShowOffer(true);
+                          setOffer(o);
                         }}
                       >
-                        {offer.img ? (
-                          <img src={offer.img} alt={offer.title} />
+                        {o.img ? (
+                          <img src={o.img} alt={o.title} />
                         ) : (
                           <div className={styles.logoFallback}>
-                            {offer?.companyName?.charAt(0)?.toUpperCase() ||
-                              "?"}
+                            {o?.companyName?.charAt(0)?.toUpperCase() || "?"}
                           </div>
                         )}
                         <div>
-                          <h4>{offer.title}</h4>
-                          <p>{offer.company_name}</p>
-                          <span>{offer.locations}</span>
+                          <h4>{o.title}</h4>
+                          <p>{o.company_name}</p>
+                          <span>{o.locations}</span>
                         </div>
                       </div>
                     </>
@@ -1405,6 +1401,14 @@ const CandidateSettings = () => {
           </div>
         </div>
       </div>
+      {showOffer && (
+        <OfferInfo
+          offer={offer}
+          id={offer.id}
+          is_favorite={true}
+          onClose={() => setShowOffer(false)}
+        />
+      )}
     </div>
   );
 };

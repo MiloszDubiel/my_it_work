@@ -396,13 +396,15 @@ router.post(
   },
 );
 
-
-router.post("/scrap/stop", authenticateToken,
-  requireRole("admin"),async (req, res) => {
-  await stopScraping(req.app.get("io"));
-  res.json({ message: "Zatrzymywanie..." });
-});
-
+router.post(
+  "/scrap/stop",
+  authenticateToken,
+  requireRole("admin"),
+  async (req, res) => {
+    await stopScraping(req.app.get("io"));
+    res.json({ message: "Zatrzymywanie..." });
+  },
+);
 
 router.get(
   "/scrap/:scrap_when",
@@ -410,8 +412,6 @@ router.get(
   requireRole("admin"),
   async (req, res) => {
     const { scrap_when } = req.params;
-
-
 
     try {
       await connection.query("INSERT INTO scrap_data(date) VALUES(?)", [
@@ -427,13 +427,12 @@ router.get(
         .catch((err) => {
           console.error("Błąd podczas scrapowania:", err);
         });
-
     } catch (error) {
       if (!res.headersSent) {
         res.status(500).json({ error: error.message });
       }
     }
-  }
+  },
 );
 
 router.get(
