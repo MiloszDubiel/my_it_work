@@ -1,0 +1,377 @@
+import { useEffect, useState, useRef } from "react";
+import styles from "./ofertinfo.module.css";
+import { IoMdClose } from "react-icons/io";
+import axios from "axios";
+import LoadingComponent from "../../ui/Loading/LoadingComponent";
+import { BsStar, BsStarFill } from "react-icons/bs";
+import ConfirmModal from "../../ui/PromptModals/ConfirmModal";
+import { useFavorites } from "../../../context/FavoriteContext";
+import { socket } from "../../../socket";
+
+const safeJsonParse = (value, fallback = []) => {
+  if (!value || typeof value !== "string") return fallback;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const OfferInfo = ({ offer, in_company_info, onClose }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedEmployer, setSelectedEmployer] = useState(null);
+  const [__, setLoading] = useState(true);
+  const userData =
+    JSON.parse(sessionStorage.getItem("user-data")) ||
+    JSON.parse(localStorage.getItem("user-data"));
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [_, setShowInfo] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const confirmCallbackRef = useRef(null);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [appliedDate, setAppliedDate] = useState(null);
+
+  const { isFavorite, toggleFavorite, loading } = useFavorites();
+
+  const checkApplication = async () => {
+    if (!userData?.id || !offer?.id) return;
+
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/job-offerts/applications/${userData.id}/${offer.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+          },
+        },
+      );
+      setAlreadyApplied(res.data.applied);
+      setAppliedDate(res.data.applied_at);
+    } catch (err) {
+      console.error("Błąd przy sprawdzaniu aplikacji:", err);
+    }
+  };
+  useEffect(() => {
+    checkApplication();
+  }, [userData?.id, offer?.id]);
+
+  useEffect(() => {
+    window.addEventListener("deleted-application", checkApplication);
+    return () =>
+      window.removeEventListener("deleted-application", checkApplication);
+  }, []);
+
+  const applyToOffer = async () => {
+    if (!userData?.id) {
+      setModalMessage("Musisz być zalogowany, aby aplikować");
+      setShowInfo(true);
+      return;
+    }
+
+    if (alreadyApplied) {
+      setModalMessage(
+        `Już aplikowałeś na tę ofertę: ${new Date(
+          appliedDate,
+        ).toLocaleDateString()}`,
+      );
+      setShowInfo(true);
+      return;
+    }
+
+    setModalMessage("Czy na pewno chcesz aplikować na tę ofertę?");
+    setShowConfirm(true);
+
+    confirmCallbackRef.current = async () => {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/job-offerts/applications",
+          {
+            user_id: userData.id,
+            offer_id: offer.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        socket.emit("application_submitted", {
+          candidate_id: userData.id,
+          company_id: offer.company_id,
+          offer_id: offer.id,
+        });
+        setModalMessage(res.data.message);
+        setShowInfo(true);
+        setAlreadyApplied(true);
+        setAppliedDate(new Date());
+        window.dispatchEvent(new Event("applied"));
+      } catch (err) {
+        setModalMessage("Błąd przy aplikowaniu");
+        setShowInfo(true);
+      }
+    };
+  };
+
+  return (
+    <div id="offer-details-container" className={styles.container}>
+      {showConfirm && (
+        <ConfirmModal
+          message={modalMessage}
+          onConfirm={() => {
+            if (confirmCallbackRef.current) {
+              confirmCallbackRef.current();
+            }
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+      <main className={styles.wrapper} aria-labelledby="job-title">
+        <div className={styles.actionsBar}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            {userData?.role === "candidate" && !loading && (
+              <button
+                onClick={() => toggleFavorite(offer)}
+                className={styles.iconBtn}
+                aria-label="Dodaj do ulubionych"
+              >
+                {!loading && isFavorite(offer.id) ? (
+                  <BsStarFill size={24} className={styles.starFilled} />
+                ) : (
+                  <BsStar size={24} className={styles.starEmpty} />
+                )}
+              </button>
+            )}
+          </div>
+
+          <button className={styles.closeBtn} onClick={onClose}>
+            <IoMdClose />
+          </button>
+        </div>
+
+        <section className={styles.hero}>
+          <div className={styles.headerLeft}>
+            <h1 id="job-title" className={styles.title}>
+              {offer?.title}
+            </h1>
+            <div className={styles.sub}>
+              <div className={styles.company}>
+                <span className={styles.companyName}>
+                  {offer["company-name"]}
+                </span>
+              </div>
+
+              <div className={styles.meta}>
+                Zarobki:
+                {offer?.salary === "not available" ? (
+                  <span className={styles.salary}>Nie podano</span>
+                ) : (
+                  <span className={styles.salary}>
+                    {offer?.salary.includes("PLN")
+                      ? offer?.salary
+                      : offer?.salary + " PLN"}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className={styles.headerRight}>
+            <a href={offer.link} target="_blank" style={{ all: "unset" }}>
+              {offer.source == "scraped" ? (
+                <button className={styles.applyBtn}>
+                  Przejdz do strony z ofertą{" "}
+                </button>
+              ) : userData?.role != "employer" &&
+                userData?.role != "admin" &&
+                !!userData?.role ? (
+                <>
+                  <button className={styles.applyBtn} onClick={applyToOffer}>
+                    {alreadyApplied ? "Już aplikowano" : "Aplikuj"}
+                  </button>
+
+                  {alreadyApplied && appliedDate && (
+                    <p
+                      style={{
+                        marginTop: "5px",
+                        color: "green",
+                        fontSize: "12px",
+                      }}
+                    >
+                      Aplikowano dnia:{" "}
+                      {new Date(appliedDate).toLocaleDateString()}
+                    </p>
+                  )}
+                </>
+              ) : (
+                ""
+              )}
+            </a>
+          </div>{" "}
+        </section>
+
+        <section className={styles.contentGrid}>
+          <article className={styles.leftCol}>
+            <h3 className={styles.sectionTitle}>Wymagane technologie</h3>
+            <ul className={styles.techList}>
+              {safeJsonParse(offer.technologies).length > 0 ? (
+                safeJsonParse(offer.technologies).map((el) => <li>{el}</li>)
+              ) : (
+                <li>Brak podanych technologii</li>
+              )}
+            </ul>
+            {isLoading ? (
+              <LoadingComponent />
+            ) : (
+              <>
+                {offer.source !== "scraped" && <h2>Opis</h2>}
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{
+                    __html: offer.description?.replaceAll("\\n", ""),
+                  }}
+                ></div>
+                {offer.source !== "scraped" && <h2>Wymagania</h2>}
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: offer.requirements }}
+                ></div>
+                {offer.source !== "scraped" && <h2>Benefity</h2>}
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{ __html: offer.benefits }}
+                ></div>
+              </>
+            )}
+          </article>
+
+          <aside
+            className={styles.rightCol}
+            aria-labelledby="company-info-title"
+          >
+            <h3 id="company-info-title" className={styles.sectionTitle}>
+              O firmie
+            </h3>
+            <div className={styles.companyBox}>
+              <div className={styles.companyRow}>
+                <div className={styles.companyLogoSmall}>
+                  {offer.company_img || offer.offer_img ? (
+                    <img
+                      src={offer.company_img || offer.offer_img}
+                      alt="zdjecie"
+                    />
+                  ) : (
+                    <div className={styles.logoFallback}>
+                      {offer?.companyName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className={styles.companyNameSmall}>
+                    {offer?.companyName}
+                  </div>
+                </div>
+              </div>
+
+              {offer.source !== "scraped" && (
+                <div className={styles.compActions}>
+                  {!in_company_info && (
+                    <button
+                      className={styles.compBtn}
+                      onClick={() => setSelectedEmployer(offer.employer_id)}
+                    >
+                      Zobacz profil firmy
+                    </button>
+                  )}
+
+                  {userData?.email && userData?.role !== "employer" && (
+                    <button
+                      className={styles.compBtnOutline}
+                      onClick={async () => {
+                        try {
+                          const user = JSON.parse(
+                            sessionStorage.getItem("user-data") ||
+                              localStorage.getItem("user-data"),
+                          );
+
+                          const res = await axios.post(
+                            "http://localhost:5001/chat/create",
+                            {
+                              employer_id: offer.employer_id,
+                              candidate_id: user.id,
+                            },
+                          );
+
+                          const conversationId = res.data.id;
+
+                          document.querySelector(
+                            "#chatContainer",
+                          ).style.display = "flex";
+
+                          document.querySelector("#root").style.overflow =
+                            "hidden";
+                          window.dispatchEvent(
+                            new CustomEvent("openConversation", {
+                              detail: { conversationId },
+                            }),
+                          );
+                        } catch (err) {
+                          console.error("Błąd uruchamiania wiadomości:", err);
+                        }
+                      }}
+                    >
+                      Wyślij wiadomość
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.quickFacts}>
+              <h4 className={styles.sectionTitle}>Szybkie informacje</h4>
+              <ul>
+                <li>
+                  Typ umowy:
+                  <ul>
+                    {safeJsonParse(offer?.contractType).map((el) => {
+                      return (
+                        <li>
+                          <strong>{el}</strong>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+                <li>
+                  Doświadczenie:
+                  <ul>
+                    {safeJsonParse(offer?.experience).map((el) => {
+                      return (
+                        <li>
+                          <strong>{el}</strong>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+                <li>
+                  Lokalizacja:
+                  <ul>
+                    <li>
+                      <strong>{safeJsonParse(offer.workingMode)}</strong>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default OfferInfo;

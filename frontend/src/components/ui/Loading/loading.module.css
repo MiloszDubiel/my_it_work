@@ -1,0 +1,20 @@
+.loader {
+  top: 100px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.loaderAnimation {
+  width: 20px;
+  height: 20px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid rgb(121, 121, 121);
+  border-right-color: #3b82f6;
+  animation: l2 1s infinite linear;
+}
+@keyframes l2 {
+  to {
+    transform: rotate(1turn);
+  }
+}

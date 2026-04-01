@@ -1,0 +1,214 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import styles from "./employers.module.css";
+import SortButton, { Sort } from "../ui/SortButton/SortButton";
+import Navbar from "../NavBar/NavBar";
+import Filter from "../layout/Offert/Filter/Filter";
+import EmployerInfo from "./EmployerInfo";
+
+const OFFERS_PER_PAGE = 9;
+
+const EmployersComponent = () => {
+  const [offers, setOffers] = useState([]);
+  const [sortedOffers, setSortedOffers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedEmployer, setSelectedEmployer] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchOffers = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/employers",
+          {
+            timeout: 10000,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token") || localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        if (isMounted) {
+          const data = Array.isArray(res.data) ? res.data : [];
+          setOffers(data);
+          setSortedOffers(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError("Nie udało się pobrać ofert.");
+          console.error("Błąd podczas pobierania ofert:", err);
+        }
+      } finally {
+        isMounted && setLoading(false);
+      }
+    };
+
+    fetchOffers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleSortChange = () => {
+      const type = sessionStorage.getItem("sort-option");
+      setSortedOffers((prev) => Sort([...prev], type));
+      setCurrentPage(1);
+    };
+
+    window.addEventListener("changed-sort-option", handleSortChange);
+
+    return () => {
+      window.removeEventListener("changed-sort-option", handleSortChange);
+    };
+  }, []);
+
+  const totalPages = useMemo(
+    () => Math.ceil(sortedOffers.length / OFFERS_PER_PAGE),
+    [sortedOffers],
+  );
+
+  const currentOffers = useMemo(() => {
+    const start = (currentPage - 1) * OFFERS_PER_PAGE;
+    return sortedOffers.slice(start, start + OFFERS_PER_PAGE);
+  }, [sortedOffers, currentPage]);
+
+  const handleNext = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrev = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  return (
+    <>
+      <Navbar />
+      <Filter employersPage />
+
+      <div className={styles.container}>
+        <h1>Pracodawcy</h1>
+        <div className={styles.wrapper}>
+          <div className={styles.selectWrapper}>
+            <select className={styles.select}>
+              <option value="default" defaultValue="default">
+                Domyślnie
+              </option>
+
+              <option value="name-a-z">Nazwa firmy A-Z</option>
+              <option value="name-z-a">Nazwa firmy Z-A</option>
+            </select>
+            <span className={styles.chev} aria-hidden="true">
+              ▾
+            </span>
+          </div>
+        </div>
+
+        {loading && <p>Ładowanie ofert…</p>}
+        {error && <p className={styles.noOffers}>{error}</p>}
+
+        {!loading && !error && (
+          <div className={styles.offersList}>
+            {currentOffers.length > 0 ? (
+              currentOffers.map((offer) => {
+                return (
+                  <>
+                    <div
+                      className={styles.offerRow}
+                      key={offer.id || offer._id}
+                    >
+                      <div className={styles.logoSection}>
+                        {offer.img ? (
+                          <img
+                            src={offer.img}
+                            alt={offer.companyName || "Firma"}
+                            className={styles.companyImg}
+                          />
+                        ) : (
+                          <div className={styles.logoFallback}>
+                            {offer?.companyName?.charAt(0)?.toUpperCase() ||
+                              "?"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className={styles.infoSection}>
+                        <h3>{offer.companyName}</h3>
+                        <p className={styles.company}>{offer.link}</p>
+
+                        {offer.location && (
+                          <p className={styles.location}>{offer.location}</p>
+                        )}
+
+                        <div className={styles.tags}>
+                          <span className={styles.tag}>
+                            {"Kontakt: " +
+                              offer.email +
+                              ", " +
+                              offer.phone_number}
+                          </span>
+                          <span className={styles.tag}>
+                            {"NIP: " + offer.nip}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div
+                        className={styles.actions + " " + styles.detailsBtn}
+                        onClick={() => setSelectedEmployer(offer)}
+                      >
+                        Szczegóły
+                      </div>
+                    </div>
+                  </>
+                );
+              })
+            ) : (
+              <p className={styles.noOffers}>Brak dostępnych firm.</p>
+            )}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              onClick={handlePrev}
+              disabled={currentPage === 1}
+              className={styles.pageBtn}
+            >
+              ‹
+            </button>
+            <span style={{ fontSize: 12 }}>
+              Strona {currentPage} z {totalPages}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className={styles.pageBtn}
+            >
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+
+      {selectedEmployer && (
+        <EmployerInfo
+          companyOwner={selectedEmployer.owner_id}
+          onClose={() => setSelectedEmployer(null)}
+        />
+      )}
+    </>
+  );
+};
+
+export default EmployersComponent;

@@ -1,0 +1,165 @@
+.container {
+  font-family: "Inter", sans-serif;
+  color: #111827;
+  background: #f9fafb;
+  padding: 0px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+* {
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #1e3a8a;
+  padding-top: 50px;
+}
+
+.candidateList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  max-width: 1920px;
+  width: 80%;
+}
+
+.offerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 5px;
+  width: 80%;
+  height: 100px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.offerRow:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logoSection {
+  flex: 0 0 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.companyImg {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  margin-left: 10px;
+  gap: 5px;
+  height: 100%;
+}
+
+.infoSection h3 {
+  font-size: 1.2rem;
+  color: #1e3a8a;
+  margin-bottom: 0.2rem;
+  font-size: 14px;
+}
+
+.company {
+  color: #374151;
+  font-size: 12px;
+}
+.item {
+  color: #374151;
+  font-size: 12px;
+}
+
+.location {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.technologies,
+.locations {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 50%;
+}
+
+.tag {
+  background: #e0e7ff;
+  color: #1e3a8a;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 5px;
+}
+
+.actions {
+  flex: 0 0 150px;
+  display: flex;
+  justify-content: center;
+}
+
+.detailsBtn {
+  background: #3b82f6;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.detailsBtn:hover {
+  background: #2563eb;
+}
+
+.noOffers {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.pagination {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pageBtn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 20px;
+}
+
+.pageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: #2563eb;
+}

@@ -1,0 +1,92 @@
+.modalBackground {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  width: 400px;
+  max-height: 80vh; /* maksymalnie 80% wysokości okna */
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto; /* scroll jeśli treść większa niż 80% ekranu */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2); /* lekki cień dla efektu */
+}
+
+/* scroll w nowoczesny sposób (opcjonalnie) */
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  resize: vertical; /* użytkownik może zmieniać wysokość */
+  min-height: 100px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.cancelBtn {
+  background: #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.saveBtn {
+  background: #007bff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.saveBtn:hover {
+  background: #0065d4;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.info {
+  color: green;
+  font-size: 12px;
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
